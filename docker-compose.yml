@@ -28,7 +28,7 @@ services:
     container_name: modulocrud_backend
     restart: always
     ports:
-      - "127.0.0.1:3001:3000"  # Puerto 3001 en host → 3000 interno (evita conflicto en VPS compartido)
+      - "127.0.0.1:8894:3000"  # Puerto 8894 host → 3000 interno (8893=frontend, 8894=backend)
     environment:
       - DB_HOST=db
       - DB_USER=${DB_USER}
