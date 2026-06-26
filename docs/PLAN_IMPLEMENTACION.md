@@ -35,15 +35,17 @@ Este documento describe la hoja de ruta para la construcción del Módulo CRUD, 
   - Endpoint especial `/api/sync` para recibir lotes de datos offline.
 
 ### Fase 3: Desarrollo Frontend (PWA) y Offline-First
-- [ ] **Configuración Local (Dexie.js):**
-  - Replicar el modelo relacional (Personas, Contactos, Encuestas) en IndexedDB.
-- [ ] **Interfaz de Usuario (UI):**
-  - Formularios con React Hook Form.
-  - Lógica de rotación de contactos: Al agregar uno nuevo, reasignar prioridad a los anteriores localmente.
-- [ ] **Configuración PWA:**
-  - Instalar plugin `vite-plugin-pwa`.
-  - Configurar el Web Manifest (Iconos, colores, nombre).
-  - Service Worker para cachear assets (que la app abra sin internet).
+- [x] **Configuración Local (Dexie.js):**
+  - Esquema de tablas en `src/db/schema.js`.
+  - Repositories: `personaRepository.js` (con transacciones), `contactoRepository.js` (rotación).
+- [x] **Interfaz de Usuario (UI):**
+  - `PersonaForm.jsx`: Formulario con React Hook Form + Zod.
+  - `PersonaList.jsx`: Lista reactiva con `useLiveQuery` de Dexie.
+  - Indicador visual de red: `NetworkStatus.jsx`.
+- [x] **Configuración PWA:**
+  - Plugin `vite-plugin-pwa` instalado y configurado en `vite.config.js`.
+  - Web Manifest con nombre, colores, iconos y modo standalone.
+  - Service Worker configurado con Workbox.
 
 ### Fase 4: Sincronización (Capa de Conectividad)
 - [ ] **Background Sync:**

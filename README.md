@@ -6,7 +6,9 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 
 | Documento | Descripción |
 |-----------|-------------|
-| 📋 [Plan de Implementación](docs/PLAN_IMPLEMENTACION.md) | Detalle de las fases del proyecto, stack tecnológico y arquitectura de sincronización |
+| 📋 [Plan de Implementación](docs/PLAN_IMPLEMENTACION.md) | Fases del proyecto, stack tecnológico y arquitectura de sincronización |
+| 📖 [Documentación Técnica](docs/documentacion-tecnica.md) | Arquitectura de carpetas, endpoints API, flujo offline-first y guía de despliegue VPS |
+| 📋 [Especificación de Requisitos](docs/Especificacion_Requisitos.md) | Objetivos, RNF, modelo de datos y justificaciones de decisiones de diseño |
 
 ---
 
