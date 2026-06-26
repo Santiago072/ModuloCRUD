@@ -1,51 +1,65 @@
 import db from '../schema';
 
-/**
- * Repository de Personas: Abstrae todas las operaciones de IndexedDB.
- * La capa de componentes React NUNCA llama a db directamente, siempre usa este repo.
- */
 export const PersonaRepository = {
-
-  /** Obtener todas las personas ordenadas por fecha de creación */
   getAll: () => db.personas.orderBy('id').reverse().toArray(),
-
-  /** Obtener una persona por su ID interno */
   getById: (id) => db.personas.get(id),
-
-  /** Obtener una persona por su Cédula */
   getByCc: (cc) => db.personas.where('cc').equals(cc).first(),
 
-  /**
-   * Crear una persona junto con su primer contacto (transacción atómica).
-   * Replica la lógica de personaController.js del backend, pero en local.
-   */
-  create: async ({ cc, nombres, apellidos, fecha_registro, profesion, contacto }) => {
+  /** Crea persona con hasta 3 contactos iniciales en una transacción atómica */
+  create: async ({ cc, nombres, apellidos, fecha_registro, profesion, contactos = [] }) => {
     const now = new Date().toISOString();
     return db.transaction('rw', db.personas, db.contactos, async () => {
       const personaId = await db.personas.add({
-        cc, nombres, apellidos, fecha_registro, profesion,
+        cc, nombres, apellidos, fecha_registro,
+        profesion: profesion || '',
         sync_status: 'local',
         created_at: now,
         updated_at: now,
       });
-
-      if (contacto?.valor) {
-        await db.contactos.add({
-          persona_id: personaId,
-          tipo: contacto.tipo || 'celular',
-          valor: contacto.valor,
-          prioridad: 1,
-          activo: true,
-          created_at: now,
-        });
+      // Insertar contactos iniciales con sus prioridades (1, 2, 3)
+      for (let i = 0; i < contactos.length; i++) {
+        const c = contactos[i];
+        if (c?.valor?.trim()) {
+          await db.contactos.add({
+            persona_id: personaId,
+            tipo: c.tipo || 'celular',
+            valor: c.valor.trim(),
+            prioridad: i + 1,
+            activo: true,
+            created_at: now,
+          });
+        }
       }
       return personaId;
     });
   },
 
-  /** Obtener todos los registros pendientes de sincronizar con el servidor */
-  getPendingSync: () => db.personas.where('sync_status').equals('local').toArray(),
+  /** Actualiza los datos de una persona */
+  update: async (id, data) => {
+    const now = new Date().toISOString();
+    return db.personas.update(id, { ...data, sync_status: 'local', updated_at: now });
+  },
 
-  /** Marcar un registro como sincronizado tras confirmar con el backend */
+  /** Elimina la persona y todos sus contactos (CASCADE local) */
+  remove: async (id) => {
+    return db.transaction('rw', db.personas, db.contactos, db.encuestas, async () => {
+      await db.contactos.where('persona_id').equals(id).delete();
+      await db.encuestas.where('persona_id').equals(id).delete();
+      await db.personas.delete(id);
+    });
+  },
+
+  /** Obtiene una persona con sus contactos activos ordenados por prioridad */
+  getWithContacts: async (id) => {
+    const persona = await db.personas.get(id);
+    if (!persona) return null;
+    const contactos = await db.contactos
+      .where('persona_id').equals(id)
+      .and(c => c.activo === true)
+      .sortBy('prioridad');
+    return { ...persona, contactos };
+  },
+
+  getPendingSync: () => db.personas.where('sync_status').equals('local').toArray(),
   markAsSynced: (id) => db.personas.update(id, { sync_status: 'synced', updated_at: new Date().toISOString() }),
 };

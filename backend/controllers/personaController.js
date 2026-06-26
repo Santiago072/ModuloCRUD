@@ -10,37 +10,70 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// Crear una nueva persona y su contacto principal (Transacción)
+// Crear una nueva persona con hasta 3 contactos (Transacción)
 exports.create = async (req, res) => {
-  const { cc, nombres, apellidos, fecha_registro, profesion, contacto } = req.body;
+  const { cc, nombres, apellidos, fecha_registro, profesion, contactos = [] } = req.body;
   const connection = await pool.getConnection();
-  
+
   try {
-    // Iniciamos transacción para asegurar que se guarda la persona Y su contacto, o nada.
     await connection.beginTransaction();
 
-    // 1. Insertar persona
     const [personResult] = await connection.query(
       'INSERT INTO personas (cc, nombres, apellidos, fecha_registro, profesion) VALUES (?, ?, ?, ?, ?)',
       [cc, nombres, apellidos, fecha_registro, profesion]
     );
     const personaId = personResult.insertId;
 
-    // 2. Si viene un contacto principal, lo insertamos con prioridad 1
-    if (contacto && contacto.valor) {
-      await connection.query(
-        'INSERT INTO contactos (persona_id, tipo, valor, prioridad) VALUES (?, ?, ?, ?)',
-        [personaId, contacto.tipo || 'celular', contacto.valor, 1]
-      );
+    // Insertar hasta 3 contactos con sus prioridades
+    for (let i = 0; i < contactos.length; i++) {
+      const c = contactos[i];
+      if (c?.valor?.trim()) {
+        await connection.query(
+          'INSERT INTO contactos (persona_id, tipo, valor, prioridad) VALUES (?, ?, ?, ?)',
+          [personaId, c.tipo || 'celular', c.valor.trim(), i + 1]
+        );
+      }
     }
 
-    // Confirmamos la transacción
     await connection.commit();
     res.status(201).json({ status: 'success', message: 'Persona creada exitosamente', id: personaId });
   } catch (error) {
-    // Si hay error (ej. Cédula duplicada), revertimos todo
     await connection.rollback();
     res.status(400).json({ status: 'error', message: error.message });
+  } finally {
+    connection.release();
+  }
+};
+
+/** Actualizar datos de una persona */
+exports.update = async (req, res) => {
+  const { id } = req.params;
+  const { nombres, apellidos, profesion, fecha_registro } = req.body;
+  try {
+    await pool.query(
+      'UPDATE personas SET nombres=?, apellidos=?, profesion=?, fecha_registro=?, updated_at=NOW() WHERE id=?',
+      [nombres, apellidos, profesion, fecha_registro, id]
+    );
+    res.json({ status: 'success', message: 'Persona actualizada.' });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+/** Eliminar una persona y sus registros relacionados */
+exports.remove = async (req, res) => {
+  const { id } = req.params;
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    await connection.query('DELETE FROM contactos WHERE persona_id = ?', [id]);
+    await connection.query('DELETE FROM encuestas WHERE persona_id = ?', [id]);
+    await connection.query('DELETE FROM personas WHERE id = ?', [id]);
+    await connection.commit();
+    res.json({ status: 'success', message: 'Persona eliminada.' });
+  } catch (error) {
+    await connection.rollback();
+    res.status(500).json({ status: 'error', message: error.message });
   } finally {
     connection.release();
   }

@@ -18,6 +18,8 @@ router.get('/status', async (req, res) => {
 // 2. Endpoints CRUD para Personas
 router.get('/personas', personaController.getAll);
 router.post('/personas', personaController.create);
+router.put('/personas/:id', personaController.update);
+router.delete('/personas/:id', personaController.remove);
 
 // 3. Endpoints para Contactos (Lógica de rotación)
 const contactoController = require('../controllers/contactoController');
