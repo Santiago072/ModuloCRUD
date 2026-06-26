@@ -20,8 +20,9 @@ Este documento describe la hoja de ruta para la construcción del Módulo CRUD, 
 - [x] Definición de arquitectura (PWA Offline-First + API Node.js).
 - [x] Configuración de subdominio (`modulocrud.slscode.online`).
 - [x] Creación de documentación base y repositorio.
-- [ ] Inicializar proyecto Frontend (React + Vite).
-- [ ] Inicializar proyecto Backend (Node.js + Express).
+- [x] Inicializar proyecto Frontend (React + Vite).
+- [x] Inicializar proyecto Backend (Node.js + Express).
+- [x] Configuración de Docker (docker-compose, Dockerfiles y deploy.sh).
 
 ### Fase 2: Diseño de Base de Datos y Backend (API)
 - [ ] **Modelado BD Central (MySQL/PG):**

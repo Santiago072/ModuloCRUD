@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: modulocrud_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_DATABASE: ${DB_NAME:-modulocrud}
+      MYSQL_USER: ${DB_USER:-crud_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - crud_network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: modulocrud_backend
+    restart: always
+    ports:
+      - "3000:3000" # Expuesto al host para que Nginx nativo lo tome
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER:-crud_user}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - DB_NAME=${DB_NAME:-modulocrud}
+      - PORT=3000
+    depends_on:
+      - db
+    networks:
+      - crud_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: modulocrud_frontend
+    restart: always
+    ports:
+      - "8080:80" # Expuesto al host para la PWA
+    networks:
+      - crud_network
+
+volumes:
+  db_data:
+
+networks:
+  crud_network:
+    driver: bridge
