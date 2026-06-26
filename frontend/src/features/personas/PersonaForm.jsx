@@ -4,18 +4,18 @@ import { personaSchema } from '../../utils/validationSchemas';
 import { usePersonaStore } from '../../store/usePersonaStore';
 import { PersonaRepository } from '../../db/repositories/personaRepository';
 import { ContactoRepository } from '../../db/repositories/contactoRepository';
-import { X, Search } from 'lucide-react';
+import { X, Search, Phone } from 'lucide-react';
 import { useState } from 'react';
 
+const prioridadLabel = (n) => ['Principal', 'C2', 'C3'][n - 1] ?? `C${n}`;
+
 export function PersonaForm({ onSuccess, onCancel }) {
-  const { createPersona, updatePersona, loading } = usePersonaStore();
-  const [existingPersona, setExistingPersona] = useState(null); // Si la CC ya existe
+  const { createPersona, updatePersona, addContacto, loading } = usePersonaStore();
+  const [existingPersona, setExistingPersona] = useState(null);
+  const [existingContactos, setExistingContactos] = useState([]);
 
   const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
+    register, handleSubmit, reset, setValue,
     formState: { errors },
   } = useForm({ resolver: zodResolver(personaSchema) });
 
@@ -24,10 +24,10 @@ export function PersonaForm({ onSuccess, onCancel }) {
       errors[field] ? 'border-red-400 bg-red-50' : 'border-gray-300'
     }`;
 
-  // Autocompletar si la CC ya existe en IndexedDB
+  // Autocompletar al salir del campo CC
   const handleCcBlur = async (e) => {
     const cc = e.target.value.trim();
-    if (cc.length < 6) return;
+    if (cc.length < 6) { setExistingPersona(null); setExistingContactos([]); return; }
 
     const existing = await PersonaRepository.getByCc(cc);
     if (existing) {
@@ -36,68 +36,68 @@ export function PersonaForm({ onSuccess, onCancel }) {
       setValue('profesion', existing.profesion || '');
       setValue('fecha_registro', existing.fecha_registro);
 
-      // Cargar contactos existentes
       const contactos = await ContactoRepository.getByPersona(existing.id);
-      if (contactos[0]) setValue('contacto_1', contactos[0].valor);
-      if (contactos[1]) setValue('contacto_2', contactos[1].valor);
-      if (contactos[2]) setValue('contacto_3', contactos[2].valor);
-
+      setExistingContactos(contactos);
       setExistingPersona(existing);
     } else {
       setExistingPersona(null);
+      setExistingContactos([]);
     }
   };
 
   const onSubmit = async (data) => {
     try {
-      const contactos = [
-        data.contacto_1 ? { tipo: 'celular', valor: data.contacto_1 } : null,
-        data.contacto_2 ? { tipo: 'celular', valor: data.contacto_2 } : null,
-        data.contacto_3 ? { tipo: 'celular', valor: data.contacto_3 } : null,
-      ].filter(Boolean);
-
       if (existingPersona) {
-        // Actualizar la persona existente y agregar nuevo contacto si aplica
+        // Actualizar persona existente
         await updatePersona(existingPersona.id, {
           nombres: data.nombres,
           apellidos: data.apellidos,
           profesion: data.profesion || '',
           fecha_registro: data.fecha_registro,
         });
-        if (data.contacto_1) {
-          await usePersonaStore.getState().addContacto(existingPersona.id, 'celular', data.contacto_1);
+        // Si ingresó un nuevo número, aplicar rotación
+        if (data.nuevo_contacto?.trim()) {
+          await addContacto(existingPersona.id, 'celular', data.nuevo_contacto.trim());
         }
       } else {
-        await createPersona({ ...data, contactos });
+        // Crear nueva persona — el único número del formulario va como Contacto 1
+        await createPersona({
+          cc: data.cc,
+          nombres: data.nombres,
+          apellidos: data.apellidos,
+          fecha_registro: data.fecha_registro,
+          profesion: data.profesion || '',
+          contactos: data.nuevo_contacto?.trim()
+            ? [{ tipo: 'celular', valor: data.nuevo_contacto.trim() }]
+            : [],
+        });
       }
       reset();
       setExistingPersona(null);
+      setExistingContactos([]);
       onSuccess?.();
-    } catch (err) {
-      // El store ya setea el error
-    }
+    } catch (err) { /* El store ya gestiona el error */ }
   };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
       <div className="flex justify-between items-center mb-5">
         <h3 className="font-semibold text-gray-800 text-base">Datos de la persona encuestada</h3>
-        {onCancel && (
-          <button onClick={onCancel} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
-        )}
+        {onCancel && <button onClick={onCancel} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>}
       </div>
 
+      {/* Aviso si la CC ya existe */}
       {existingPersona && (
-        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
-          <Search size={15} className="text-amber-600 flex-shrink-0" />
+        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+          <Search size={15} className="text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700">
-            <span className="font-semibold">CC encontrada.</span> Se actualizará el registro existente. Si ingresas un nuevo contacto, se rotará al primer lugar.
+            <span className="font-semibold">CC encontrada.</span> Los campos se han rellenado automáticamente. Si ingresas un nuevo número, se agregará como contacto principal y los anteriores rotarán.
           </p>
         </div>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* CC con autocompletado */}
+        {/* CC */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Cédula (CC) *</label>
           <input
@@ -105,7 +105,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
             {...register('cc')}
             onBlur={handleCcBlur}
             className={inputClass('cc')}
-            placeholder="Ingresa la CC y espera para autocompletar"
+            placeholder="Ingresa la CC — si existe, se autocompleta"
           />
           {errors.cc && <p className="text-red-500 text-xs mt-1">{errors.cc.message}</p>}
         </div>
@@ -135,24 +135,37 @@ export function PersonaForm({ onSuccess, onCancel }) {
           </div>
         </div>
 
-        {/* Contactos — solo número */}
-        <div className="border-t border-gray-100 pt-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Números de contacto</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {[1, 2, 3].map(n => (
-              <div key={n}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Contacto {n} {n === 1 && <span className="text-indigo-500">(principal)</span>}
-                </label>
-                <input
-                  type="tel"
-                  {...register(`contacto_${n}`)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Número"
-                />
-              </div>
-            ))}
+        {/* Sección de Contacto */}
+        <div className="border-t border-gray-100 pt-4 space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {existingPersona ? 'Nuevo número de contacto (opcional — aplica rotación)' : 'Número de contacto principal'}
+            </label>
+            <input
+              type="tel"
+              {...register('nuevo_contacto')}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Ej. 3001234567"
+            />
           </div>
+
+          {/* Contactos actuales (solo cuando la CC ya existe) */}
+          {existingContactos.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Contactos actuales</p>
+              <div className="space-y-1.5">
+                {existingContactos.map(c => (
+                  <div key={c.id} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border text-sm ${c.prioridad === 1 ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-100'}`}>
+                    <Phone size={13} className={c.prioridad === 1 ? 'text-indigo-500' : 'text-gray-400'} />
+                    <span className="font-medium text-gray-700 flex-1">{c.valor}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.prioridad === 1 ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'}`}>
+                      {prioridadLabel(c.prioridad)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
