@@ -25,13 +25,13 @@ Este documento describe la hoja de ruta para la construcción del Módulo CRUD, 
 - [x] Configuración de Docker (docker-compose, Dockerfiles y deploy.sh).
 
 ### Fase 2: Diseño de Base de Datos y Backend (API)
-- [ ] **Modelado BD Central (MySQL/PG):**
+- [x] **Modelado BD Central (MySQL/PG):**
   - Crear tabla `personas` (id, cc, nombres, apellidos, profesion...).
   - Crear tabla `contactos` (1:N, reemplazando las columnas fijas para rotación dinámica).
   - Crear tabla `encuestas` (1:N).
-- [ ] **Desarrollo API REST (Node.js):**
+- [x] **Desarrollo API REST (Node.js):**
   - Configurar conexión a BD.
-  - Endpoints CRUD para encuestas.
+  - Endpoints CRUD para encuestas/personas.
   - Endpoint especial `/api/sync` para recibir lotes de datos offline.
 
 ### Fase 3: Desarrollo Frontend (PWA) y Offline-First
