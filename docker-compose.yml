@@ -28,13 +28,13 @@ services:
     container_name: modulocrud_backend
     restart: always
     ports:
-      - "127.0.0.1:3000:3000"  # Solo accesible por Nginx en el host, no expuesto a internet
+      - "127.0.0.1:3001:3000"  # Puerto 3001 en host → 3000 interno (evita conflicto en VPS compartido)
     environment:
       - DB_HOST=db
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
-      - PORT=3000
+      - PORT=3000  # Puerto interno del contenedor Node.js (sin cambios)
     depends_on:
       db:
         condition: service_healthy
