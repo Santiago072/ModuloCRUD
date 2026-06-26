@@ -48,17 +48,19 @@ Este documento describe la hoja de ruta para la construcción del Módulo CRUD, 
   - Service Worker configurado con Workbox.
 
 ### Fase 4: Sincronización (Capa de Conectividad)
-- [ ] **Background Sync:**
-  - Detectar estado de red (`navigator.onLine`).
-  - Lógica: "Guardar en Dexie.js -> ¿Hay internet? -> Enviar a Node.js API -> Marcar como sincronizado".
-  - Manejo de conflictos (Integridad de datos por fechas de modificación).
+- [x] **Background Sync:**
+  - Hook `useNetworkStatus.js` detecta `navigator.onLine` en tiempo real.
+  - Hook `useSyncManager.js`: Guarda en Dexie → detecta internet → POST `/api/sync` → `markAsSynced()`.
+  - Campo `sync_status` ('local'/'synced'/'conflict') garantiza integridad y detección de conflictos.
 - [ ] **Exportación de Datos:**
-  - Integrar librería (ej. SheetJS) para exportar a CSV/Excel desde la web.
+  - Pendiente: integrar SheetJS para exportar a CSV/Excel.
 
 ### Fase 5: Despliegue y Empaquetado Android
-- [ ] **VPS:**
-  - Clonar repositorio en VPS.
-  - Configurar PM2 para correr el backend Node.js en el puerto 3000.
-  - Configurar Nginx para exponer el puerto 3000 hacia `modulocrud.slscode.online` con HTTPS.
+- [x] **VPS (Docker + Nginx):**
+  - `docker-compose.yml` orquesta 3 contenedores: `db`, `backend`, `frontend`.
+  - `.env.example` con todas las variables de entorno requeridas.
+  - `deploy.sh` mejorado: valida `.env`, reconstruye y muestra estado de contenedores.
+  - `nginx/modulocrud.conf`: Proxy inverso — Frontend en puerto 8893, API en 3000.
+  - Documentación completa en `docs/DESPLIEGUE_VPS.md` (primer deploy, actualizaciones, diagnóstico).
 - [ ] **Android APK:**
-  - Usar Bubblewrap para convertir la PWA alojada en tu VPS en un instalable `.apk`.
+  - Pendiente: usar Bubblewrap para convertir la PWA a `.apk` instalable.
