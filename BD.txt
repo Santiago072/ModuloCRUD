@@ -1,0 +1,38 @@
+-- Script SQL inicial para el Servidor VPS (MySQL/MariaDB)
+
+CREATE DATABASE IF NOT EXISTS modulocrud CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE modulocrud;
+
+CREATE TABLE personas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cc VARCHAR(50) UNIQUE NOT NULL,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    fecha_registro DATE NOT NULL,
+    profesion VARCHAR(100) DEFAULT NULL,
+    sync_status ENUM('local', 'synced', 'conflict') DEFAULT 'synced',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE contactos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    persona_id INT NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    valor VARCHAR(100) NOT NULL,
+    prioridad INT NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (persona_id) REFERENCES personas(id) ON DELETE CASCADE
+);
+
+CREATE TABLE encuestas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    persona_id INT NOT NULL,
+    fecha DATE NOT NULL,
+    encuestador VARCHAR(100) NOT NULL,
+    notas TEXT DEFAULT NULL,
+    sync_status ENUM('local', 'synced', 'conflict') DEFAULT 'synced',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (persona_id) REFERENCES personas(id) ON DELETE CASCADE
+);

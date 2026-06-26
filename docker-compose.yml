@@ -41,7 +41,7 @@ services:
     container_name: modulocrud_frontend
     restart: always
     ports:
-      - "8080:80" # Expuesto al host para la PWA
+      - "8893:80" # Expuesto al host para la PWA (Puerto solicitado)
     networks:
       - crud_network
 
