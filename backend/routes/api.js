@@ -28,5 +28,6 @@ router.post('/contactos', contactoController.addContacto);
 // 4. Endpoint Core: Sincronización PWA (Offline-First)
 const syncController = require('../controllers/syncController');
 router.post('/sync', syncController.syncOfflineData);
+router.get('/sync', syncController.pullData); // Nuevo: Descargar BD al cliente
 
 module.exports = router;

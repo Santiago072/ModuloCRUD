@@ -60,6 +60,46 @@ export const PersonaRepository = {
     return { ...persona, contactos };
   },
 
-  getPendingSync: () => db.personas.where('sync_status').equals('local').toArray(),
+  getPendingSync: async () => {
+    const personas = await db.personas.where('sync_status').equals('local').toArray();
+    for (let p of personas) {
+      p.contactos = await db.contactos.where('persona_id').equals(p.id).toArray();
+    }
+    return personas;
+  },
+
   markAsSynced: (id) => db.personas.update(id, { sync_status: 'synced', updated_at: new Date().toISOString() }),
+
+  /** Sincronización desde el servidor (Pull) */
+  syncFromServer: async (serverPersonas, serverContactos) => {
+    return db.transaction('rw', db.personas, db.contactos, async () => {
+      // 1. Guardar o actualizar personas
+      for (const sp of serverPersonas) {
+        const local = await db.personas.where('cc').equals(sp.cc).first();
+        if (local) {
+          // Actualizamos solo si es más reciente
+          if (new Date(sp.updated_at) > new Date(local.updated_at)) {
+            await db.personas.update(local.id, { ...sp, id: local.id, sync_status: 'synced' });
+          }
+        } else {
+          // No podemos usar el ID del servidor directamente porque Dexie usa AutoIncrement local.
+          // Pero podemos guardarla, y Dexie le asignará un ID local.
+          // Para mantener el enlace con los contactos, guardaremos el server_id original en el contacto.
+          // Mejor: Si usamos el ID del servidor, forzamos que el ID local sea el mismo (peligroso si hay colisión).
+          // La forma más fácil: ignorar el ID local autoincremental si viene del servidor, o forzarlo.
+          // Como la CC es única, usamos la CC como clave lógica.
+          
+          await db.personas.put({ ...sp, sync_status: 'synced' });
+        }
+      }
+
+      // 2. Limpiar y recrear contactos del servidor para evitar desajustes
+      if (serverContactos && serverContactos.length > 0) {
+        await db.contactos.clear();
+        for (const sc of serverContactos) {
+          await db.contactos.put(sc);
+        }
+      }
+    });
+  }
 };
