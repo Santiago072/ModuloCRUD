@@ -48,15 +48,13 @@ exports.syncOfflineData = async (req, res) => {
             [p.nombres, p.apellidos, p.profesion, p.fecha_registro, personaId]
           );
         } else {
-          // Si no existe, usamos el ID que venga o dejamos que MySQL auto-incremente.
-          // Recomendado: dejar que MySQL auto-incremente o forzar el ID si coinciden.
-          // Usaremos el mismo ID de Dexie para simplificar la consistencia (si no choca).
-          // Pero es más seguro dejar el autoincrement.
+          // Si no existe, dejamos que MySQL asigne el ID autoincremental para evitar conflictos
+          // de claves primarias si el cliente vació su caché (su Dexie ID se reinicia a 1).
           const [result] = await connection.query(
-            'INSERT INTO personas (id, cc, nombres, apellidos, fecha_registro, profesion) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE nombres=VALUES(nombres), apellidos=VALUES(apellidos), profesion=VALUES(profesion), fecha_registro=VALUES(fecha_registro)',
-            [p.id, p.cc, p.nombres, p.apellidos, p.fecha_registro, p.profesion]
+            'INSERT INTO personas (cc, nombres, apellidos, fecha_registro, profesion) VALUES (?, ?, ?, ?, ?)',
+            [p.cc, p.nombres, p.apellidos, p.fecha_registro, p.profesion]
           );
-          personaId = p.id;
+          personaId = result.insertId;
         }
 
         // 2. Reemplazar contactos para esa persona

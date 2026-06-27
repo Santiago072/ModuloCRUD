@@ -28,6 +28,11 @@ export const syncData = async () => {
     });
 
     if (pushRes.ok) {
+      const responseBody = await pushRes.json();
+      if (responseBody.stats && responseBody.stats.errors > 0) {
+        throw new Error(`El servidor reportó ${responseBody.stats.errors} errores al sincronizar.`);
+      }
+
       for (const p of pendientes) {
         await PersonaRepository.markAsSynced(p.id);
       }
