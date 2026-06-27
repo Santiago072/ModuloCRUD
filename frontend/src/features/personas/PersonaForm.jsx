@@ -24,8 +24,8 @@ export function PersonaForm({ onSuccess, onCancel }) {
       errors[field] ? 'border-red-400 bg-red-50' : 'border-gray-300'
     }`;
 
-  // Autocompletar al salir del campo CC
-  const handleCcBlur = async (e) => {
+  // Autocompletar mientras se escribe la CC
+  const handleCcChange = async (e) => {
     const cc = e.target.value.trim();
     if (cc.length < 6) { setExistingPersona(null); setExistingContactos([]); return; }
 
@@ -40,8 +40,12 @@ export function PersonaForm({ onSuccess, onCancel }) {
       setExistingContactos(contactos);
       setExistingPersona(existing);
     } else {
-      setExistingPersona(null);
-      setExistingContactos([]);
+      // Si la CC tenía más de 6 dígitos pero no se encontró, limpiamos los datos autocompletados
+      // pero SOLO si había un existingPersona previo para no borrar lo que el usuario esté escribiendo nuevo.
+      if (existingPersona) {
+        setExistingPersona(null);
+        setExistingContactos([]);
+      }
     }
   };
 
@@ -102,10 +106,9 @@ export function PersonaForm({ onSuccess, onCancel }) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Cédula (CC) *</label>
           <input
             type="text"
-            {...register('cc')}
-            onBlur={handleCcBlur}
+            {...register('cc', { onChange: handleCcChange })}
             className={inputClass('cc')}
-            placeholder="Ingresa la CC — si existe, se autocompleta"
+            placeholder="Ingresa la CC — autocompletado en vivo"
           />
           {errors.cc && <p className="text-red-500 text-xs mt-1">{errors.cc.message}</p>}
         </div>
