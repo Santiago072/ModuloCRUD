@@ -23,7 +23,7 @@ export const usePersonaStore = create((set, get) => ({
     try {
       await PersonaRepository.create(formData);
       await get().fetchPersonas();
-      syncData(); // Sincronización proactiva
+      syncData({ pushOnly: true }); // Sincronización proactiva rápida (sin pull)
     } catch (err) {
       set({ error: err.message, loading: false });
       throw err;
@@ -35,7 +35,7 @@ export const usePersonaStore = create((set, get) => ({
     try {
       await PersonaRepository.update(id, data);
       await get().fetchPersonas();
-      syncData(); // Sincronización proactiva
+      syncData({ pushOnly: true }); // Sincronización proactiva rápida
     } catch (err) {
       set({ error: err.message, loading: false });
       throw err;
@@ -47,7 +47,7 @@ export const usePersonaStore = create((set, get) => ({
     try {
       await PersonaRepository.remove(id);
       set(state => ({ personas: state.personas.filter(p => p.id !== id), loading: false }));
-      syncData(); // Sincronización proactiva
+      syncData({ pushOnly: true }); // Sincronización proactiva rápida
     } catch (err) {
       set({ error: err.message, loading: false });
     }
@@ -55,7 +55,7 @@ export const usePersonaStore = create((set, get) => ({
 
   addContacto: async (personaId, tipo, valor) => {
     const res = await ContactoRepository.addContacto(personaId, tipo, valor);
-    syncData(); // Sincronización proactiva
+    syncData({ pushOnly: true }); // Sincronización proactiva rápida
     return res;
   },
 

@@ -5,26 +5,28 @@ const API_URL = '/api';
 let isSyncing = false;
 let syncTimeout = null;
 
-export const syncData = async () => {
+export const syncData = async ({ pushOnly = false } = {}) => {
   if (!navigator.onLine) return;
   
-  // Debounce de 500ms para agrupar actualizaciones rápidas (ej. updatePersona + addContacto seguidos)
+  // Debounce de 500ms para agrupar actualizaciones rápidas
   if (syncTimeout) clearTimeout(syncTimeout);
   
   syncTimeout = setTimeout(async () => {
     if (isSyncing) return; // Evitar ejecuciones simultáneas
     isSyncing = true;
     
-    // 1. PULL: Descargar datos más recientes del servidor
-    try {
-    const pullRes = await fetch(`${API_URL}/sync`);
-    if (pullRes.ok) {
-      const { data } = await pullRes.json();
-      await PersonaRepository.syncFromServer(data.personas, data.contactos);
+    // 1. PULL: Descargar datos más recientes del servidor (Solo si no es pushOnly)
+    if (!pushOnly) {
+      try {
+        const pullRes = await fetch(`${API_URL}/sync`);
+        if (pullRes.ok) {
+          const { data } = await pullRes.json();
+          await PersonaRepository.syncFromServer(data.personas, data.contactos);
+        }
+      } catch (err) {
+        console.warn('⚠️ Error al descargar datos del servidor:', err.message);
+      }
     }
-  } catch (err) {
-    console.warn('⚠️ Error al descargar datos del servidor:', err.message);
-  }
 
   // 2. PUSH: Enviar los datos que se crearon/editaron localmente
   try {
