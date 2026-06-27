@@ -35,7 +35,19 @@ exports.syncOfflineData = async (req, res) => {
 
     for (const p of registros_offline) {
       try {
-        // 1. UPSERT Persona (basado en la CC que es única)
+        // 1. Verificar si es una eliminación lógica
+        if (p.sync_status === 'deleted') {
+          const [existing] = await connection.query('SELECT id FROM personas WHERE cc = ?', [p.cc]);
+          if (existing.length > 0) {
+            await connection.query('DELETE FROM contactos WHERE persona_id = ?', [existing[0].id]);
+            await connection.query('DELETE FROM encuestas WHERE persona_id = ?', [existing[0].id]);
+            await connection.query('DELETE FROM personas WHERE id = ?', [existing[0].id]);
+          }
+          syncSuccess++;
+          continue; // Pasamos al siguiente registro
+        }
+
+        // 2. UPSERT Persona (basado en la CC que es única)
         const [existing] = await connection.query('SELECT id, updated_at FROM personas WHERE cc = ?', [p.cc]);
         
         let personaId;

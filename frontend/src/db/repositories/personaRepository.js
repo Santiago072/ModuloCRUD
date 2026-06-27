@@ -40,13 +40,9 @@ export const PersonaRepository = {
     return db.personas.update(id, { ...data, sync_status: 'local', updated_at: now });
   },
 
-  /** Elimina la persona y todos sus contactos (CASCADE local) */
+  /** Elimina la persona de la UI y la marca para borrar en el servidor */
   remove: async (id) => {
-    return db.transaction('rw', db.personas, db.contactos, db.encuestas, async () => {
-      await db.contactos.where('persona_id').equals(id).delete();
-      await db.encuestas.where('persona_id').equals(id).delete();
-      await db.personas.delete(id);
-    });
+    return db.personas.update(id, { sync_status: 'deleted', updated_at: new Date().toISOString() });
   },
 
   /** Obtiene una persona con sus contactos activos ordenados por prioridad */
@@ -61,14 +57,25 @@ export const PersonaRepository = {
   },
 
   getPendingSync: async () => {
-    const personas = await db.personas.where('sync_status').equals('local').toArray();
+    const personas = await db.personas.where('sync_status').anyOf('local', 'deleted').toArray();
     for (let p of personas) {
       p.contactos = await db.contactos.where('persona_id').equals(p.id).toArray();
     }
     return personas;
   },
 
-  markAsSynced: (id) => db.personas.update(id, { sync_status: 'synced', updated_at: new Date().toISOString() }),
+  markAsSynced: async (id) => {
+    const p = await db.personas.get(id);
+    if (p && p.sync_status === 'deleted') {
+      await db.transaction('rw', db.personas, db.contactos, db.encuestas, async () => {
+        await db.contactos.where('persona_id').equals(id).delete();
+        await db.encuestas.where('persona_id').equals(id).delete();
+        await db.personas.delete(id);
+      });
+    } else {
+      await db.personas.update(id, { sync_status: 'synced', updated_at: new Date().toISOString() });
+    }
+  },
 
   /** Sincronización desde el servidor (Pull) */
   syncFromServer: async (serverPersonas, serverContactos) => {

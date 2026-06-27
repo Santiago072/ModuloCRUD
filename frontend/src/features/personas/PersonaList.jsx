@@ -15,8 +15,9 @@ export function PersonaList({ onSelect }) {
   // useLiveQuery con filtro reactivo — re-ejecuta automáticamente cuando cambia `query`
   const personas = useLiveQuery(() => {
     const q = query.trim();
-    if (!q) return db.personas.orderBy('id').reverse().toArray();
+    if (!q) return db.personas.filter(p => p.sync_status !== 'deleted').reverse().toArray();
     return db.personas
+      .filter(p => p.sync_status !== 'deleted')
       .filter(p =>
         p.cc.includes(q) ||
         p.nombres.toLowerCase().includes(q.toLowerCase()) ||
