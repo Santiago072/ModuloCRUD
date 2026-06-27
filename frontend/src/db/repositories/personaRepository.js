@@ -88,10 +88,13 @@ export const PersonaRepository = {
         const local = await db.personas.where('cc').equals(sp.cc).first();
         if (local) {
           serverToLocalId[sp.id] = local.id; // Mapeamos
+          
+          // Si estaba marcado para borrar, ignoramos cualquier actualización del servidor
+          if (local.sync_status === 'deleted') continue;
+          
           if (new Date(sp.updated_at) > new Date(local.updated_at)) {
             await db.personas.update(local.id, { ...sp, id: local.id, sync_status: 'synced' });
           } else if (local.sync_status !== 'local') {
-             // Si no hay cambios locales pendientes, aseguramos que esté marcado como synced
              await db.personas.update(local.id, { sync_status: 'synced' });
           }
         } else {
@@ -103,7 +106,6 @@ export const PersonaRepository = {
 
       // 2. Limpiar y recrear contactos usando los IDs locales
       if (serverContactos && serverContactos.length > 0) {
-        // Solo borrar los contactos de las personas que vinieron del servidor
         const localIdsToUpdate = Object.values(serverToLocalId);
         if (localIdsToUpdate.length > 0) {
           await db.contactos.where('persona_id').anyOf(localIdsToUpdate).delete();
@@ -112,8 +114,9 @@ export const PersonaRepository = {
         for (const sc of serverContactos) {
           const localPersonaId = serverToLocalId[sc.persona_id];
           if (localPersonaId) {
-            // Eliminar sc.id para evitar conflictos de ID si Dexie usa autoincremental
             const { id, ...contactData } = sc;
+            // Forzar a booleano porque MySQL lo devuelve como 1 o 0
+            contactData.activo = contactData.activo === 1 || contactData.activo === true;
             await db.contactos.put({ ...contactData, persona_id: localPersonaId });
           }
         }
