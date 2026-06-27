@@ -9,7 +9,7 @@ export const ContactoRepository = {
 
   /** Algoritmo 5.2 — Rotación de prioridades */
   addContacto: async (personaId, tipo, valor) => {
-    return db.transaction('rw', db.contactos, async () => {
+    return db.transaction('rw', db.contactos, db.personas, async () => {
       const existente = await db.contactos
         .where({ persona_id: personaId, valor })
         .and(c => c.activo === true)
@@ -38,6 +38,10 @@ export const ContactoRepository = {
         activo: true,
         created_at: new Date().toISOString(),
       });
+
+      // ¡Importante! Marcar la persona como local para que el SyncManager suba el nuevo contacto
+      await db.personas.update(personaId, { sync_status: 'local', updated_at: new Date().toISOString() });
+
       return { changed: true, id: newId };
     });
   },

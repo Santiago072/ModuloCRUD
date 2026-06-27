@@ -2,11 +2,21 @@ import { PersonaRepository } from '../db/repositories/personaRepository';
 
 const API_URL = '/api';
 
+let isSyncing = false;
+let syncTimeout = null;
+
 export const syncData = async () => {
   if (!navigator.onLine) return;
-
-  // 1. PULL: Descargar datos más recientes del servidor
-  try {
+  
+  // Debounce de 500ms para agrupar actualizaciones rápidas (ej. updatePersona + addContacto seguidos)
+  if (syncTimeout) clearTimeout(syncTimeout);
+  
+  syncTimeout = setTimeout(async () => {
+    if (isSyncing) return; // Evitar ejecuciones simultáneas
+    isSyncing = true;
+    
+    // 1. PULL: Descargar datos más recientes del servidor
+    try {
     const pullRes = await fetch(`${API_URL}/sync`);
     if (pullRes.ok) {
       const { data } = await pullRes.json();
@@ -37,7 +47,10 @@ export const syncData = async () => {
         await PersonaRepository.markAsSynced(p.id);
       }
     }
-  } catch (err) {
-    console.warn('⚠️ Sincronización push fallida.', err.message);
-  }
+    } catch (err) {
+      console.warn('⚠️ Sincronización push fallida.', err.message);
+    } finally {
+      isSyncing = false; // Liberar lock
+    }
+  }, 500);
 };
