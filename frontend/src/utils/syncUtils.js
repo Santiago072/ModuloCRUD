@@ -1,6 +1,6 @@
 import { PersonaRepository } from '../db/repositories/personaRepository';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = '/api';
 
 export const syncData = async () => {
   if (!navigator.onLine) return;
