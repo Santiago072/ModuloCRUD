@@ -104,6 +104,17 @@ export const PersonaRepository = {
         }
       }
 
+      // 1.5 Borrar localmente las que estaban sincronizadas pero ya no existen en el servidor
+      const serverCcSet = new Set(serverPersonas.map(p => p.cc));
+      const locales = await db.personas.toArray();
+      for (const loc of locales) {
+        if (loc.sync_status === 'synced' && !serverCcSet.has(loc.cc)) {
+          await db.contactos.where('persona_id').equals(loc.id).delete();
+          await db.encuestas.where('persona_id').equals(loc.id).delete();
+          await db.personas.delete(loc.id);
+        }
+      }
+
       // 2. Limpiar y recrear contactos usando los IDs locales
       if (serverContactos && serverContactos.length > 0) {
         const localIdsToUpdate = Object.values(serverToLocalId);
