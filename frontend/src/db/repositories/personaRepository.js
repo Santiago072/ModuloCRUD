@@ -73,31 +73,35 @@ export const PersonaRepository = {
   /** Sincronización desde el servidor (Pull) */
   syncFromServer: async (serverPersonas, serverContactos) => {
     return db.transaction('rw', db.personas, db.contactos, async () => {
+      // Mapa para asociar el ID del servidor con el ID local de Dexie
+      const serverToLocalId = {};
+
       // 1. Guardar o actualizar personas
       for (const sp of serverPersonas) {
         const local = await db.personas.where('cc').equals(sp.cc).first();
         if (local) {
-          // Actualizamos solo si es más reciente
+          serverToLocalId[sp.id] = local.id; // Mapeamos
           if (new Date(sp.updated_at) > new Date(local.updated_at)) {
             await db.personas.update(local.id, { ...sp, id: local.id, sync_status: 'synced' });
+          } else if (local.sync_status !== 'local') {
+             // Si no hay cambios locales pendientes, aseguramos que esté marcado como synced
+             await db.personas.update(local.id, { sync_status: 'synced' });
           }
         } else {
-          // No podemos usar el ID del servidor directamente porque Dexie usa AutoIncrement local.
-          // Pero podemos guardarla, y Dexie le asignará un ID local.
-          // Para mantener el enlace con los contactos, guardaremos el server_id original en el contacto.
-          // Mejor: Si usamos el ID del servidor, forzamos que el ID local sea el mismo (peligroso si hay colisión).
-          // La forma más fácil: ignorar el ID local autoincremental si viene del servidor, o forzarlo.
-          // Como la CC es única, usamos la CC como clave lógica.
-          
-          await db.personas.put({ ...sp, sync_status: 'synced' });
+          // Es nueva desde el servidor, la guardamos
+          const newId = await db.personas.put({ ...sp, sync_status: 'synced' });
+          serverToLocalId[sp.id] = newId;
         }
       }
 
-      // 2. Limpiar y recrear contactos del servidor para evitar desajustes
+      // 2. Limpiar y recrear contactos usando los IDs locales
       if (serverContactos && serverContactos.length > 0) {
         await db.contactos.clear();
         for (const sc of serverContactos) {
-          await db.contactos.put(sc);
+          const localPersonaId = serverToLocalId[sc.persona_id];
+          if (localPersonaId) {
+            await db.contactos.put({ ...sc, persona_id: localPersonaId });
+          }
         }
       }
     });

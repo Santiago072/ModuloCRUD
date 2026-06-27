@@ -28,7 +28,7 @@ exports.syncOfflineData = async (req, res) => {
 
   const connection = await pool.getConnection();
   let syncSuccess = 0;
-  let syncErrors = 0;
+  let syncErrors = [];
 
   try {
     await connection.beginTransaction();
@@ -71,7 +71,7 @@ exports.syncOfflineData = async (req, res) => {
         syncSuccess++;
       } catch (err) {
         console.error('Error insertando persona CC ' + p.cc, err);
-        syncErrors++;
+        syncErrors.push(err.message); // Guardamos el mensaje real
       }
     }
 
@@ -79,7 +79,7 @@ exports.syncOfflineData = async (req, res) => {
     res.status(200).json({ 
       status: 'success', 
       message: 'Sincronización procesada', 
-      stats: { synced: syncSuccess, errors: syncErrors }
+      stats: { synced: syncSuccess, errors: syncErrors.length, details: syncErrors }
     });
   } catch (error) {
     await connection.rollback();
