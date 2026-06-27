@@ -32,15 +32,26 @@ if [ ! -f ".env" ]; then
   exit 1
 fi
 
+# Cargar variables de entorno
+set -a
+source .env
+set +a
+
 # Paso 4: Reconstruir imágenes y reiniciar todos los contenedores
 echo "🐳 Reconstruyendo y levantando contenedores..."
 sudo docker compose up -d --build
 
-# Paso 5: Limpiar imágenes obsoletas para liberar espacio en el VPS
+# Paso 5: Importar/Asegurar la estructura de la base de datos
+echo "📂 Verificando y creando estructura de la base de datos..."
+# Esperar unos segundos a que MySQL esté listo
+sleep 5
+sudo docker exec -i modulocrud_db mysql -u"${DB_USER}" -p"${DB_PASSWORD}" "${DB_NAME}" < BD.txt
+
+# Paso 6: Limpiar imágenes obsoletas para liberar espacio en el VPS
 echo "🧹 Limpiando imágenes antiguas..."
 sudo docker image prune -f
 
-# Paso 6: Mostrar el estado final de los contenedores
+# Paso 7: Mostrar el estado final de los contenedores
 echo ""
 echo "📊 Estado de los contenedores:"
 sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
