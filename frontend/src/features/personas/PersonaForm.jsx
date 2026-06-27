@@ -27,7 +27,20 @@ export function PersonaForm({ onSuccess, onCancel }) {
   // Autocompletar mientras se escribe la CC
   const handleCcChange = async (e) => {
     const cc = e.target.value.trim();
-    if (cc.length < 6) { setExistingPersona(null); setExistingContactos([]); return; }
+
+    // Si la CC se borró o es muy corta, limpiar todos los campos
+    if (cc.length < 6) {
+      if (existingPersona) {
+        setExistingPersona(null);
+        setExistingContactos([]);
+        setValue('nombres', '');
+        setValue('apellidos', '');
+        setValue('profesion', '');
+        setValue('fecha_registro', '');
+        setValue('nuevo_contacto', '');
+      }
+      return;
+    }
 
     const existing = await PersonaRepository.getByCc(cc);
     if (existing) {
@@ -40,11 +53,15 @@ export function PersonaForm({ onSuccess, onCancel }) {
       setExistingContactos(contactos);
       setExistingPersona(existing);
     } else {
-      // Si la CC tenía más de 6 dígitos pero no se encontró, limpiamos los datos autocompletados
-      // pero SOLO si había un existingPersona previo para no borrar lo que el usuario esté escribiendo nuevo.
+      // CC no encontrada — si había datos autocompletados, limpiarlos
       if (existingPersona) {
         setExistingPersona(null);
         setExistingContactos([]);
+        setValue('nombres', '');
+        setValue('apellidos', '');
+        setValue('profesion', '');
+        setValue('fecha_registro', '');
+        setValue('nuevo_contacto', '');
       }
     }
   };

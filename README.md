@@ -6,6 +6,7 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 
 | Documento | Descripción |
 |-----------|-------------|
+| 👤 [Manual de Usuario](docs/MANUAL_USUARIO.md) | Guía de uso de la aplicación para usuarios finales |
 | 📋 [Plan de Implementación](docs/PLAN_IMPLEMENTACION.md) | Fases del proyecto, stack tecnológico y arquitectura de sincronización |
 | 📖 [Documentación Técnica](docs/documentacion-tecnica.md) | Arquitectura de carpetas, endpoints API, flujo offline-first |
 | 📋 [Especificación de Requisitos](docs/Especificacion_Requisitos.md) | Objetivos, RNF, modelo de datos y justificaciones de diseño |
@@ -16,7 +17,7 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 ### 📱 Portal App (PWA Frontend)
 * **Arquitectura Offline-First:** Los datos se guardan instantáneamente en el dispositivo (usando `IndexedDB` y `Dexie.js`) permitiendo continuar el trabajo sin interrupciones aunque se pierda la señal celular.
 * **Componentes UI:** Interfaz construida con **React 18** y **Tailwind CSS** para un diseño responsivo, limpio y rápido.
-* **Validación Robusta:** Formularios gestionados con `React Hook Form` y esquemas de validación estrictos usando `Zod`.
+* **Validación Robusta:** Formularios gestionados con `React Hook Form` con validación de campos en tiempo real.
 * **Empaquetado Android:** Capacidad de ser instalada directamente desde el navegador o compilada como un `.apk` nativo mediante TWA (Trusted Web Activity).
 
 ### ⚙️ Servidor Central (Backend API)
