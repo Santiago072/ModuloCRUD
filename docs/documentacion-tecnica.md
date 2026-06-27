@@ -20,8 +20,9 @@ ModuloCRUD/
 │       │       └── contactoRepository.js
 │       ├── features/            # Módulos por funcionalidad
 │       │   └── personas/
-│       │       ├── PersonaForm.jsx   # Formulario React Hook Form + Zod
-│       │       └── PersonaList.jsx   # Lista reactiva con useLiveQuery
+│       │       ├── PersonaForm.jsx   # Formulario con autocompletado y validación
+│       │       ├── PersonaList.jsx   # Lista reactiva con Live Search
+│       │       └── PersonaDetail.jsx # Modal de detalles, edición y eliminación
 │       ├── hooks/               # Custom hooks
 │       │   ├── useNetworkStatus.js  # Detecta estado de red (online/offline)
 │       │   └── useSyncManager.js    # Sincronización automática al reconectar
@@ -30,7 +31,8 @@ ModuloCRUD/
 │       ├── store/               # Estado global Zustand (MVVM — ViewModel)
 │       │   └── usePersonaStore.js
 │       └── utils/               # Utilidades
-│           └── validationSchemas.js # Esquemas Zod compartibles
+│           ├── validationSchemas.js # Esquemas Zod compartibles
+│           └── exportUtils.js       # Utilidad para exportación a CSV nativa
 ├── backend/                     # API REST — Node.js + Express
 │   ├── config/db.js             # Pool de conexiones MySQL (mysql2)
 │   ├── controllers/             # Lógica de negocio
@@ -56,7 +58,9 @@ ModuloCRUD/
 |--------|------|-------------|
 | `GET` | `/api/status` | Verifica conexión de la API con la BD |
 | `GET` | `/api/personas` | Lista todas las personas registradas |
-| `POST` | `/api/personas` | Crea una persona y su primer contacto (transacción) |
+| `POST` | `/api/personas` | Crea una persona y sus contactos iniciales |
+| `PUT` | `/api/personas/:id` | Actualiza los datos de una persona |
+| `DELETE` | `/api/personas/:id` | Elimina una persona y sus contactos (Cascade) |
 | `POST` | `/api/contactos` | Agrega un contacto con rotación de prioridades |
 | `POST` | `/api/sync` | Recibe lote de registros offline del Service Worker |
 
@@ -111,15 +115,20 @@ chmod +x deploy.sh
 ./deploy.sh
 ```
 
-Configurar Nginx para el subdominio `modulocrud.slscode.online`:
+Configurar Nginx para el subdominio `modulocrud.slscode.online` con los puertos del VPS:
 ```nginx
 server {
     listen 80;
     server_name modulocrud.slscode.online;
+
     location / {
-        proxy_pass http://127.0.0.1:8893;
+        proxy_pass http://127.0.0.1:8893; # Frontend
         proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /api {
+        proxy_pass http://127.0.0.1:8894; # Backend
+        proxy_set_header Host $host;
     }
 }
 ```

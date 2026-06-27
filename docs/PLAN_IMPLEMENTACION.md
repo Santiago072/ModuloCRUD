@@ -52,8 +52,8 @@ Este documento describe la hoja de ruta para la construcción del Módulo CRUD, 
   - Hook `useNetworkStatus.js` detecta `navigator.onLine` en tiempo real.
   - Hook `useSyncManager.js`: Guarda en Dexie → detecta internet → POST `/api/sync` → `markAsSynced()`.
   - Campo `sync_status` ('local'/'synced'/'conflict') garantiza integridad y detección de conflictos.
-- [ ] **Exportación de Datos:**
-  - Pendiente: integrar SheetJS para exportar a CSV/Excel.
+- [x] **Exportación de Datos:**
+  - Exportación nativa a CSV implementada (sin dependencias extra).
 
 ### Fase 5: Despliegue y Empaquetado Android
 - [x] **VPS (Docker + Nginx):**
