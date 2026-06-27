@@ -44,14 +44,13 @@ El flujo de operaciones garantiza que el sistema nunca bloquea al usuario por fa
 5. El Service Worker detecta cuando se restaura la conexión y procesa la cola automáticamente.
 
 **Garantía de integridad:**
-Cada registro incluye un campo `sync_status` con valores: `'local'` (pendiente de sincronizar), `'synced'` (confirmado en servidor) o `'conflict'` (requiere resolución manual). El campo `updated_at` permite detectar conflictos de concurrencia.
+Cada registro incluye un campo `sync_status` con valores: `'local'` (pendiente de subir al servidor), `'synced'` (sincronizado con el servidor) o `'deleted'` (pendiente de eliminación física en el servidor). El campo `updated_at` permite resolver conflictos de concurrencia a favor del dato más reciente.
 
 ## 3. Stack tecnológico
 ### 3.1 Frontend — Capa de presentación
 | Tecnología | Versión | Rol en el sistema | Justificación |
 |------------|---------|-------------------|---------------|
 | React | 18.x | Framework de componentes UI | Ecosistema maduro, hooks, rendimiento con Virtual DOM |
-| TypeScript | 5.x | Tipado estático | Previene errores, mejor documentación automática |
 | Vite | 5.x | Bundler y servidor | Rápido, plugin PWA oficial |
 | vite-plugin-pwa | 0.19.x | Generación Service Worker | Integra Workbox, genera manifest automáticamente |
 | Tailwind CSS | 3.x | Framework de estilos | Clases utilitarias, responsive por defecto |
@@ -61,24 +60,22 @@ Cada registro incluye un campo `sync_status` con valores: `'local'` (pendiente d
 | Tecnología | Versión | Rol en el sistema | Justificación |
 |------------|---------|-------------------|---------------|
 | Zustand | 4.x | Estado global | Más simple que Redux, sin boilerplate |
-| React Hook Form | 7.x | Gestión de formularios | Validación eficiente, integración con Zod |
-| Zod | 3.x | Validación de esquemas | Validación frontend y backend |
-| date-fns | 3.x | Manejo de fechas | Ligero, funcional, soporte ISO 8601 |
+| React Hook Form | 7.x | Gestión de formularios | Validación eficiente |
 
 ### 3.3 Capa de datos (offline)
 | Tecnología | Versión | Rol en el sistema | Justificación |
 |------------|---------|-------------------|---------------|
 | IndexedDB | Nativa | Base de datos | API estándar del navegador para datos estructurados offline |
 | Dexie.js | 3.x | ORM sobre IndexedDB | API similar a SQL con soporte transaccional |
-| Workbox | 7.x | Cache de Service Worker | Estrategias offline |
 
 ### 3.4 Sincronización y backend
 | Tecnología | Versión | Rol en el sistema | Justificación |
 |------------|---------|-------------------|---------------|
-| Background Sync API | Nativa | Sincronización en 2do plano | Nativa del navegador, sincroniza con app cerrada |
-| Axios / Fetch | 1.x | Llamadas HTTP | Comunicación con API REST |
-| Node.js + Express | 20.x | Backend API REST | Servidor central |
-| SheetJS (xlsx) | 0.20.x | Exportación Excel/CSV | Generación en el navegador |
+| Custom SyncManager | Nativo | Sincronización proactiva | Sincronización Push/Pull con Debounce para mitigar latencia |
+| Fetch API | Nativa | Llamadas HTTP | Comunicación ligera y nativa con API REST |
+| Node.js + Express | 20.x | Backend API REST | Servidor central (API y Sync Queue processor) |
+| MySQL (mysql2) | 3.x | Base de Datos Central | Relacional, despliegue dockerizado |
+| CSV Nativo | Nativo | Exportación CSV | Conversión a Blob sin dependencias externas |
 
 ## 4. Estructura del proyecto
 La organización de carpetas sigue el patrón feature-based (por funcionalidad). *(Ver repositorio para la estructura del código base).*
