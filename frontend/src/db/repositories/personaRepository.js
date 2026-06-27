@@ -96,11 +96,18 @@ export const PersonaRepository = {
 
       // 2. Limpiar y recrear contactos usando los IDs locales
       if (serverContactos && serverContactos.length > 0) {
-        await db.contactos.clear();
+        // Solo borrar los contactos de las personas que vinieron del servidor
+        const localIdsToUpdate = Object.values(serverToLocalId);
+        if (localIdsToUpdate.length > 0) {
+          await db.contactos.where('persona_id').anyOf(localIdsToUpdate).delete();
+        }
+
         for (const sc of serverContactos) {
           const localPersonaId = serverToLocalId[sc.persona_id];
           if (localPersonaId) {
-            await db.contactos.put({ ...sc, persona_id: localPersonaId });
+            // Eliminar sc.id para evitar conflictos de ID si Dexie usa autoincremental
+            const { id, ...contactData } = sc;
+            await db.contactos.put({ ...contactData, persona_id: localPersonaId });
           }
         }
       }
