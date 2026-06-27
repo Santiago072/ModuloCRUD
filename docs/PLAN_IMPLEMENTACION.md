@@ -47,20 +47,25 @@ Este documento describe la hoja de ruta para la construcción del Módulo CRUD, 
   - Web Manifest con nombre, colores, iconos y modo standalone.
   - Service Worker configurado con Workbox.
 
-### Fase 4: Sincronización (Capa de Conectividad)
-- [x] **Background Sync:**
+### Fase 4: Sincronización Avanzada (Capa de Conectividad)
+- [x] **Background Sync (Push/Pull):**
   - Hook `useNetworkStatus.js` detecta `navigator.onLine` en tiempo real.
-  - Hook `useSyncManager.js`: Guarda en Dexie → detecta internet → POST `/api/sync` → `markAsSynced()`.
-  - Campo `sync_status` ('local'/'synced'/'conflict') garantiza integridad y detección de conflictos.
+  - Sincronización proactiva con **Debounce (500ms)** para evitar condiciones de carrera al guardar datos encadenados.
+  - Separación de `Pull` y `Push`: `syncData({ pushOnly: true })` para sincronizaciones ultra-rápidas al crear/editar.
+  - Campo `sync_status` ('local'/'synced'/'deleted') garantiza integridad y detección de conflictos.
+- [x] **Resolución de Conflictos y Consistencia:**
+  - **Soft Delete:** El borrado de encuestas usa eliminación lógica local antes del Push, y eliminación física tras confirmación del servidor.
+  - **Limpieza de Fantasmas:** El algoritmo Pull identifica y elimina localmente encuestas que hayan sido borradas por otros dispositivos.
+  - Conversión estricta de tipos de datos (Ej: MySQL `TINYINT` a `Boolean` en IndexedDB).
 - [x] **Exportación de Datos:**
-  - Exportación nativa a CSV implementada (sin dependencias extra).
+  - Exportación nativa a CSV implementada.
 
 ### Fase 5: Despliegue y Empaquetado Android
 - [x] **VPS (Docker + Nginx):**
   - `docker-compose.yml` orquesta 3 contenedores: `db`, `backend`, `frontend`.
   - `.env.example` con todas las variables de entorno requeridas.
-  - `deploy.sh` mejorado: valida `.env`, reconstruye y muestra estado de contenedores.
-  - `nginx/modulocrud.conf`: Proxy inverso — Frontend en puerto 8893, API en 3000.
-  - Documentación completa en `docs/DESPLIEGUE_VPS.md` (primer deploy, actualizaciones, diagnóstico).
+  - `deploy.sh` mejorado y **robusto**: Inyecta variables de `.env` y fuerza la ejecución idempotente de `BD.txt` para asegurar la creación estructural.
+  - `nginx/modulocrud.conf`: Proxy inverso — Frontend en puerto 8893, API en 3000 (Expuesto como ruta relativa `/api` para compatibilidad móvil).
+  - Documentación completa en `docs/DESPLIEGUE_VPS.md`.
 - [ ] **Android APK:**
   - Pendiente: usar Bubblewrap para convertir la PWA a `.apk` instalable.

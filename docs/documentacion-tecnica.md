@@ -88,31 +88,35 @@ ModuloCRUD/
 
 ---
 
-## 3. Flujo de Datos Bidireccional — Offline-First
+## 3. Flujo de Datos Bidireccional — Offline-First Avanzado
 
 El sistema utiliza un enfoque híbrido donde IndexedDB (mediante Dexie.js) actúa como la única fuente de la verdad para el Frontend, y MySQL en el VPS es el repositorio central histórico.
 
-### Fase 1: Pull (Descarga inicial / Reconexión)
+### Fase 1: Pull (Descarga completa / Reconexión / Limpieza)
 Cuando el usuario abre la aplicación o recupera la conexión a Internet (`navigator.onLine = TRUE`):
 ```text
-useSyncManager (Frontend) 
+syncData() (Frontend) 
        ↓ 
 GET /api/sync (Node.js extrae TODO de MySQL) 
        ↓ 
 PersonaRepository.syncFromServer (Inyecta/Actualiza en IndexedDB)
+       ↓
+(Lógica de limpieza): Borra localmente las encuestas que fueron eliminadas en otros dispositivos.
 ```
 Esto asegura que un celular que recién se conecta vea exactamente las mismas encuestas que se registraron desde un PC.
 
-### Fase 2: Push (Subida de trabajo offline)
-Inmediatamente después del Pull, el sistema verifica si hubo trabajo sin conexión:
+### Fase 2: Push Proactivo (Subida ultra-rápida de trabajo offline)
+Para evitar bloqueos y lentitud, al guardar, crear o eliminar una persona/contacto, el sistema ejecuta un *Debounce de 500ms* y lanza un **Push Exclusivo** (sin necesidad de hacer Pull previo):
 ```text
-PersonaRepository.getPendingSync (Busca registros con sync_status = 'local')
+PersonaRepository.getPendingSync (Busca registros 'local' y 'deleted')
        ↓
 POST /api/sync (Envía lote al Node.js)
        ↓
-syncController.syncOfflineData (UPSERT en MySQL para evitar duplicidad de CC)
+syncController.syncOfflineData:
+  1. Si es 'deleted', elimina de MySQL (Soft Delete local -> Hard Delete remoto)
+  2. Si es 'local', hace UPSERT en MySQL (basado en CC) y reemplaza contactos.
        ↓
-PersonaRepository.markAsSynced (Actualiza a sync_status = 'synced' en el dispositivo)
+PersonaRepository.markAsSynced (Actualiza a 'synced' o elimina de IndexedDB si era 'deleted')
 ```
 
 ---
