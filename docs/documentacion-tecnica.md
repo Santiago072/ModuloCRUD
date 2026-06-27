@@ -88,18 +88,31 @@ ModuloCRUD/
 
 ---
 
-## 3. Flujo de Datos — Offline-First
+## 3. Flujo de Datos Bidireccional — Offline-First
+
+El sistema utiliza un enfoque híbrido donde IndexedDB (mediante Dexie.js) actúa como la única fuente de la verdad para el Frontend, y MySQL en el VPS es el repositorio central histórico.
+
+### Fase 1: Pull (Descarga inicial / Reconexión)
+Cuando el usuario abre la aplicación o recupera la conexión a Internet (`navigator.onLine = TRUE`):
+```text
+useSyncManager (Frontend) 
+       ↓ 
+GET /api/sync (Node.js extrae TODO de MySQL) 
+       ↓ 
+PersonaRepository.syncFromServer (Inyecta/Actualiza en IndexedDB)
 ```
-Usuario → PersonaForm → usePersonaStore → PersonaRepository → IndexedDB (Dexie.js)
-                                                                      ↓
-                                                    (sync_status = 'local')
-                                                                      ↓
-                                             navigator.onLine = TRUE → useSyncManager
-                                                                      ↓
-                                                          POST /api/sync (Node.js)
-                                                                      ↓
-                                                    PersonaRepository.markAsSynced()
-                                                    (sync_status = 'synced')
+Esto asegura que un celular que recién se conecta vea exactamente las mismas encuestas que se registraron desde un PC.
+
+### Fase 2: Push (Subida de trabajo offline)
+Inmediatamente después del Pull, el sistema verifica si hubo trabajo sin conexión:
+```text
+PersonaRepository.getPendingSync (Busca registros con sync_status = 'local')
+       ↓
+POST /api/sync (Envía lote al Node.js)
+       ↓
+syncController.syncOfflineData (UPSERT en MySQL para evitar duplicidad de CC)
+       ↓
+PersonaRepository.markAsSynced (Actualiza a sync_status = 'synced' en el dispositivo)
 ```
 
 ---
