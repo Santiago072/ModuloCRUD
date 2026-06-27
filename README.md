@@ -35,6 +35,30 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 
 ---
 
-## 🚀 Instalación y Desarrollo (Próximamente)
+## 🚀 Instalación y Despliegue (Docker)
 
-El código fuente del Frontend y Backend será estructurado en este repositorio durante la [Fase 1](docs/PLAN_IMPLEMENTACION.md) del proyecto.
+El proyecto está completamente dockerizado para facilitar su despliegue en entornos locales y en producción (VPS).
+
+### Prerrequisitos
+- Docker y Docker Compose instalados.
+- Archivo `.env` configurado (ver `.env.example`).
+
+### Iniciar el proyecto localmente
+1. Clonar el repositorio.
+2. Copiar `.env.example` a `.env` y configurar las credenciales.
+3. Ejecutar el script automatizado:
+   ```bash
+   bash deploy.sh
+   ```
+4. El Frontend (PWA) estará disponible en `http://localhost:8893`.
+5. La API del Backend estará en `http://localhost:3000/api`.
+
+---
+
+## 📅 Estado del Proyecto: Fase 5 (Completado ✅)
+
+El sistema ha superado con éxito todas las fases de desarrollo y se encuentra en etapa de producción:
+* **Fase 1 & 2:** Arquitectura, Backend Node.js y MySQL completados.
+* **Fase 3:** Frontend PWA con React y Dexie.js finalizado.
+* **Fase 4 (Completada):** Motor de sincronización proactivo con Debounce (Push) y limpieza de fantasmas (Pull) estable. Implementación de Soft-Deletes local/remoto funcional.
+* **Fase 5 (Actual):** Despliegue en VPS (Nginx + Let's Encrypt) exitoso. Empaquetado a Android APK (Bubblewrap/TWA) pendiente como paso final opcional para distribución en tiendas.
