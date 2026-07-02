@@ -11,6 +11,7 @@ export const exportToCSV = async () => {
     .filter(p => p.sync_status !== 'deleted')
     .toArray();
   const contactos = await db.contactos.toArray();
+  const encuestas = await db.encuestas.toArray();
 
   const headers = [
     'CC',
@@ -21,6 +22,7 @@ export const exportToCSV = async () => {
     'Contacto Principal',
     'Contacto 2',
     'Contacto 3',
+    'Encuestador',
     'Estado Sync',
   ];
 
@@ -28,6 +30,9 @@ export const exportToCSV = async () => {
     const pContacts = contactos
       .filter(c => c.persona_id === p.id && c.activo)
       .sort((a, b) => a.prioridad - b.prioridad);
+
+    const pEncuesta = encuestas.find(e => e.persona_id === p.id);
+    const encuestador = pEncuesta ? pEncuesta.encuestador : 'Sin asignar';
 
     const fecha = p.fecha_registro
       ? String(p.fecha_registro).slice(0, 10)
@@ -45,6 +50,7 @@ export const exportToCSV = async () => {
       pContacts[0]?.valor || '',
       pContacts[1]?.valor || '',
       pContacts[2]?.valor || '',
+      encuestador,
       estado,
     ];
   });
