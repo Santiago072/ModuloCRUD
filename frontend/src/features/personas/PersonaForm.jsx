@@ -17,9 +17,15 @@ export function PersonaForm({ onSuccess, onCancel }) {
   const [encuestadores, setEncuestadores] = useState([]);
 
   useEffect(() => {
-    // Cargar encuestadores activos desde Dexie
-    db.encuestadores.filter(e => e.activo).toArray().then(setEncuestadores);
-  }, []);
+    // Cargar encuestadores activos desde Dexie y luego asignar el valor por defecto
+    db.encuestadores.filter(e => e.activo).toArray().then((data) => {
+      setEncuestadores(data);
+      const last = localStorage.getItem('last_encuestador');
+      if (last && !existingPersona) {
+        setValue('encuestador', last);
+      }
+    });
+  }, [setValue, existingPersona]);
 
   const {
     register, handleSubmit, reset, setValue,
