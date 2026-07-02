@@ -17,6 +17,7 @@ export default function AdminDashboard() {
   const [newPassword, setNewPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [stats, setStats] = useState(null);
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
@@ -63,6 +64,20 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error fetching encuestadores', error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(`${API_URL}/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setStats(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats', error);
     } finally {
       setLoading(false);
     }
@@ -70,6 +85,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchEncuestadores();
+    fetchStats();
   }, []);
 
   const handleCreate = async (e) => {
@@ -160,7 +176,35 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+        <div className="px-4 py-6 sm:px-0 space-y-6">
+          
+          {/* Tarjetas de Estadísticas */}
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg shadow px-5 py-6 flex flex-col items-center justify-center border-t-4 border-purple-500">
+                <span className="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Personas</span>
+                <span className="text-3xl font-bold text-gray-800 mt-2">{stats.totalPersonas}</span>
+              </div>
+              <div className="bg-white rounded-lg shadow px-5 py-6 flex flex-col items-center justify-center border-t-4 border-indigo-500">
+                <span className="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Encuestas</span>
+                <span className="text-3xl font-bold text-gray-800 mt-2">{stats.totalEncuestas}</span>
+              </div>
+              <div className="bg-white rounded-lg shadow px-5 py-6 border-t-4 border-blue-500">
+                <span className="text-gray-500 text-sm font-medium uppercase tracking-wide mb-3 block text-center">Top Encuestadores</span>
+                <ul className="space-y-2">
+                  {stats.ranking.length > 0 ? stats.ranking.map((r, i) => (
+                    <li key={i} className="flex justify-between items-center text-sm">
+                      <span className="text-gray-700 truncate mr-2" title={r.encuestador}>{r.encuestador || 'Desconocido'}</span>
+                      <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{r.cantidad}</span>
+                    </li>
+                  )) : (
+                    <li className="text-gray-400 text-sm text-center">Sin datos</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-medium leading-6 text-gray-900">Gestión de Encuestadores</h2>
