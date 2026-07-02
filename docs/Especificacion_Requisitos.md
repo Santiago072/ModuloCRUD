@@ -118,9 +118,23 @@ El modelo normaliza los contactos en una tabla independiente, eliminando las col
 | sync_status | string | DEFAULT 'local' | Estado sincronización |
 | created_at | string | NOT NULL | Timestamp de creación |
 
-### 5.2 Lógica de rotación de contactos
-1. Se detecta si el nuevo valor ya existe.
-2. Si ya existe: no hay cambios.
-3. Si es nuevo: el nuevo toma `prioridad = 1`.
-4. Los anteriores se desplazan (1 pasa a 2, 2 pasa a 3).
-5. Si había 3 activos, el de prioridad 3 pasa a `activo = false`.
+### Tabla: encuestadores
+| Campo | Tipo | Restricción | Descripción |
+|-------|------|-------------|-------------|
+| id | number | PK auto | Identificador único |
+| nombre | string | UNIQUE, NOT NULL | Nombre del encuestador |
+| activo | boolean | DEFAULT true | Si puede ser seleccionado en la app |
+
+### Tabla: usuarios (Admin)
+| Campo | Tipo | Restricción | Descripción |
+|-------|------|-------------|-------------|
+| id | number | PK auto | Identificador único |
+| username | string | UNIQUE, NOT NULL | Nombre de usuario (ej. admin) |
+| password_hash | string | NOT NULL | Hash Bcrypt de la contraseña |
+
+### 5.2 Lógica inteligente de rotación de contactos
+1. Se detecta si el nuevo número ya existe en el perfil de la persona.
+2. Si **ya existe**: se promueve a `prioridad = 1` y los demás contactos se desplazan hacia abajo. Si estaba inactivo, se reactiva como principal.
+3. Si es **nuevo**: el nuevo toma `prioridad = 1`.
+4. Los contactos anteriores se desplazan (1 pasa a 2, 2 pasa a 3).
+5. Si ya había 3 activos, el que era de prioridad 3 pasa a inactivo (`activo = false`).

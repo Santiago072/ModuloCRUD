@@ -63,6 +63,13 @@ ModuloCRUD/
 | `DELETE` | `/api/personas/:id` | Elimina una persona y sus contactos (Cascade) |
 | `POST` | `/api/contactos` | Agrega un contacto con rotación de prioridades |
 | `POST` | `/api/sync` | Recibe lote de registros offline del Service Worker |
+| `POST` | `/api/auth/login` | Inicia sesión en el panel de administrador (JWT) |
+| `PUT` | `/api/auth/password` | Cambia la contraseña del administrador (Bcrypt) |
+| `GET` | `/api/encuestadores` | Lista los encuestadores activos e inactivos |
+| `POST` | `/api/encuestadores` | Crea un nuevo encuestador |
+| `PUT` | `/api/encuestadores/:id` | Habilita/Deshabilita el estado de un encuestador |
+| `DELETE`| `/api/encuestadores/:id` | Elimina lógicamente un encuestador |
+| `GET` | `/api/stats` | Obtiene estadísticas (Total personas, ranking encuestadores) |
 
 ### Ejemplo — POST `/api/personas`
 ```json
