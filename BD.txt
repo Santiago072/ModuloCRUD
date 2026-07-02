@@ -36,3 +36,23 @@ CREATE TABLE IF NOT EXISTS encuestas (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (persona_id) REFERENCES personas(id) ON DELETE CASCADE
 );
+
+-- Nuevas Tablas para la Fase de Administración
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    rol ENUM('admin', 'user') DEFAULT 'admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS encuestadores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Usuario administrador por defecto (la contraseña es "admin123" encriptada con bcrypt)
+INSERT IGNORE INTO usuarios (username, password_hash, rol) VALUES ('admin', '$2a$10$D/Bw7jM6f4Y2E9G//1P0.ezc2a.b4nBfXzJbV8O4oT1Vq8l6U5/8C', 'admin');

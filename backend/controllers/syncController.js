@@ -5,12 +5,16 @@ exports.pullData = async (req, res) => {
   try {
     const [personas] = await pool.query('SELECT * FROM personas');
     const [contactos] = await pool.query('SELECT * FROM contactos WHERE activo = 1');
+    const [encuestas] = await pool.query('SELECT * FROM encuestas');
+    const [encuestadores] = await pool.query('SELECT * FROM encuestadores WHERE activo = 1');
     
     res.json({
       status: 'success',
       data: {
         personas,
-        contactos
+        contactos,
+        encuestas,
+        encuestadores
       }
     });
   } catch (error) {
