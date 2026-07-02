@@ -40,7 +40,6 @@ exports.syncOfflineData = async (req, res) => {
           const [existing] = await connection.query('SELECT id FROM personas WHERE cc = ?', [p.cc]);
           if (existing.length > 0) {
             await connection.query('DELETE FROM contactos WHERE persona_id = ?', [existing[0].id]);
-            await connection.query('DELETE FROM encuestas WHERE persona_id = ?', [existing[0].id]);
             await connection.query('DELETE FROM personas WHERE id = ?', [existing[0].id]);
           }
           syncSuccess++;
