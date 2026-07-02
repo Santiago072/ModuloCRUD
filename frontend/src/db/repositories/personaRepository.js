@@ -67,9 +67,8 @@ export const PersonaRepository = {
   markAsSynced: async (id) => {
     const p = await db.personas.get(id);
     if (p && p.sync_status === 'deleted') {
-      await db.transaction('rw', db.personas, db.contactos, db.encuestas, async () => {
+      await db.transaction('rw', db.personas, db.contactos, async () => {
         await db.contactos.where('persona_id').equals(id).delete();
-        await db.encuestas.where('persona_id').equals(id).delete();
         await db.personas.delete(id);
       });
     } else {
@@ -110,7 +109,6 @@ export const PersonaRepository = {
       for (const loc of locales) {
         if (loc.sync_status === 'synced' && !serverCcSet.has(loc.cc)) {
           await db.contactos.where('persona_id').equals(loc.id).delete();
-          await db.encuestas.where('persona_id').equals(loc.id).delete();
           await db.personas.delete(loc.id);
         }
       }
