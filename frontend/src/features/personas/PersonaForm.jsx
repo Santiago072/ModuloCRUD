@@ -22,20 +22,14 @@ export function PersonaForm({ onSuccess, onCancel }) {
   } = useForm({ 
     resolver: zodResolver(personaSchema),
     defaultValues: {
-      encuestador: localStorage.getItem('last_encuestador') || ''
+      encuestador: ''
     }
   });
 
   useEffect(() => {
-    // Cargar encuestadores activos desde Dexie y luego asignar el valor por defecto
-    db.encuestadores.filter(e => e.activo).toArray().then((data) => {
-      setEncuestadores(data);
-      const last = localStorage.getItem('last_encuestador');
-      if (last && !existingPersona) {
-        setValue('encuestador', last);
-      }
-    });
-  }, [setValue, existingPersona]);
+    // Cargar encuestadores activos desde Dexie
+    db.encuestadores.filter(e => e.activo).toArray().then(setEncuestadores);
+  }, []);
 
   const inputClass = (field) =>
     `w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
@@ -56,6 +50,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
         setValue('profesion', '');
         setValue('fecha_registro', '');
         setValue('nuevo_contacto', '');
+        setValue('encuestador', '');
       }
       return;
     }
@@ -85,16 +80,13 @@ export function PersonaForm({ onSuccess, onCancel }) {
         setValue('profesion', '');
         setValue('fecha_registro', '');
         setValue('nuevo_contacto', '');
-        setValue('encuestador', localStorage.getItem('last_encuestador') || '');
+        setValue('encuestador', '');
       }
     }
   };
 
   const onSubmit = async (data) => {
     try {
-      // Guardar el último encuestador usado
-      localStorage.setItem('last_encuestador', data.encuestador);
-
       if (existingPersona) {
         // Actualizar persona existente
         await updatePersona(existingPersona.id, {
@@ -109,7 +101,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
           await addContacto(existingPersona.id, 'celular', data.nuevo_contacto.trim());
         }
       } else {
-        // Crear nueva persona — el único número del formulario va como Contacto 1
+        // Crear nueva persona
         await createPersona({
           cc: data.cc,
           nombres: data.nombres,
@@ -123,7 +115,6 @@ export function PersonaForm({ onSuccess, onCancel }) {
         });
       }
       reset();
-      setValue('encuestador', data.encuestador); // Mantener el encuestador seleccionado
       setExistingPersona(null);
       setExistingContactos([]);
       onSuccess?.();
