@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
+import { Plus, X } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = '/api';
 
 export default function AdminDashboard() {
   const { user, token, logout } = useAuthStore();
@@ -10,6 +11,7 @@ export default function AdminDashboard() {
   const [encuestadores, setEncuestadores] = useState([]);
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchEncuestadores = async () => {
     try {
@@ -45,6 +47,7 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (data.status === 'success') {
         setNuevoNombre('');
+        setIsModalOpen(false);
         fetchEncuestadores();
       }
     } catch (error) {
@@ -89,7 +92,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 relative">
       <nav className="bg-purple-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -112,24 +115,66 @@ export default function AdminDashboard() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-            <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">Gestión de Encuestadores</h2>
-            
-            {/* Formulario de creación */}
-            <form onSubmit={handleCreate} className="mb-8 flex gap-4">
-              <input
-                type="text"
-                value={nuevoNombre}
-                onChange={(e) => setNuevoNombre(e.target.value)}
-                placeholder="Nombre del nuevo encuestador..."
-                className="flex-1 shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
-              />
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-medium leading-6 text-gray-900">Gestión de Encuestadores</h2>
               <button
-                type="submit"
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none"
+                onClick={() => setIsModalOpen(true)}
+                className="inline-flex items-center gap-2 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none"
               >
-                Añadir
+                <Plus size={16} /> Nuevo Encuestador
               </button>
-            </form>
+            </div>
+            
+            {/* Modal de creación */}
+            {isModalOpen && (
+              <div className="fixed inset-0 z-50 overflow-y-auto">
+                <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                  <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={() => setIsModalOpen(false)}></div>
+                  </div>
+                  <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                  <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">Añadir Encuestador</h3>
+                        <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-500">
+                          <X size={20} />
+                        </button>
+                      </div>
+                      <form onSubmit={handleCreate}>
+                        <div className="mt-2">
+                          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                          <input
+                            type="text"
+                            id="nombre"
+                            value={nuevoNombre}
+                            onChange={(e) => setNuevoNombre(e.target.value)}
+                            placeholder="Ej. María López"
+                            className="mt-1 shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                          <button
+                            type="submit"
+                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsModalOpen(false)}
+                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Lista */}
             {loading ? (
