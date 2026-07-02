@@ -45,3 +45,34 @@ exports.login = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
   }
 };
+
+exports.changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user.id; // Viene del token
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ status: 'error', message: 'Faltan datos' });
+  }
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM usuarios WHERE id = ?', [userId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ status: 'error', message: 'Usuario no encontrado' });
+    }
+
+    const user = rows[0];
+    const match = await bcrypt.compare(currentPassword, user.password_hash);
+    
+    if (!match) {
+      return res.status(401).json({ status: 'error', message: 'La contraseña actual es incorrecta' });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE usuarios SET password_hash = ? WHERE id = ?', [hashedNewPassword, userId]);
+
+    res.json({ status: 'success', message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
+  }
+};

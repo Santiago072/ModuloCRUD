@@ -1,7 +1,14 @@
 import db from '../schema';
 
 export const PersonaRepository = {
-  getAll: () => db.personas.orderBy('id').reverse().toArray(),
+  getAll: async () => {
+    const personas = await db.personas.orderBy('id').reverse().toArray();
+    for (let p of personas) {
+      const encuesta = await db.encuestas.where('persona_id').equals(p.id).first();
+      p.encuestador = encuesta ? encuesta.encuestador : 'Sin registro';
+    }
+    return personas;
+  },
   getById: (id) => db.personas.get(id),
   getByCc: (cc) => db.personas.where('cc').equals(cc).first(),
 
@@ -62,7 +69,11 @@ export const PersonaRepository = {
       .where('persona_id').equals(id)
       .and(c => c.activo === true)
       .sortBy('prioridad');
-    return { ...persona, contactos };
+    
+    const encuesta = await db.encuestas.where('persona_id').equals(id).first();
+    const encuestador = encuesta ? encuesta.encuestador : 'Sin registro';
+
+    return { ...persona, contactos, encuestador };
   },
 
   getPendingSync: async () => {
