@@ -1,198 +1,89 @@
-# 📖 Manual de Usuario — Módulo CRUD Encuestas
+# Manual de Usuario - Módulo CRUD Encuestas (Versión 1.1.0)
 
-**Sistema:** Módulo CRUD de Encuestas (PWA Offline-First)  
-**Plataforma:** Web / Android (PWA instalable)  
-**URL:** [modulocrud.slscode.online](https://modulocrud.slscode.online)
+Bienvenido al Módulo CRUD para Encuestas. Esta aplicación (PWA) está diseñada para funcionar **incluso sin internet** (offline-first), permitiendo a los encuestadores recolectar datos en campo y sincronizarlos automáticamente cuando se recupere la conexión.
 
----
+## 📱 Instalación (PWA)
 
-## 1. Introducción
+La aplicación puede instalarse en su teléfono móvil o computadora como una aplicación nativa:
 
-El **Módulo CRUD de Encuestas** es una aplicación diseñada para registrar, consultar, actualizar y eliminar encuestas de personas en campo. Funciona **con o sin internet**:
+**Desde el Celular (Android/Chrome):**
+1. Abra el navegador Chrome y visite la URL de la aplicación.
+2. Toque el menú de opciones (tres puntos verticales) en la esquina superior derecha.
+3. Seleccione **"Instalar aplicación"** o **"Añadir a la pantalla de inicio"**.
+4. ¡Listo! Ahora tendrá un ícono de la aplicación en su menú y podrá abrirla sin entrar al navegador.
 
-- ✅ **Con internet:** Los datos se guardan localmente y se sincronizan al servidor en tiempo real.
-- ✅ **Sin internet:** Los datos se guardan en el dispositivo y se sincronizan automáticamente cuando se recupere la señal.
-
----
-
-## 2. Acceso al Sistema
-
-### Desde el navegador (PC o Celular)
-1. Abra su navegador web (Chrome recomendado).
-2. Ingrese la URL: **`modulocrud.slscode.online`**
-3. La aplicación cargará automáticamente.
-
-### Instalación como aplicación en Android
-1. Abra Chrome en su celular y acceda a la URL.
-2. Chrome mostrará un banner **"Agregar a pantalla de inicio"** — pulse **Instalar**.
-3. La app aparecerá en su pantalla de inicio como cualquier aplicación nativa.
-
-> **Nota:** Si no aparece el banner, pulse el menú (⋮) de Chrome y seleccione "Agregar a pantalla de inicio".
+**Desde el PC:**
+1. Visite la URL en Google Chrome o Edge.
+2. Verá un ícono de instalación (una pantalla con una flecha hacia abajo) en la parte derecha de la barra de direcciones.
+3. Haga clic y seleccione **"Instalar"**.
 
 ---
 
-## 3. Pantalla Principal
+## ⚡ Funcionamiento Básico (Offline-First)
 
-Al abrir la aplicación verá la pantalla principal con:
+La principal característica de este sistema es su capacidad de trabajar sin internet.
 
-| Elemento | Descripción |
-|----------|-------------|
-| **Indicador de red** | Esquina superior derecha: muestra `🛜 En línea` (verde) u `Offline` (rojo) |
-| **Encuestas registradas** | Lista de todas las personas encuestadas |
-| **Buscador** | Campo de búsqueda por CC, nombre o apellido |
-| **Exportar CSV** | Botón para descargar todos los datos en formato CSV |
-| **+ Nueva Encuesta** | Botón para crear un nuevo registro |
+*   **Sin conexión (Offline):** Puede seguir agregando encuestas, editando información de contactos y eliminando personas. Todos los cambios se guardan en la memoria local de su dispositivo y se marcan con una etiqueta de **Pendiente (Color Amarillo)**.
+*   **Con conexión (Online):** Al momento de detectar conexión a internet, la aplicación enviará todos los datos pendientes al servidor central. Una vez guardados con éxito, la etiqueta cambiará a **Sincronizado (Color Verde)**.
+
+**Importante:** Nunca cierre sesión, borre los datos de navegación o desinstale la aplicación mientras tenga registros en estado "Pendiente", ya que esa información no ha llegado al servidor y se perderá.
 
 ---
 
-## 4. Crear una Nueva Encuesta
+## 👥 Gestión de Personas y Contactos
 
-1. Pulse el botón **"+ Nueva Encuesta"**.
-2. Se desplegará el formulario de captura.
+### 1. Registrar una nueva Encuesta
+1. Haga clic en el botón morado **"Nueva Encuesta"**.
+2. Llene los datos básicos obligatorios (Documento, Nombres, Apellidos y Fecha).
+3. **Seleccione su nombre de Encuestador** en la lista desplegable. El sistema recordará su selección automáticamente para las próximas encuestas.
+4. Ingrese el número de contacto principal (Celular, Fijo, WhatsApp, etc.).
+5. Haga clic en **Guardar**.
 
-### Campos del formulario
+### 2. Buscar Personas
+En la pantalla principal, utilice la barra de búsqueda para encontrar registros rápidamente. Puede buscar por:
+*   Número de Cédula (CC).
+*   Nombres.
+*   Apellidos.
 
-| Campo | Obligatorio | Descripción |
-|-------|-------------|-------------|
-| **Cédula (CC)** | ✅ Sí | Número de cédula de ciudadanía |
-| **Nombres** | ✅ Sí | Nombre(s) de la persona |
-| **Apellidos** | ✅ Sí | Apellido(s) de la persona |
-| **Fecha de Encuesta** | ✅ Sí | Fecha en que se realizó la encuesta |
-| **Profesión** | ❌ No | Ocupación o profesión |
-| **Número de contacto** | ❌ No | Número de celular o teléfono |
+### 3. Ver Detalles e Historial
+Para ver toda la información de un usuario, simplemente haga clic sobre su tarjeta en la lista principal. Se abrirá una ventana con:
+*   Sus datos básicos, profesión y el **Encuestador** responsable.
+*   Su lista de contactos (Principal, Contacto 2, Contacto 3).
+*   El estado de sincronización.
 
-### Autocompletado por CC
-El sistema busca la CC en tiempo real mientras usted escribe:
-
-- Si la CC **ya existe**, se rellenan automáticamente los campos con los datos guardados. Puede editar los campos o agregar un nuevo número de contacto.
-- Si la CC **no existe**, los campos quedan vacíos para ingresar un nuevo registro.
-- Si borra o cambia la CC, los campos se **limpian automáticamente**.
-
-3. Complete los campos y pulse **"Guardar Encuesta"** (o **"Actualizar Encuesta"** si la CC ya existía).
-
----
-
-## 5. Ver el Detalle de una Encuesta
-
-1. En la lista principal, pulse sobre el nombre de cualquier persona.
-2. Se abrirá un **modal de detalle** con:
-   - Datos personales (nombre, CC, profesión, fecha).
-   - Lista de **números de contacto** ordenados por prioridad.
-   - Estado de sincronización (Sincronizado / Pendiente).
-   - Fecha de última actualización.
+### 4. Actualizar o Eliminar Registros
+*   **Para Editar:** Dentro del detalle de la persona, presione el botón **"Editar"** en la esquina inferior derecha. Modifique los campos necesarios y presione **"Guardar"**.
+*   **Para Eliminar:** En la misma ventana de detalle, presione **"Eliminar"** en la esquina inferior izquierda. Le pedirá confirmación. Una vez confirmado, desaparecerá de su pantalla y se borrará del servidor en la próxima sincronización.
+*   **Para Añadir más números de teléfono:** En el detalle de la persona, al lado del título "Números de contacto", haga clic en **"+ Agregar"**. Tenga en cuenta que el nuevo número pasará a ser el contacto principal, y los demás se desplazarán hacia abajo.
 
 ---
 
-## 6. Editar una Encuesta
+## 🔒 Panel de Administración (NUEVO)
 
-Desde el modal de detalle:
+Los administradores tienen acceso a un panel de control avanzado para gestionar a los encuestadores del sistema:
 
-1. Pulse el botón **"Editar"** (esquina inferior derecha).
-2. Los campos pasarán a modo edición.
-3. Modifique los datos que desee.
-4. Pulse **"Guardar"** para confirmar o **"Cancelar"** para descartar.
-
----
-
-## 7. Agregar un Número de Contacto
-
-El sistema permite registrar hasta **3 números de contacto activos** por persona, con rotación automática de prioridades:
-
-1. Abra el detalle de una encuesta.
-2. Pulse el botón **"⊕ Agregar"** junto a "Números de contacto".
-3. Ingrese el nuevo número y pulse **"Guardar"**.
-
-### Lógica de rotación de prioridades
-| Situación | Resultado |
-|-----------|-----------|
-| No hay contactos | El nuevo número queda como **Principal** (prioridad 1) |
-| Hay 1 contacto | El nuevo pasa a **Principal**, el anterior a Contacto 2 |
-| Hay 2 contactos | El nuevo pasa a **Principal**, los anteriores rotan (1→2, 2→3) |
-| Hay 3 contactos | El nuevo pasa a **Principal**, el de prioridad 3 se **archiva** (queda inactivo) |
+1. **Ingreso:** En la esquina superior derecha de la pantalla principal, presione el botón **"Admin"**.
+2. **Dashboard:** Aquí podrá ver la lista de todos los encuestadores registrados.
+3. **Añadir Encuestadores:** Presione el botón "+ Nuevo Encuestador", escriba el nombre completo y presione guardar. Este nombre aparecerá automáticamente en los celulares de los encuestadores en campo (siempre y cuando tengan conexión a internet para descargar la lista actualizada).
+4. **Desactivar o Eliminar:** Puede pausar a un encuestador (Desactivar) para que no salga en la lista sin borrar su historial, o eliminarlo permanentemente.
+5. **Cambio de Contraseñas:** En la esquina superior derecha del panel, los administradores pueden cambiar su propia contraseña en cualquier momento por motivos de seguridad.
 
 ---
 
-## 8. Eliminar una Encuesta
+## 📊 Exportación de Reportes
 
-1. Abra el detalle de la encuesta que desea eliminar.
-2. Pulse el botón rojo **"🗑 Eliminar"**.
-3. Aparecerá una confirmación: pulse **"Sí"** para confirmar o **"No"** para cancelar.
-
-> ⚠️ **Importante:** La eliminación es permanente. Al confirmar, el registro se borra del dispositivo y del servidor central en cuanto haya conexión.
-
----
-
-## 9. Buscar Encuestas
-
-Utilice el buscador en la parte superior de la lista:
-
-- Puede buscar por **CC**, **nombre** o **apellido**.
-- La búsqueda es **en tiempo real** (no necesita pulsar Enter).
-- Para ver todos los registros nuevamente, borre el texto del buscador.
+Para generar reportes y entregar los consolidados de las encuestas:
+1. Asegúrese de tener buena conexión a internet para que la aplicación descargue todos los datos actualizados del equipo.
+2. En la pantalla principal, clic en el botón blanco **"Exportar CSV"**.
+3. Se generará automáticamente un archivo de Excel (`.xls`) con todas las personas, sus múltiples contactos y su estado de sincronización.
 
 ---
 
-## 10. Exportar a CSV
+## 🔧 Soporte Técnico y Errores Comunes
 
-1. Pulse el botón **"⬇ Exportar CSV"** en la pantalla principal.
-2. Se descargará un archivo `.csv` con todos los registros actuales.
-3. Puede abrirlo con Excel, Google Sheets o cualquier programa de hojas de cálculo.
-
----
-
-## 11. Estado de Sincronización
-
-Cada encuesta muestra su estado junto al nombre:
-
-| Indicador | Significado |
-|-----------|-------------|
-| 🟢 **Sincronizado** | El registro está confirmado en el servidor central |
-| 🟡 **Pendiente** | El registro está guardado localmente, pendiente de subir al servidor |
-
-> El sistema sincroniza automáticamente en cuanto detecta conexión a internet. Normalmente el cambio de "Pendiente" a "Sincronizado" ocurre en **menos de 1 segundo** con buena señal.
-
----
-
-## 12. Uso Sin Conexión
-
-El sistema funciona completamente sin internet:
-
-- Puede **crear, editar y consultar** encuestas sin señal.
-- Los datos se guardan de forma segura en su dispositivo.
-- Al reconectarse, la app **sincroniza automáticamente** todos los cambios pendientes.
-- Las encuestas creadas en un dispositivo aparecerán en los demás al reconectarse.
-
----
-
-## 13. Solución de Problemas Comunes
-
-### ❓ Las encuestas no aparecen en mi celular
-- Verifique que tiene conexión a internet.
-- Recargue la página (deslice hacia abajo para refrescar en móvil).
-- Si persiste, borre la caché de la app: en Chrome, vaya a **Información del sitio → Borrar y restablecer**.
-
-### ❓ Una encuesta sigue en "Pendiente" a pesar de tener internet
-- Espere unos segundos y recargue la página.
-- Si sigue igual, cierre y vuelva a abrir la aplicación.
-- El sistema reiniciará la sincronización automáticamente.
-
-### ❓ Instalé la app en Android pero no actualiza
-- Abra la app, cierre y vuelva a abrir.
-- Si el problema persiste, desinstale la app PWA, borre los datos del sitio en Chrome y vuelva a instalarla desde la URL.
-
----
-
-## 14. Glosario
-
-| Término | Definición |
-|---------|------------|
-| **PWA** | Aplicación Web Progresiva — funciona en el navegador e instalable como app nativa |
-| **Offline-First** | Arquitectura que prioriza el funcionamiento sin internet |
-| **CC** | Cédula de Ciudadanía — identificador único de cada persona |
-| **Sincronizado** | Dato confirmado en el servidor central y visible desde cualquier dispositivo |
-| **Pendiente** | Dato guardado localmente, aún no enviado al servidor |
-| **Rotación de Contactos** | Sistema que gestiona hasta 3 números activos por persona, archivando el más antiguo |
-
----
-
-*Última actualización: 2026-06-27*
+*   **¿Por qué mis registros dicen "Pendiente"?**
+    Significa que no tiene conexión a internet o la conexión es inestable. Asegúrese de tener datos móviles encendidos o estar conectado a un Wi-Fi y recargue la página.
+*   **No aparece mi nombre en la lista de encuestadores**
+    El administrador debe agregarlo primero en el Panel de Control. Si ya lo agregó, conéctese a internet un momento y refresque la página para que el celular descargue la lista nueva.
+*   **¿Por qué no veo los cambios que hizo mi compañero?**
+    La aplicación sincroniza los cambios cada vez que la abre o recupera el internet. Si acaba de abrir la app y no los ve, deslice hacia abajo (en el celular) o presione `F5` (en el PC) para forzar la sincronización.

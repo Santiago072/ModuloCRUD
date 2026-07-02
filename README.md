@@ -6,8 +6,8 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 
 | Documento | Descripción |
 |-----------|-------------|
-| 👤 [Manual de Usuario](MANUAL_USUARIO.md) | Guía de uso de la aplicación para usuarios finales |
-| 📜 [Registro de Cambios](CHANGELOG.md) | Historial de versiones y modificaciones del sistema (v1.0.0) |
+| 👤 [Manual de Usuario](docs/MANUAL_USUARIO.md) | Guía de uso de la aplicación para usuarios finales |
+| 📜 [Registro de Cambios](docs/CHANGELOG.md) | Historial de versiones y modificaciones del sistema (v1.1.0) |
 | 📋 [Plan de Implementación](docs/PLAN_IMPLEMENTACION.md) | Fases del proyecto, stack tecnológico y arquitectura de sincronización |
 | 📖 [Documentación Técnica](docs/documentacion-tecnica.md) | Arquitectura de carpetas, endpoints API, flujo offline-first |
 | 📋 [Especificación de Requisitos](docs/Especificacion_Requisitos.md) | Objetivos, RNF, modelo de datos y justificaciones de diseño |
@@ -18,22 +18,22 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 ### 📱 Portal App (PWA Frontend)
 * **Arquitectura Offline-First:** Los datos se guardan instantáneamente en el dispositivo (usando `IndexedDB` y `Dexie.js`) permitiendo continuar el trabajo sin interrupciones aunque se pierda la señal celular.
 * **Componentes UI:** Interfaz construida con **React 18** y **Tailwind CSS** para un diseño responsivo, limpio y rápido.
-* **Validación Robusta:** Formularios gestionados con `React Hook Form` con validación de campos en tiempo real.
-* **Empaquetado Android:** Capacidad de ser instalada directamente desde el navegador o compilada como un `.apk` nativo mediante TWA (Trusted Web Activity).
+* **Panel de Administración (v1.1.0):** Dashboard integrado para la gestión de encuestadores (alta, baja, listado), protegido mediante autenticación JWT, incluyendo cambio de contraseñas.
+* **Manejo Dinámico de Encuestadores:** Sincronización automática del listado de encuestadores al cliente offline, autocompletado y memoria local persistente para máxima agilidad en campo.
 
 ### ⚙️ Servidor Central (Backend API)
 * **API RESTful:** Desarrollada íntegramente en **Node.js** con **Express**, proporcionando un ecosistema homogéneo (JavaScript en cliente y servidor).
-* **Base de Datos Normalizada:** Estructura relacional estricta (Personas -> Contactos -> Encuestas) que permite un historial infinito de contactos y su rotación de prioridades sin límite de columnas.
+* **Base de Datos Normalizada:** Estructura relacional estricta (Usuarios -> Personas -> Contactos -> Encuestas) que permite un historial infinito de encuestas vinculadas a encuestadores específicos.
 * **Sincronización Inteligente:** El servidor recibe lotes de datos desde el `Background Sync` de los Service Workers, evaluando marcas de tiempo (`updated_at`) para evitar conflictos de sobreescritura.
-* **Dominio Integrado:** Listo para despliegue en VPS bajo el subdominio `modulocrud.slscode.online` con encriptación HTTPS.
+* **Seguridad Avanzada:** Autenticación por Bearer Tokens, encriptación de contraseñas mediante `bcrypt` y protección de rutas administrativas.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 * **Frontend:** React, Vite, Tailwind CSS, Zustand, Dexie.js
-* **Backend:** Node.js, Express.js
-* **Base de Datos:** IndexedDB (Local) / MySQL o PostgreSQL (VPS)
-* **Infraestructura:** Nginx, PM2, Let's Encrypt (Certbot)
+* **Backend:** Node.js, Express.js, JWT, bcrypt
+* **Base de Datos:** IndexedDB (Local) / MySQL (VPS)
+* **Infraestructura:** Docker Compose, Nginx, Let's Encrypt (Certbot)
 
 ---
 
@@ -57,10 +57,9 @@ El proyecto está completamente dockerizado para facilitar su despliegue en ento
 
 ---
 
-## 📅 Estado del Proyecto: Fase 5 (Completado ✅)
+## 📅 Estado del Proyecto: Cloud Survey System v1.1.0 (Completado ✅)
 
 El sistema ha superado con éxito todas las fases de desarrollo y se encuentra en etapa de producción:
-* **Fase 1 & 2:** Arquitectura, Backend Node.js y MySQL completados.
-* **Fase 3:** Frontend PWA con React y Dexie.js finalizado.
-* **Fase 4 (Completada):** Motor de sincronización proactivo con Debounce (Push) y limpieza de fantasmas (Pull) estable. Implementación de Soft-Deletes local/remoto funcional.
-* **Fase 5 (Actual):** Despliegue en VPS (Nginx + Let's Encrypt) exitoso. Empaquetado a Android APK (Bubblewrap/TWA) pendiente como paso final opcional para distribución en tiendas.
+* **Fases 1 a 4:** Arquitectura Offline-First, Backend Node.js, y motor de sincronización proactivo completados (Versión Base).
+* **Fase 5:** Despliegue en VPS (Nginx + Let's Encrypt + Docker) 100% estable.
+* **Actualización v1.1.0 (Nueva):** Integración de Panel Administrativo, Control de Accesos por JWT, Tabla "Encuestas" y selector dinámico offline de "Encuestadores" implementado exitosamente.

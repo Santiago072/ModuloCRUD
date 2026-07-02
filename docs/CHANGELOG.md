@@ -5,6 +5,15 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lang/es/).
 
+## [v1.1.0] - 2026-07-02
+### Panel de Administración y Gestión de Encuestadores
+- **Panel Administrativo Web**: Se creó el área `/admin` (protegida con JWT y autenticación encriptada) para la gestión completa de los trabajadores en campo.
+- **Gestión Dinámica de Encuestadores**: Funcionalidad CRUD para añadir, desactivar y eliminar encuestadores. Los nombres ahora se controlan desde la base de datos central.
+- **Seguridad y Accesos**: Endpoint y UI con Modal para el cambio seguro de contraseñas de administrador (mediante bcrypt). Botón de navegación integrado en el inicio para acceso rápido al panel.
+- **Sincronización de Base de Datos PWA**: La tabla local de Dexie se actualizó a la `v2` para soportar la sincronización en segundo plano de la lista de encuestadores.
+- **Formulario Inteligente y Persistente**: El formulario de `Nueva Encuesta` ahora tiene un selector dinámico para asociar cada encuesta a su encuestador, almacenando la selección en `localStorage` para evitar selecciones repetitivas en campo.
+- **Experiencia de Usuario (UI)**: Visualización del nombre del encuestador directamente en la lista principal de resultados (Badge gris) y en los detalles individuales, facilitando el seguimiento de metas.
+
 ## [v1.0.0] - 2026-07-02
 ### Lanzamiento Oficial (Stable Release)
 - **Motor de Sincronización Offline-First**: Implementación robusta de sincronización bidireccional (PULL/PUSH) con soporte para reconexión inteligente, previniendo sobreescrituras (fantasmas) y garantizando la integridad de datos en escenarios sin conexión a internet.
