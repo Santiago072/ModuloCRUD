@@ -60,6 +60,11 @@ export function PersonaForm({ onSuccess, onCancel }) {
       setValue('apellidos', existing.apellidos);
       setValue('profesion', existing.profesion || '');
       setValue('fecha_registro', existing.fecha_registro);
+      
+      const encuesta = await db.encuestas.where('persona_id').equals(existing.id).first();
+      if (encuesta) {
+        setValue('encuestador', encuesta.encuestador);
+      }
 
       const contactos = await ContactoRepository.getByPersona(existing.id);
       setExistingContactos(contactos);
@@ -74,6 +79,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
         setValue('profesion', '');
         setValue('fecha_registro', '');
         setValue('nuevo_contacto', '');
+        setValue('encuestador', localStorage.getItem('last_encuestador') || '');
       }
     }
   };
@@ -111,6 +117,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
         });
       }
       reset();
+      setValue('encuestador', data.encuestador); // Mantener el encuestador seleccionado
       setExistingPersona(null);
       setExistingContactos([]);
       onSuccess?.();
