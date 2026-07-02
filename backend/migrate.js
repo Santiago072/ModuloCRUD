@@ -28,7 +28,7 @@ const migrate = async () => {
           activo BOOLEAN DEFAULT TRUE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
-      `INSERT IGNORE INTO usuarios (username, password_hash, rol) VALUES ('admin', '$2a$10$D/Bw7jM6f4Y2E9G//1P0.ezc2a.b4nBfXzJbV8O4oT1Vq8l6U5/8C', 'admin')`
+      `INSERT IGNORE INTO usuarios (username, password_hash, rol) VALUES ('admin', '$2b$10$.pH9Y/LD7xuFevs9sZ08cu2aDF5tUcRiaQC4llY2tHUea/4lID5o2', 'admin')`
     ];
 
     for (let i = 0; i < queries.length; i++) {

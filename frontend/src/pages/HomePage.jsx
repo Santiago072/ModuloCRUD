@@ -5,7 +5,8 @@ import { PersonaDetail } from '../features/personas/PersonaDetail';
 import { NetworkStatus } from '../components/NetworkStatus';
 import { useSyncManager } from '../hooks/useSyncManager';
 import { exportToCSV } from '../utils/exportUtils';
-import { PlusCircle, ClipboardList, Download } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { PlusCircle, ClipboardList, Download, ShieldCheck } from 'lucide-react';
 
 export default function HomePage() {
   useSyncManager();
@@ -21,7 +22,15 @@ export default function HomePage() {
             <ClipboardList size={22} className="text-indigo-600" />
             <h1 className="text-base font-bold text-gray-800">Módulo CRUD – Encuestas</h1>
           </div>
-          <NetworkStatus />
+          <div className="flex items-center gap-4">
+            <NetworkStatus />
+            <Link 
+              to="/admin/login" 
+              className="flex items-center gap-1 text-xs font-semibold text-purple-600 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 px-2 py-1.5 rounded transition-colors"
+            >
+              <ShieldCheck size={16} /> Admin
+            </Link>
+          </div>
         </div>
       </header>
 
