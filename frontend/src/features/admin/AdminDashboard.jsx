@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Users, FileText, Trophy, LogOut, KeyRound } from 'lucide-react';
 
 const API_URL = '/api';
 
@@ -149,70 +149,96 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 relative">
-      <nav className="bg-purple-600 shadow-lg">
+    <div className="min-h-screen bg-slate-50 relative">
+      {/* Navbar Minimalista */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-white text-xl font-bold">Panel Admin - Módulo CRUD</h1>
+            <div className="flex items-center gap-2">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Users className="text-white h-5 w-5" />
+              </div>
+              <h1 className="text-slate-800 text-xl font-bold tracking-tight">Panel Admin</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-white text-sm hidden sm:block">Hola, {user?.username}</span>
+            <div className="flex items-center space-x-3 sm:space-x-5">
+              <div className="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-slate-600 text-sm font-medium">{user?.username}</span>
+              </div>
               <button
                 onClick={() => setIsPasswordModalOpen(true)}
-                className="text-purple-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="flex items-center gap-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg text-sm font-medium transition-all"
+                title="Cambiar Contraseña"
               >
-                Cambiar Contraseña
+                <KeyRound size={18} />
+                <span className="hidden sm:inline">Contraseña</span>
               </button>
               <button
                 onClick={handleLogout}
-                className="bg-purple-700 hover:bg-purple-800 text-white px-3 py-2 rounded-md text-sm font-medium"
+                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
               >
-                Cerrar Sesión
+                <LogOut size={16} />
+                <span className="hidden sm:inline">Salir</span>
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0 space-y-6">
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="space-y-8">
           
-          {/* Tarjetas de Estadísticas */}
+          {/* Tarjetas de Estadísticas Mejoradas */}
           {stats && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-lg shadow px-5 py-6 flex flex-col items-center justify-center border-t-4 border-purple-500">
-                <span className="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Personas</span>
-                <span className="text-3xl font-bold text-gray-800 mt-2">{stats.totalPersonas}</span>
+              
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="absolute -right-6 -top-6 bg-blue-50 w-24 h-24 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                <Users className="text-blue-500 mb-3" size={32} />
+                <span className="text-slate-500 text-sm font-semibold uppercase tracking-wider">Total Personas</span>
+                <span className="text-4xl font-extrabold text-slate-800 mt-1">{stats.totalPersonas}</span>
               </div>
-              <div className="bg-white rounded-lg shadow px-5 py-6 flex flex-col items-center justify-center border-t-4 border-indigo-500">
-                <span className="text-gray-500 text-sm font-medium uppercase tracking-wide">Total Encuestas</span>
-                <span className="text-3xl font-bold text-gray-800 mt-2">{stats.totalEncuestas}</span>
+
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="absolute -right-6 -top-6 bg-indigo-50 w-24 h-24 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                <FileText className="text-indigo-500 mb-3" size={32} />
+                <span className="text-slate-500 text-sm font-semibold uppercase tracking-wider">Total Encuestas</span>
+                <span className="text-4xl font-extrabold text-slate-800 mt-1">{stats.totalEncuestas}</span>
               </div>
-              <div className="bg-white rounded-lg shadow px-5 py-6 border-t-4 border-blue-500">
-                <span className="text-gray-500 text-sm font-medium uppercase tracking-wide mb-3 block text-center">Top Encuestadores</span>
-                <ul className="space-y-2">
+
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+                <div className="flex items-center gap-2 mb-4 justify-center">
+                  <Trophy className="text-amber-500" size={20} />
+                  <span className="text-slate-700 text-sm font-bold uppercase tracking-wide">Top Encuestadores</span>
+                </div>
+                <ul className="space-y-3">
                   {stats.ranking.length > 0 ? stats.ranking.map((r, i) => (
-                    <li key={i} className="flex justify-between items-center text-sm">
-                      <span className="text-gray-700 truncate mr-2" title={r.encuestador}>{r.encuestador || 'Desconocido'}</span>
-                      <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{r.cantidad}</span>
+                    <li key={i} className="flex justify-between items-center text-sm bg-slate-50 px-3 py-2 rounded-lg">
+                      <span className="text-slate-700 font-medium truncate mr-2 flex items-center gap-2" title={r.encuestador}>
+                        <span className="text-slate-400 font-bold w-4">{i+1}.</span>
+                        {r.encuestador || 'Desconocido'}
+                      </span>
+                      <span className="font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-md">{r.cantidad}</span>
                     </li>
                   )) : (
-                    <li className="text-gray-400 text-sm text-center">Sin datos</li>
+                    <li className="text-slate-400 text-sm text-center py-4">Sin datos</li>
                   )}
                 </ul>
               </div>
             </div>
           )}
 
-          <div className="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-medium leading-6 text-gray-900">Gestión de Encuestadores</h2>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-slate-800">Gestión de Encuestadores</h2>
+                <p className="text-sm text-slate-500 mt-1">Añade o deshabilita los encuestadores que aparecen en la app.</p>
+              </div>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center gap-2 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none"
+                className="inline-flex items-center gap-2 justify-center py-2.5 px-5 shadow-sm text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors w-full sm:w-auto"
               >
-                <Plus size={16} /> Nuevo Encuestador
+                <Plus size={18} /> Nuevo Encuestador
               </button>
             </div>
             
@@ -221,43 +247,43 @@ export default function AdminDashboard() {
               <div className="fixed inset-0 z-50 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
                   <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                    <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={() => setIsModalOpen(false)}></div>
+                    <div className="absolute inset-0 bg-slate-900 opacity-50 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
                   </div>
                   <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                  <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">Añadir Encuestador</h3>
-                        <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-500">
+                  <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                    <div className="bg-white px-6 pt-6 pb-6">
+                      <div className="flex justify-between items-center mb-5">
+                        <h3 className="text-xl font-bold text-slate-800">Añadir Encuestador</h3>
+                        <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1 rounded-full transition-colors">
                           <X size={20} />
                         </button>
                       </div>
                       <form onSubmit={handleCreate}>
                         <div className="mt-2">
-                          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                          <label htmlFor="nombre" className="block text-sm font-semibold text-slate-700 mb-1">Nombre Completo</label>
                           <input
                             type="text"
                             id="nombre"
                             value={nuevoNombre}
                             onChange={(e) => setNuevoNombre(e.target.value)}
                             placeholder="Ej. María López"
-                            className="mt-1 shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                            className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-lg p-3 border outline-none transition-all"
                             autoFocus
                           />
                         </div>
-                        <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                          <button
-                            type="submit"
-                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
-                          >
-                            Guardar
-                          </button>
+                        <div className="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
                           <button
                             type="button"
                             onClick={() => setIsModalOpen(false)}
-                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            className="w-full sm:w-auto inline-flex justify-center rounded-lg border border-slate-300 px-5 py-2.5 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                           >
                             Cancelar
+                          </button>
+                          <button
+                            type="submit"
+                            className="w-full sm:w-auto inline-flex justify-center rounded-lg border border-transparent px-5 py-2.5 bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                          >
+                            Guardar
                           </button>
                         </div>
                       </form>
@@ -272,64 +298,64 @@ export default function AdminDashboard() {
               <div className="fixed inset-0 z-50 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
                   <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                    <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={() => setIsPasswordModalOpen(false)}></div>
+                    <div className="absolute inset-0 bg-slate-900 opacity-50 backdrop-blur-sm" onClick={() => setIsPasswordModalOpen(false)}></div>
                   </div>
                   <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                  <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full">
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">Cambiar Contraseña</h3>
-                        <button onClick={() => setIsPasswordModalOpen(false)} className="text-gray-400 hover:text-gray-500">
+                  <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full">
+                    <div className="bg-white px-6 pt-6 pb-6">
+                      <div className="flex justify-between items-center mb-5">
+                        <h3 className="text-xl font-bold text-slate-800">Cambiar Contraseña</h3>
+                        <button onClick={() => setIsPasswordModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1 rounded-full transition-colors">
                           <X size={20} />
                         </button>
                       </div>
                       
                       {passwordError && (
-                        <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-3">
-                          <p className="text-sm text-red-700">{passwordError}</p>
+                        <div className="mb-5 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
+                          <p className="text-sm font-medium text-red-800">{passwordError}</p>
                         </div>
                       )}
                       
                       {passwordSuccess && (
-                        <div className="mb-4 bg-green-50 border-l-4 border-green-400 p-3">
-                          <p className="text-sm text-green-700">{passwordSuccess}</p>
+                        <div className="mb-5 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-md">
+                          <p className="text-sm font-medium text-green-800">{passwordSuccess}</p>
                         </div>
                       )}
 
                       <form onSubmit={handlePasswordSubmit}>
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Contraseña Actual</label>
+                            <label className="block text-sm font-semibold text-slate-700 mb-1">Contraseña Actual</label>
                             <input
                               type="password"
                               value={currentPassword}
                               onChange={(e) => setCurrentPassword(e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                              className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-lg p-3 border outline-none transition-all"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
+                            <label className="block text-sm font-semibold text-slate-700 mb-1">Nueva Contraseña</label>
                             <input
                               type="password"
                               value={newPassword}
                               onChange={(e) => setNewPassword(e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                              className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-lg p-3 border outline-none transition-all"
                             />
                           </div>
                         </div>
-                        <div className="mt-6 sm:flex sm:flex-row-reverse">
-                          <button
-                            type="submit"
-                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
-                          >
-                            Actualizar
-                          </button>
+                        <div className="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
                           <button
                             type="button"
                             onClick={() => setIsPasswordModalOpen(false)}
-                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            className="w-full sm:w-auto inline-flex justify-center rounded-lg border border-slate-300 px-5 py-2.5 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                           >
                             Cancelar
+                          </button>
+                          <button
+                            type="submit"
+                            className="w-full sm:w-auto inline-flex justify-center rounded-lg border border-transparent px-5 py-2.5 bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                          >
+                            Actualizar
                           </button>
                         </div>
                       </form>
@@ -341,41 +367,43 @@ export default function AdminDashboard() {
 
             {/* Lista */}
             {loading ? (
-              <p className="text-center text-gray-500">Cargando...</p>
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
             ) : (
               <div className="flex flex-col">
                 <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                   <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                    <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <div className="overflow-hidden border border-slate-200 sm:rounded-xl">
+                      <table className="min-w-full divide-y divide-slate-200">
+                        <thead className="bg-slate-50">
                           <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Nombre</th>
+                            <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</th>
+                            <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Acciones</th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white divide-y divide-slate-100">
                           {encuestadores.map((encuestador) => (
-                            <tr key={encuestador.id}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <tr key={encuestador.id} className="hover:bg-slate-50 transition-colors">
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">
                                 {encuestador.nombre}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${encuestador.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                <span className={`px-2.5 py-1 inline-flex text-xs font-bold rounded-md ${encuestador.activo ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
                                   {encuestador.activo ? 'Activo' : 'Inactivo'}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                 <button
                                   onClick={() => handleToggleActivo(encuestador.id, encuestador.activo, encuestador.nombre)}
-                                  className="text-purple-600 hover:text-purple-900"
+                                  className={`${encuestador.activo ? 'text-amber-600 hover:text-amber-800' : 'text-emerald-600 hover:text-emerald-800'} transition-colors font-semibold`}
                                 >
                                   {encuestador.activo ? 'Desactivar' : 'Activar'}
                                 </button>
                                 <button
                                   onClick={() => handleDelete(encuestador.id)}
-                                  className="text-red-600 hover:text-red-900"
+                                  className="text-rose-600 hover:text-rose-800 transition-colors font-semibold"
                                 >
                                   Eliminar
                                 </button>
@@ -384,7 +412,7 @@ export default function AdminDashboard() {
                           ))}
                           {encuestadores.length === 0 && (
                             <tr>
-                              <td colSpan="3" className="px-6 py-4 text-center text-sm text-gray-500">
+                              <td colSpan="3" className="px-6 py-12 text-center text-sm text-slate-500 font-medium">
                                 No hay encuestadores registrados.
                               </td>
                             </tr>
