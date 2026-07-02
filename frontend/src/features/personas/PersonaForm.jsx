@@ -16,6 +16,16 @@ export function PersonaForm({ onSuccess, onCancel }) {
   const [existingContactos, setExistingContactos] = useState([]);
   const [encuestadores, setEncuestadores] = useState([]);
 
+  const {
+    register, handleSubmit, reset, setValue,
+    formState: { errors },
+  } = useForm({ 
+    resolver: zodResolver(personaSchema),
+    defaultValues: {
+      encuestador: localStorage.getItem('last_encuestador') || ''
+    }
+  });
+
   useEffect(() => {
     // Cargar encuestadores activos desde Dexie y luego asignar el valor por defecto
     db.encuestadores.filter(e => e.activo).toArray().then((data) => {
@@ -26,16 +36,6 @@ export function PersonaForm({ onSuccess, onCancel }) {
       }
     });
   }, [setValue, existingPersona]);
-
-  const {
-    register, handleSubmit, reset, setValue,
-    formState: { errors },
-  } = useForm({ 
-    resolver: zodResolver(personaSchema),
-    defaultValues: {
-      encuestador: localStorage.getItem('last_encuestador') || ''
-    }
-  });
 
   const inputClass = (field) =>
     `w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
