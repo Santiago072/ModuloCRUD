@@ -18,7 +18,9 @@ export const syncData = async ({ pushOnly = false } = {}) => {
     // 1. PULL: Descargar datos más recientes del servidor (Solo si no es pushOnly)
     if (!pushOnly) {
       try {
-        const pullRes = await fetch(`${API_URL}/sync`);
+        const pullRes = await fetch(`${API_URL}/sync?t=${Date.now()}`, {
+          cache: 'no-store'
+        });
         if (pullRes.ok) {
           const { data } = await pullRes.json();
           await PersonaRepository.syncFromServer(data.personas, data.contactos);

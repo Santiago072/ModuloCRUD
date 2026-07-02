@@ -9,5 +9,14 @@ export function useSyncManager() {
     if (isOnline) {
       syncData();
     }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && navigator.onLine) {
+        syncData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [isOnline]); 
 }
