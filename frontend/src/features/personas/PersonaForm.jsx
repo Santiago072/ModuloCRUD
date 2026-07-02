@@ -5,7 +5,8 @@ import { usePersonaStore } from '../../store/usePersonaStore';
 import { PersonaRepository } from '../../db/repositories/personaRepository';
 import { ContactoRepository } from '../../db/repositories/contactoRepository';
 import { X, Search, Phone } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import db from '../../db/schema';
 
 const prioridadLabel = (n) => ['Principal', 'C2', 'C3'][n - 1] ?? `C${n}`;
 
@@ -13,11 +14,22 @@ export function PersonaForm({ onSuccess, onCancel }) {
   const { createPersona, updatePersona, addContacto, loading } = usePersonaStore();
   const [existingPersona, setExistingPersona] = useState(null);
   const [existingContactos, setExistingContactos] = useState([]);
+  const [encuestadores, setEncuestadores] = useState([]);
+
+  useEffect(() => {
+    // Cargar encuestadores activos desde Dexie
+    db.encuestadores.filter(e => e.activo).toArray().then(setEncuestadores);
+  }, []);
 
   const {
     register, handleSubmit, reset, setValue,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(personaSchema) });
+  } = useForm({ 
+    resolver: zodResolver(personaSchema),
+    defaultValues: {
+      encuestador: localStorage.getItem('last_encuestador') || ''
+    }
+  });
 
   const inputClass = (field) =>
     `w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
@@ -68,6 +80,9 @@ export function PersonaForm({ onSuccess, onCancel }) {
 
   const onSubmit = async (data) => {
     try {
+      // Guardar el último encuestador usado
+      localStorage.setItem('last_encuestador', data.encuestador);
+
       if (existingPersona) {
         // Actualizar persona existente
         await updatePersona(existingPersona.id, {
@@ -75,6 +90,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
           apellidos: data.apellidos,
           profesion: data.profesion || '',
           fecha_registro: data.fecha_registro,
+          encuestador: data.encuestador
         });
         // Si ingresó un nuevo número, aplicar rotación
         if (data.nuevo_contacto?.trim()) {
@@ -88,6 +104,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
           apellidos: data.apellidos,
           fecha_registro: data.fecha_registro,
           profesion: data.profesion || '',
+          encuestador: data.encuestador,
           contactos: data.nuevo_contacto?.trim()
             ? [{ tipo: 'celular', valor: data.nuevo_contacto.trim() }]
             : [],
@@ -147,6 +164,20 @@ export function PersonaForm({ onSuccess, onCancel }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Encuesta *</label>
             <input type="date" {...register('fecha_registro')} className={inputClass('fecha_registro')} />
             {errors.fecha_registro && <p className="text-red-500 text-xs mt-1">{errors.fecha_registro.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Encuestador *</label>
+            <select
+              {...register('encuestador')}
+              className={inputClass('encuestador')}
+            >
+              <option value="">Selecciona tu nombre...</option>
+              {encuestadores.map(e => (
+                <option key={e.id} value={e.nombre}>{e.nombre}</option>
+              ))}
+            </select>
+            {errors.encuestador && <p className="text-red-500 text-xs mt-1">{errors.encuestador.message}</p>}
           </div>
 
           <div>

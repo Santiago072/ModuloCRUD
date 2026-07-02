@@ -6,9 +6,9 @@ export const PersonaRepository = {
   getByCc: (cc) => db.personas.where('cc').equals(cc).first(),
 
   /** Crea persona con hasta 3 contactos iniciales en una transacción atómica */
-  create: async ({ cc, nombres, apellidos, fecha_registro, profesion, contactos = [] }) => {
+  create: async ({ cc, nombres, apellidos, fecha_registro, profesion, encuestador, contactos = [] }) => {
     const now = new Date().toISOString();
-    return db.transaction('rw', db.personas, db.contactos, async () => {
+    return db.transaction('rw', db.personas, db.contactos, db.encuestas, async () => {
       const personaId = await db.personas.add({
         cc, nombres, apellidos, fecha_registro,
         profesion: profesion || '',
@@ -16,6 +16,15 @@ export const PersonaRepository = {
         created_at: now,
         updated_at: now,
       });
+
+      if (encuestador) {
+        await db.encuestas.add({
+          persona_id: personaId,
+          fecha: fecha_registro,
+          encuestador: encuestador,
+          sync_status: 'local'
+        });
+      }
       // Insertar contactos iniciales con sus prioridades (1, 2, 3)
       for (let i = 0; i < contactos.length; i++) {
         const c = contactos[i];
@@ -60,6 +69,7 @@ export const PersonaRepository = {
     const personas = await db.personas.where('sync_status').anyOf('local', 'deleted').toArray();
     for (let p of personas) {
       p.contactos = await db.contactos.where('persona_id').equals(p.id).toArray();
+      p.encuestas = await db.encuestas.where('persona_id').equals(p.id).toArray();
     }
     return personas;
   },

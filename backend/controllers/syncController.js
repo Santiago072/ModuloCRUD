@@ -83,6 +83,17 @@ exports.syncOfflineData = async (req, res) => {
           }
         }
         
+        // 3. Insertar encuestas
+        if (p.encuestas && p.encuestas.length > 0) {
+          await connection.query('DELETE FROM encuestas WHERE persona_id = ?', [personaId]);
+          for (const enc of p.encuestas) {
+            await connection.query(
+              'INSERT INTO encuestas (persona_id, fecha, encuestador) VALUES (?, ?, ?)',
+              [personaId, enc.fecha, enc.encuestador]
+            );
+          }
+        }
+        
         syncSuccess++;
       } catch (err) {
         console.error('Error insertando persona CC ' + p.cc, err);

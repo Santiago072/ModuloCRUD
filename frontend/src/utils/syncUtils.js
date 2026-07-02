@@ -24,6 +24,13 @@ export const syncData = async ({ pushOnly = false } = {}) => {
         if (pullRes.ok) {
           const { data } = await pullRes.json();
           await PersonaRepository.syncFromServer(data.personas, data.contactos);
+          
+          import('../db/schema').then(async ({ db }) => {
+             if (data.encuestadores) {
+               await db.encuestadores.clear();
+               await db.encuestadores.bulkPut(data.encuestadores);
+             }
+          });
         }
       } catch (err) {
         console.warn('⚠️ Error al descargar datos del servidor:', err.message);
