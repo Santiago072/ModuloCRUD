@@ -23,7 +23,7 @@ export const syncData = async ({ pushOnly = false } = {}) => {
         });
         if (pullRes.ok) {
           const { data } = await pullRes.json();
-          await PersonaRepository.syncFromServer(data.personas, data.contactos);
+          await PersonaRepository.syncFromServer(data.personas, data.contactos, data.encuestas);
           
           import('../db/schema').then(async ({ db }) => {
              if (data.encuestadores) {

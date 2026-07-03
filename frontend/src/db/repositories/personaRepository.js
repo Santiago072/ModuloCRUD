@@ -98,8 +98,8 @@ export const PersonaRepository = {
   },
 
   /** Sincronización desde el servidor (Pull) */
-  syncFromServer: async (serverPersonas, serverContactos) => {
-    return db.transaction('rw', db.personas, db.contactos, async () => {
+  syncFromServer: async (serverPersonas, serverContactos, serverEncuestas = []) => {
+    return db.transaction('rw', db.personas, db.contactos, db.encuestas, async () => {
       // Mapa para asociar el ID del servidor con el ID local de Dexie
       const serverToLocalId = {};
 
@@ -130,6 +130,7 @@ export const PersonaRepository = {
       for (const loc of locales) {
         if (loc.sync_status === 'synced' && !serverCcSet.has(loc.cc)) {
           await db.contactos.where('persona_id').equals(loc.id).delete();
+          await db.encuestas.where('persona_id').equals(loc.id).delete();
           await db.personas.delete(loc.id);
         }
       }
@@ -148,6 +149,22 @@ export const PersonaRepository = {
             // Forzar a booleano porque MySQL lo devuelve como 1 o 0
             contactData.activo = contactData.activo === 1 || contactData.activo === true;
             await db.contactos.put({ ...contactData, persona_id: localPersonaId });
+          }
+        }
+      }
+
+      // 3. Limpiar y recrear encuestas usando los IDs locales
+      if (serverEncuestas && serverEncuestas.length > 0) {
+        const localIdsToUpdate = Object.values(serverToLocalId);
+        if (localIdsToUpdate.length > 0) {
+          await db.encuestas.where('persona_id').anyOf(localIdsToUpdate).delete();
+        }
+
+        for (const se of serverEncuestas) {
+          const localPersonaId = serverToLocalId[se.persona_id];
+          if (localPersonaId) {
+            const { id, ...encuestaData } = se;
+            await db.encuestas.put({ ...encuestaData, persona_id: localPersonaId, sync_status: 'synced' });
           }
         }
       }
