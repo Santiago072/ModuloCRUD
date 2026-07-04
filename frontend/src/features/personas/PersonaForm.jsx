@@ -62,7 +62,9 @@ export function PersonaForm({ onSuccess, onCancel }) {
       setValue('profesion', existing.profesion || '');
       setValue('fecha_registro', existing.fecha_registro);
       
-      const encuesta = await db.encuestas.where('persona_id').equals(existing.id).first();
+      const encuestas = await db.encuestas.where('persona_id').equals(existing.id).toArray();
+      encuestas.sort((a, b) => b.id - a.id);
+      const encuesta = encuestas.length > 0 ? encuestas[0] : null;
       if (encuesta) {
         setValue('encuestador', encuesta.encuestador);
       }

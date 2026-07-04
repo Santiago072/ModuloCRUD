@@ -31,7 +31,7 @@ export function PersonaList({ onSelect }) {
   }, [query]);
 
   const contactos = useLiveQuery(() => db.contactos.where('activo').equals(1).toArray(), []);
-  const encuestas = useLiveQuery(() => db.encuestas.toArray(), []);
+  const encuestas = useLiveQuery(() => db.encuestas.orderBy('id').reverse().toArray(), []);
 
   // Reiniciar a la página 1 si cambia la búsqueda
   if (query && currentPage !== 1) {
