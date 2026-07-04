@@ -53,7 +53,29 @@ export const PersonaRepository = {
   /** Actualiza los datos de una persona */
   update: async (id, data) => {
     const now = new Date().toISOString();
-    return db.personas.update(id, { ...data, sync_status: 'local', updated_at: now });
+    return db.transaction('rw', db.personas, db.encuestas, async () => {
+      const { encuestador, ...personaData } = data;
+      
+      await db.personas.update(id, { ...personaData, sync_status: 'local', updated_at: now });
+      
+      if (encuestador) {
+        const encuesta = await db.encuestas.where('persona_id').equals(id).first();
+        if (encuesta) {
+          await db.encuestas.update(encuesta.id, { 
+            encuestador, 
+            fecha: personaData.fecha_registro || encuesta.fecha,
+            sync_status: 'local' 
+          });
+        } else {
+          await db.encuestas.add({
+            persona_id: id,
+            fecha: personaData.fecha_registro || now,
+            encuestador: encuestador,
+            sync_status: 'local'
+          });
+        }
+      }
+    });
   },
 
   /** Elimina la persona de la UI y la marca para borrar en el servidor */

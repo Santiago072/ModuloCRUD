@@ -12,6 +12,9 @@ const syncBadge = (status) => {
 export function PersonaList({ onSelect }) {
   const [query, setQuery] = useState('');
 
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
   // useLiveQuery con filtro reactivo — re-ejecuta automáticamente cuando cambia `query`
   const personas = useLiveQuery(() => {
     const q = query.trim();
@@ -30,11 +33,21 @@ export function PersonaList({ onSelect }) {
   const contactos = useLiveQuery(() => db.contactos.where('activo').equals(1).toArray(), []);
   const encuestas = useLiveQuery(() => db.encuestas.toArray(), []);
 
+  // Reiniciar a la página 1 si cambia la búsqueda
+  if (query && currentPage !== 1) {
+    setCurrentPage(1);
+  }
+
   const getContactoPrincipal = (personaId) =>
     contactos?.find(c => c.persona_id === personaId && c.prioridad === 1)?.valor || '—';
 
   const getEncuestador = (personaId) =>
     encuestas?.find(e => e.persona_id === personaId)?.encuestador || 'Sin encuestador';
+
+  // Lógica de paginación
+  const totalPages = personas ? Math.ceil(personas.length / itemsPerPage) : 0;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const displayedPersonas = personas?.slice(startIndex, startIndex + itemsPerPage) || [];
 
   return (
     <div className="space-y-4">
@@ -86,7 +99,7 @@ export function PersonaList({ onSelect }) {
             </p>
           )}
           <div className="space-y-2">
-            {personas.map(p => (
+            {displayedPersonas.map(p => (
               <button
                 key={p.id}
                 onClick={() => onSelect(p.id)}
@@ -113,6 +126,29 @@ export function PersonaList({ onSelect }) {
               </button>
             ))}
           </div>
+
+          {/* Controles de Paginación */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-6">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Anterior
+              </button>
+              <span className="text-sm text-gray-500 font-medium">
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
