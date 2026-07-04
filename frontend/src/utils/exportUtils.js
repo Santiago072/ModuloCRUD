@@ -11,7 +11,7 @@ export const exportToCSV = async () => {
     .filter(p => p.sync_status !== 'deleted')
     .toArray();
   const contactos = await db.contactos.toArray();
-  const encuestas = await db.encuestas.orderBy('id').reverse().toArray();
+  const encuestas = await db.encuestas.toArray();
 
   const headers = [
     'CC',
