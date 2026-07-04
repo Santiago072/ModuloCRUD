@@ -4,8 +4,8 @@ export const PersonaRepository = {
   getAll: async () => {
     const personas = await db.personas.orderBy('id').reverse().toArray();
     for (let p of personas) {
-      const encuesta = await db.encuestas.where('persona_id').equals(p.id).first();
-      p.encuestador = encuesta ? encuesta.encuestador : 'Sin registro';
+      const encuestas = await db.encuestas.where('persona_id').equals(p.id).reverse().sortBy('id');
+      p.encuestador = encuestas.length > 0 ? encuestas[0].encuestador : 'Sin registro';
     }
     return personas;
   },
@@ -50,7 +50,7 @@ export const PersonaRepository = {
     });
   },
 
-  /** Actualiza los datos de una persona */
+  /** Actualiza los datos de una persona (Historial de Encuestas Max 3) */
   update: async (id, data) => {
     const now = new Date().toISOString();
     return db.transaction('rw', db.personas, db.encuestas, async () => {
@@ -59,20 +59,29 @@ export const PersonaRepository = {
       await db.personas.update(id, { ...personaData, sync_status: 'local', updated_at: now });
       
       if (encuestador) {
-        const encuesta = await db.encuestas.where('persona_id').equals(id).first();
-        if (encuesta) {
-          await db.encuestas.update(encuesta.id, { 
-            encuestador, 
-            fecha: personaData.fecha_registro || encuesta.fecha,
-            sync_status: 'local' 
-          });
+        const encuestas = await db.encuestas.where('persona_id').equals(id).reverse().sortBy('id');
+        const latest = encuestas[0];
+        const nuevaFecha = personaData.fecha_registro || (latest ? latest.fecha : now);
+        
+        // Si no hay cambios en fecha ni encuestador, no duplicar el registro
+        if (latest && latest.encuestador === encuestador && latest.fecha === nuevaFecha) {
+          await db.encuestas.update(latest.id, { sync_status: 'local' });
         } else {
+          // Agregar nueva encuesta al historial
           await db.encuestas.add({
             persona_id: id,
-            fecha: personaData.fecha_registro || now,
+            fecha: nuevaFecha,
             encuestador: encuestador,
             sync_status: 'local'
           });
+          
+          // Limitar a las últimas 3 encuestas
+          const updatedEncuestas = await db.encuestas.where('persona_id').equals(id).reverse().sortBy('id');
+          if (updatedEncuestas.length > 3) {
+            for (let i = 3; i < updatedEncuestas.length; i++) {
+              await db.encuestas.delete(updatedEncuestas[i].id);
+            }
+          }
         }
       }
     });
@@ -92,10 +101,10 @@ export const PersonaRepository = {
       .and(c => c.activo === true)
       .sortBy('prioridad');
     
-    const encuesta = await db.encuestas.where('persona_id').equals(id).first();
-    const encuestador = encuesta ? encuesta.encuestador : 'Sin registro';
+    const encuestas = await db.encuestas.where('persona_id').equals(id).reverse().sortBy('id');
+    const encuestador = encuestas.length > 0 ? encuestas[0].encuestador : 'Sin registro';
 
-    return { ...persona, contactos, encuestador };
+    return { ...persona, contactos, encuestador, historialEncuestas: encuestas };
   },
 
   getPendingSync: async () => {
