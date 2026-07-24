@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import db from '../../db/schema';
-import { Search, X, Clock, Phone, ChevronRight, Users } from 'lucide-react';
+import { Search, X, Clock, Phone, ChevronRight, Users, User } from 'lucide-react';
 
 const syncBadge = (status) => {
   if (status === 'synced') return <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Sincronizado</span>;
@@ -116,12 +116,15 @@ export function PersonaList({ onSelect, isAdmin = false }) {
                       {p.profesion && <span>{p.profesion}</span>}
                       <span className="flex items-center gap-1"><Phone size={11} />{getContactoPrincipal(p.id)}</span>
                       <span className="flex items-center gap-1"><Clock size={11} />{p.fecha_registro ? p.fecha_registro.slice(0, 10) : ''}</span>
-                      {isAdmin && (
-                        <span className="flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md font-medium text-[10px] ml-auto border border-indigo-100">
+                    </div>
+                    {isAdmin && (
+                      <div className="mt-2.5 flex items-center">
+                        <span className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md font-medium text-[11px] border border-indigo-100">
+                          <User size={12} className="text-indigo-500" />
                           Encuestador: {getEncuestador(p.id)}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                   <ChevronRight size={18} className="text-gray-300 group-hover:text-indigo-400 transition-colors ml-2 flex-shrink-0" />
                 </div>

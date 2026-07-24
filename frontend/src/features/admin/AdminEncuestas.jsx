@@ -21,7 +21,7 @@ export default function AdminEncuestas() {
         <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-8 space-y-8">
           <div className="glass-panel p-6 sm:p-8">
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Todas las Encuestas</h2>
+              <h2 className="text-xl font-bold text-slate-800">Gestión de Encuestas</h2>
               <p className="text-sm text-slate-500 mt-1">Listado general de todos los registros en el sistema (Puedes buscar y editar).</p>
             </div>
             
