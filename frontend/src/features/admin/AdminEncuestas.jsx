@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
 import { Loader2, LayoutDashboard } from 'lucide-react';
 import { AppSidebar } from '../../components/layout/AppSidebar';
+import { AdminHeader } from '../../components/layout/AdminHeader';
 
 const API_URL = '/api';
 
@@ -35,15 +36,7 @@ export default function AdminEncuestas() {
       <AppSidebar />
       
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
-        <header className="bg-white/70 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-10 px-6 py-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-slate-800 md:hidden">ModCRUD Admin</h2>
-            <div className="hidden md:flex items-center gap-2 text-slate-500">
-              <LayoutDashboard size={18} />
-              <span className="font-medium">Panel Administrativo</span>
-            </div>
-          </div>
-        </header>
+        <AdminHeader />
 
         <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-8 space-y-8">
           {/* Todas las Encuestas */}

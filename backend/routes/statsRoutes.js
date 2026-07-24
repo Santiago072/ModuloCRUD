@@ -5,6 +5,13 @@ const { verifyToken } = require('../middlewares/authMiddleware');
 
 router.get('/', verifyToken, async (req, res) => { 
   try { 
+    // Auto-heal missing encuestas from personas
+    await pool.query(`
+      INSERT IGNORE INTO encuestas (persona_id, encuestador, fecha, usuario_id) 
+      SELECT id, 'N/A', fecha_registro, usuario_id FROM personas 
+      WHERE id NOT IN (SELECT persona_id FROM encuestas)
+    `);
+
     const [totalEncuestas] = await pool.query('SELECT COUNT(*) as total FROM encuestas'); 
     const [totalPersonas] = await pool.query('SELECT COUNT(*) as total FROM personas'); 
     const [ranking] = await pool.query(`

@@ -35,6 +35,7 @@ export function AppSidebar() {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.to === '/admin'}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                   isActive 
