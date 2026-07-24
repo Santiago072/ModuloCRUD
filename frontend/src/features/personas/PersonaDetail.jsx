@@ -92,10 +92,6 @@ export function PersonaDetail({ personaId, onClose }) {
                 <p className="text-sm font-medium text-gray-700">{persona.fecha_registro}</p>
               )}
             </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Encuestador</p>
-              <p className="text-sm font-medium text-gray-700">{persona.encuestador}</p>
-            </div>
           </div>
 
           {/* Contactos */}

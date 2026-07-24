@@ -29,4 +29,20 @@ router.get('/', verifyToken, async (req, res) => {
   } 
 }); 
 
+router.get('/encuestas', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT p.id, p.cc, p.nombres, p.apellidos, p.profesion, p.fecha_registro, 
+             e.encuestador, e.fecha as fecha_encuesta,
+             (SELECT valor FROM contactos c WHERE c.persona_id = p.id AND c.activo = 1 ORDER BY prioridad ASC LIMIT 1) as contacto
+      FROM personas p
+      LEFT JOIN encuestas e ON p.id = e.persona_id
+      ORDER BY p.created_at DESC
+    `);
+    res.json({ status: 'success', data: rows });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Error al obtener encuestas' });
+  }
+});
+
 module.exports = router;

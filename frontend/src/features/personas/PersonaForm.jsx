@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { personaSchema } from '../../utils/validationSchemas';
 import { usePersonaStore } from '../../store/usePersonaStore';
+import useAuthStore from '../../store/authStore';
 import { PersonaRepository } from '../../db/repositories/personaRepository';
 import { ContactoRepository } from '../../db/repositories/contactoRepository';
 import { X, Search, Phone } from 'lucide-react';
@@ -78,7 +79,8 @@ export function PersonaForm({ onSuccess, onCancel }) {
           nombres: data.nombres,
           apellidos: data.apellidos,
           profesion: data.profesion || '',
-          fecha_registro: data.fecha_registro
+          fecha_registro: data.fecha_registro,
+          encuestador: useAuthStore.getState().user?.username || 'Sin registro',
         });
         // Si ingresó un nuevo número, aplicar rotación
         if (data.nuevo_contacto?.trim()) {
@@ -92,6 +94,7 @@ export function PersonaForm({ onSuccess, onCancel }) {
           apellidos: data.apellidos,
           fecha_registro: data.fecha_registro,
           profesion: data.profesion || '',
+          encuestador: useAuthStore.getState().user?.username || 'Sin registro',
           contactos: data.nuevo_contacto?.trim()
             ? [{ tipo: 'celular', valor: data.nuevo_contacto.trim() }]
             : [],
