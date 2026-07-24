@@ -84,3 +84,22 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
+exports.updateUser = async (req, res) => {
+  const { username, password } = req.body;
+  const userId = req.params.id;
+  if (!username) return res.status(400).json({ status: 'error', message: 'El nombre de usuario es obligatorio' });
+
+  try {
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await pool.query('UPDATE usuarios SET username = ?, password_hash = ? WHERE id = ? AND rol = "user"', [username, hashedPassword, userId]);
+    } else {
+      await pool.query('UPDATE usuarios SET username = ? WHERE id = ? AND rol = "user"', [username, userId]);
+    }
+    res.json({ status: 'success', message: 'Usuario actualizado' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') return res.status(400).json({ status: 'error', message: 'El nombre de usuario ya está en uso' });
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};

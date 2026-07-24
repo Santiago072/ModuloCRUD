@@ -20,8 +20,14 @@ export default function AdminDashboard() {
   const [newPassword, setNewPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [stats, setStats] = useState(null);
 
+  // Edit User State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editUsername, setEditUsername] = useState('');
+  const [editPassword, setEditPassword] = useState('');
   const fetchUsuarios = async () => {
     try {
       const res = await fetch(`${API_URL}/auth/users`, {
@@ -84,6 +90,31 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEditUser = async (e) => {
+    e.preventDefault();
+    if (!editUsername.trim()) return;
+
+    try {
+      const res = await fetch(`${API_URL}/auth/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ username: editUsername, password: editPassword })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setIsEditModalOpen(false);
+        fetchUsuarios();
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error editing usuario', error);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este usuario? No podrá acceder al sistema.')) return;
     try {
@@ -104,8 +135,13 @@ export default function AdminDashboard() {
     setPasswordError('');
     setPasswordSuccess('');
     
-    if (!currentPassword || !newPassword) {
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
       setPasswordError('Todos los campos son obligatorios');
+      return;
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('Las contraseñas no coinciden');
       return;
     }
 
@@ -125,6 +161,7 @@ export default function AdminDashboard() {
           setIsPasswordModalOpen(false);
           setCurrentPassword('');
           setNewPassword('');
+          setConfirmNewPassword('');
           setPasswordSuccess('');
         }, 1500);
       } else {
@@ -248,6 +285,17 @@ export default function AdminDashboard() {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                 <button
+                                  onClick={() => {
+                                    setEditingUser(u);
+                                    setEditUsername(u.username);
+                                    setEditPassword('');
+                                    setIsEditModalOpen(true);
+                                  }}
+                                  className="text-indigo-600 hover:text-indigo-800 transition-colors font-semibold bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg"
+                                >
+                                  Editar
+                                </button>
+                                <button
                                   onClick={() => handleDelete(u.id)}
                                   className="text-rose-600 hover:text-rose-800 transition-colors font-semibold bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg"
                                 >
@@ -334,6 +382,64 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* Modal Editar Usuario */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setIsEditModalOpen(false)}>
+              <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+            </div>
+            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full relative z-10">
+              <div className="px-6 pt-6 pb-6">
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="text-xl font-bold text-slate-800">Editar Usuario</h3>
+                  <button onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors">
+                    <X size={18} />
+                  </button>
+                </div>
+                <form onSubmit={handleEditUser} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre de Usuario</label>
+                    <input
+                      type="text"
+                      required
+                      value={editUsername}
+                      onChange={(e) => setEditUsername(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nueva Contraseña <span className="text-slate-400 font-normal">(Opcional)</span></label>
+                    <input
+                      type="password"
+                      value={editPassword}
+                      onChange={(e) => setEditPassword(e.target.value)}
+                      placeholder="Dejar en blanco para no cambiar"
+                      className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm"
+                    />
+                  </div>
+                  <div className="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditModalOpen(false)}
+                      className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-200 px-5 py-2.5 bg-slate-50 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2.5 text-sm font-semibold text-white blue-gradient shadow-md hover:opacity-90 transition-all"
+                    >
+                      Guardar Cambios
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal Contraseña */}
       {isPasswordModalOpen && (
         <div className="fixed inset-0 z-[100] overflow-y-auto">
@@ -361,6 +467,10 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nueva Contraseña</label>
                     <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Repetir Nueva Contraseña</label>
+                    <input type="password" value={confirmNewPassword} onChange={e => setConfirmNewPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />
                   </div>
                   <div className="mt-6 flex justify-end gap-3 pt-2">
                     <button type="button" onClick={() => setIsPasswordModalOpen(false)} className="px-5 py-2.5 rounded-xl border bg-slate-50 text-sm font-semibold">Cancelar</button>
