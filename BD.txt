@@ -1,7 +1,15 @@
--- Script SQL inicial para el Servidor VPS (MySQL/MariaDB)
+-- Script SQL inicial para el Servidor (MySQL/MariaDB)
 
 CREATE DATABASE IF NOT EXISTS modulocrud CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE modulocrud;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    rol ENUM('admin', 'user') DEFAULT 'admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS personas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -10,9 +18,11 @@ CREATE TABLE IF NOT EXISTS personas (
     apellidos VARCHAR(100) NOT NULL,
     fecha_registro DATE NOT NULL,
     profesion VARCHAR(100) DEFAULT NULL,
+    usuario_id INT DEFAULT NULL,
     sync_status ENUM('local', 'synced', 'conflict') DEFAULT 'synced',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS contactos (
@@ -31,27 +41,12 @@ CREATE TABLE IF NOT EXISTS encuestas (
     persona_id INT NOT NULL,
     fecha DATE NOT NULL,
     encuestador VARCHAR(100) NOT NULL,
+    usuario_id INT DEFAULT NULL,
     notas TEXT DEFAULT NULL,
     sync_status ENUM('local', 'synced', 'conflict') DEFAULT 'synced',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (persona_id) REFERENCES personas(id) ON DELETE CASCADE
-);
-
--- Nuevas Tablas para la Fase de Administración
-
-CREATE TABLE IF NOT EXISTS usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    rol ENUM('admin', 'user') DEFAULT 'admin',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS encuestadores (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    activo BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    FOREIGN KEY (persona_id) REFERENCES personas(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
 -- Usuario administrador por defecto (la contraseña es "admin123" encriptada con bcrypt)

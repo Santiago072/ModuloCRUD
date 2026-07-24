@@ -7,7 +7,14 @@ router.get('/', verifyToken, async (req, res) => {
   try { 
     const [totalEncuestas] = await pool.query('SELECT COUNT(*) as total FROM encuestas'); 
     const [totalPersonas] = await pool.query('SELECT COUNT(*) as total FROM personas'); 
-    const [ranking] = await pool.query('SELECT encuestador, COUNT(*) as cantidad FROM encuestas GROUP BY encuestador ORDER BY cantidad DESC LIMIT 5'); 
+    const [ranking] = await pool.query(`
+      SELECT u.username as encuestador, COUNT(e.id) as cantidad 
+      FROM encuestas e
+      LEFT JOIN usuarios u ON e.usuario_id = u.id
+      GROUP BY u.id
+      ORDER BY cantidad DESC 
+      LIMIT 5
+    `); 
     
     res.json({ 
       status: 'success', 

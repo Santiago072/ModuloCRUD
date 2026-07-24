@@ -11,5 +11,4 @@ export const personaSchema = z.object({
   fecha_registro: z.string().min(1, 'La fecha es requerida'),
   profesion: z.string().optional(),
   nuevo_contacto: z.string().optional(), // Número de contacto nuevo (activa rotación si existe)
-  encuestador: z.string().min(1, 'El encuestador es requerido'),
 });

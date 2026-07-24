@@ -3,18 +3,24 @@ const pool = require('../config/db');
 // GET: Descargar todos los datos desde el servidor hacia el cliente (Pull)
 exports.pullData = async (req, res) => {
   try {
-    const [personas] = await pool.query('SELECT * FROM personas');
-    const [contactos] = await pool.query('SELECT * FROM contactos WHERE activo = 1');
-    const [encuestas] = await pool.query('SELECT * FROM encuestas');
-    const [encuestadores] = await pool.query('SELECT * FROM encuestadores WHERE activo = 1');
+    let personas, contactos, encuestas;
+    
+    if (req.user.rol === 'admin') {
+      [personas] = await pool.query('SELECT * FROM personas');
+      [contactos] = await pool.query('SELECT * FROM contactos WHERE activo = 1');
+      [encuestas] = await pool.query('SELECT * FROM encuestas');
+    } else {
+      [personas] = await pool.query('SELECT * FROM personas WHERE usuario_id = ?', [req.user.id]);
+      [contactos] = await pool.query('SELECT c.* FROM contactos c JOIN personas p ON c.persona_id = p.id WHERE p.usuario_id = ? AND c.activo = 1', [req.user.id]);
+      [encuestas] = await pool.query('SELECT * FROM encuestas WHERE usuario_id = ?', [req.user.id]);
+    }
     
     res.json({
       status: 'success',
       data: {
         personas,
         contactos,
-        encuestas,
-        encuestadores
+        encuestas
       }
     });
   } catch (error) {
@@ -66,8 +72,8 @@ exports.syncOfflineData = async (req, res) => {
           // Si no existe, dejamos que MySQL asigne el ID autoincremental para evitar conflictos
           // de claves primarias si el cliente vació su caché (su Dexie ID se reinicia a 1).
           const [result] = await connection.query(
-            'INSERT INTO personas (cc, nombres, apellidos, fecha_registro, profesion) VALUES (?, ?, ?, ?, ?)',
-            [p.cc, p.nombres, p.apellidos, p.fecha_registro, p.profesion]
+            'INSERT INTO personas (cc, nombres, apellidos, fecha_registro, profesion, usuario_id) VALUES (?, ?, ?, ?, ?, ?)',
+            [p.cc, p.nombres, p.apellidos, p.fecha_registro, p.profesion, req.user.id]
           );
           personaId = result.insertId;
         }
@@ -88,8 +94,8 @@ exports.syncOfflineData = async (req, res) => {
           await connection.query('DELETE FROM encuestas WHERE persona_id = ?', [personaId]);
           for (const enc of p.encuestas) {
             await connection.query(
-              'INSERT INTO encuestas (persona_id, fecha, encuestador) VALUES (?, ?, ?)',
-              [personaId, enc.fecha, enc.encuestador]
+              'INSERT INTO encuestas (persona_id, fecha, encuestador, usuario_id) VALUES (?, ?, ?, ?)',
+              [personaId, enc.fecha, enc.encuestador || req.user.username, req.user.id]
             );
           }
         }

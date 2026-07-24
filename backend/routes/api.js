@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const personaController = require('../controllers/personaController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
 // 1. Endpoint de prueba de conexión
 router.get('/status', async (req, res) => {
@@ -14,6 +15,9 @@ router.get('/status', async (req, res) => {
     res.status(500).json({ status: 'error', error: error.message });
   }
 });
+
+// Todas las rutas a partir de aquí requieren autenticación
+router.use(verifyToken);
 
 // 2. Endpoints CRUD para Personas
 router.get('/personas', personaController.getAll);
@@ -28,6 +32,6 @@ router.post('/contactos', contactoController.addContacto);
 // 4. Endpoint Core: Sincronización PWA (Offline-First)
 const syncController = require('../controllers/syncController');
 router.post('/sync', syncController.syncOfflineData);
-router.get('/sync', syncController.pullData); // Nuevo: Descargar BD al cliente
+router.get('/sync', syncController.pullData); // Descargar BD al cliente
 
 module.exports = router;
