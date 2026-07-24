@@ -87,9 +87,9 @@ export function PersonaDetail({ personaId, onClose }) {
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Fecha Encuesta</p>
               {editMode ? (
                 <input type="date" className="w-full border border-indigo-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={editData.fecha_registro} onChange={e => setEditData(d => ({ ...d, fecha_registro: e.target.value }))} />
+                  value={editData.fecha_registro?.slice(0, 10)} onChange={e => setEditData(d => ({ ...d, fecha_registro: e.target.value }))} />
               ) : (
-                <p className="text-sm font-medium text-gray-700">{persona.fecha_registro}</p>
+                <p className="text-sm font-medium text-gray-700">{persona.fecha_registro?.slice(0, 10)}</p>
               )}
             </div>
           </div>

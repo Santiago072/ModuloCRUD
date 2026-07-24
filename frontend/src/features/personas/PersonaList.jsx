@@ -9,7 +9,7 @@ const syncBadge = (status) => {
   return <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">Conflicto</span>;
 };
 
-export function PersonaList({ onSelect }) {
+export function PersonaList({ onSelect, isAdmin = false }) {
   const [query, setQuery] = useState('');
 
   const itemsPerPage = 10;
@@ -40,6 +40,9 @@ export function PersonaList({ onSelect }) {
 
   const getContactoPrincipal = (personaId) =>
     contactos?.find(c => c.persona_id === personaId && c.prioridad === 1)?.valor || '—';
+
+  const getEncuestador = (personaId) =>
+    encuestas?.find(e => e.persona_id === personaId)?.encuestador || 'N/A';
 
   // Lógica de paginación
   const totalPages = personas ? Math.ceil(personas.length / itemsPerPage) : 0;
@@ -112,8 +115,12 @@ export function PersonaList({ onSelect }) {
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400 flex-wrap">
                       {p.profesion && <span>{p.profesion}</span>}
                       <span className="flex items-center gap-1"><Phone size={11} />{getContactoPrincipal(p.id)}</span>
-                      <span className="flex items-center gap-1"><Clock size={11} />{p.fecha_registro}</span>
-
+                      <span className="flex items-center gap-1"><Clock size={11} />{p.fecha_registro ? p.fecha_registro.slice(0, 10) : ''}</span>
+                      {isAdmin && (
+                        <span className="flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md font-medium text-[10px] ml-auto border border-indigo-100">
+                          Encuestador: {getEncuestador(p.id)}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <ChevronRight size={18} className="text-gray-300 group-hover:text-indigo-400 transition-colors ml-2 flex-shrink-0" />
