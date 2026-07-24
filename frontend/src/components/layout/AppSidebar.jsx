@@ -13,7 +13,8 @@ export function AppSidebar() {
 
   const navItems = user?.rol === 'admin' 
     ? [
-        { to: '/admin', icon: <Users size={20} />, label: 'Gestión Usuarios' }
+        { to: '/admin', icon: <Users size={20} />, label: 'Gestión Usuarios' },
+        { to: '/admin/encuestas', icon: <ClipboardList size={20} />, label: 'Todas las Encuestas' }
       ]
     : [
         { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Mi Dashboard' }
