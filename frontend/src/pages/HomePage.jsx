@@ -61,7 +61,7 @@ export default function HomePage() {
 
           {/* Formulario Animado */}
           <div className={`transition-all duration-300 ease-in-out origin-top ${showForm ? 'opacity-100 scale-y-100 max-h-[2000px]' : 'opacity-0 scale-y-95 max-h-0 overflow-hidden'}`}>
-            <div className="glass-panel p-1">
+            <div className="glass-panel p-6">
               <PersonaForm
                 onSuccess={() => setShowForm(false)}
                 onCancel={() => setShowForm(false)}
@@ -70,7 +70,7 @@ export default function HomePage() {
           </div>
 
           {/* Lista */}
-          <div className="glass-panel p-1">
+          <div className="glass-panel p-6">
             <PersonaList onSelect={setSelectedId} />
           </div>
         </main>

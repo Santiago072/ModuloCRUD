@@ -16,7 +16,6 @@ export default function AdminDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
@@ -135,7 +134,7 @@ export default function AdminDashboard() {
     setPasswordError('');
     setPasswordSuccess('');
     
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
+    if (!newPassword || !confirmNewPassword) {
       setPasswordError('Todos los campos son obligatorios');
       return;
     }
@@ -152,14 +151,14 @@ export default function AdminDashboard() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ currentPassword, newPassword })
+        body: JSON.stringify({ newPassword })
       });
       const data = await res.json();
       if (data.status === 'success') {
         setPasswordSuccess('¡Contraseña actualizada con éxito!');
         setTimeout(() => {
           setIsPasswordModalOpen(false);
-          setCurrentPassword('');
+          setIsPasswordModalOpen(false);
           setNewPassword('');
           setConfirmNewPassword('');
           setPasswordSuccess('');
@@ -460,10 +459,7 @@ export default function AdminDashboard() {
                 {passwordSuccess && <div className="mb-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm">{passwordSuccess}</div>}
 
                 <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contraseña Actual</label>
-                    <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />
-                  </div>
+
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nueva Contraseña</label>
                     <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />

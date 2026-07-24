@@ -31,18 +31,12 @@ exports.login = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
+  const { newPassword } = req.body;
   const userId = req.user.id;
 
-  if (!currentPassword || !newPassword) return res.status(400).json({ status: 'error', message: 'Faltan datos' });
+  if (!newPassword) return res.status(400).json({ status: 'error', message: 'Faltan datos' });
 
   try {
-    const [rows] = await pool.query('SELECT * FROM usuarios WHERE id = ?', [userId]);
-    if (rows.length === 0) return res.status(404).json({ status: 'error', message: 'Usuario no encontrado' });
-
-    const match = await bcrypt.compare(currentPassword, rows[0].password_hash);
-    if (!match) return res.status(401).json({ status: 'error', message: 'La contraseña actual es incorrecta' });
-
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     await pool.query('UPDATE usuarios SET password_hash = ? WHERE id = ?', [hashedNewPassword, userId]);
 

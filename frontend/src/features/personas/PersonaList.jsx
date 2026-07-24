@@ -41,9 +41,6 @@ export function PersonaList({ onSelect }) {
   const getContactoPrincipal = (personaId) =>
     contactos?.find(c => c.persona_id === personaId && c.prioridad === 1)?.valor || '—';
 
-  const getEncuestador = (personaId) =>
-    encuestas?.find(e => e.persona_id === personaId)?.encuestador || 'Sin encuestador';
-
   // Lógica de paginación
   const totalPages = personas ? Math.ceil(personas.length / itemsPerPage) : 0;
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -116,9 +113,7 @@ export function PersonaList({ onSelect }) {
                       {p.profesion && <span>{p.profesion}</span>}
                       <span className="flex items-center gap-1"><Phone size={11} />{getContactoPrincipal(p.id)}</span>
                       <span className="flex items-center gap-1"><Clock size={11} />{p.fecha_registro}</span>
-                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-gray-50 rounded text-gray-500 border border-gray-100">
-                        <Users size={10} /> {getEncuestador(p.id)}
-                      </span>
+
                     </div>
                   </div>
                   <ChevronRight size={18} className="text-gray-300 group-hover:text-indigo-400 transition-colors ml-2 flex-shrink-0" />
