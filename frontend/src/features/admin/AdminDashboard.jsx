@@ -215,104 +215,7 @@ export default function AdminDashboard() {
               </button>
             </div>
             
-            {/* Modal Crear Usuario */}
-            {isModalOpen && (
-              <div className="fixed inset-0 z-50 overflow-y-auto">
-                <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                  <div className="fixed inset-0 transition-opacity" onClick={() => setIsModalOpen(false)}>
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-                  </div>
-                  <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full relative z-10">
-                    <div className="px-6 pt-6 pb-6">
-                      <div className="flex justify-between items-center mb-5">
-                        <h3 className="text-xl font-bold text-slate-800">Crear Usuario</h3>
-                        <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors">
-                          <X size={18} />
-                        </button>
-                      </div>
-                      <form onSubmit={handleCreateUser} className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre de Usuario</label>
-                          <input
-                            type="text"
-                            required
-                            value={nuevoUsername}
-                            onChange={(e) => setNuevoUsername(e.target.value)}
-                            placeholder="Ej. maria.lopez"
-                            className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contraseña</label>
-                          <input
-                            type="password"
-                            required
-                            value={nuevaPassword}
-                            onChange={(e) => setNuevaPassword(e.target.value)}
-                            placeholder="Mínimo 6 caracteres"
-                            className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm"
-                          />
-                        </div>
-                        <div className="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
-                          <button
-                            type="button"
-                            onClick={() => setIsModalOpen(false)}
-                            className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-200 px-5 py-2.5 bg-slate-50 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
-                          >
-                            Cancelar
-                          </button>
-                          <button
-                            type="submit"
-                            className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2.5 text-sm font-semibold text-white blue-gradient shadow-md hover:opacity-90 transition-all"
-                          >
-                            Crear Cuenta
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {/* Modal Contraseña (Simplificado para brevedad) */}
-            {isPasswordModalOpen && (
-              <div className="fixed inset-0 z-50 overflow-y-auto">
-                <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                  <div className="fixed inset-0 transition-opacity" onClick={() => setIsPasswordModalOpen(false)}>
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-                  </div>
-                  <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full relative z-10">
-                    <div className="px-6 pt-6 pb-6">
-                      <div className="flex justify-between items-center mb-5">
-                        <h3 className="text-xl font-bold text-slate-800">Cambiar Contraseña</h3>
-                        <button onClick={() => setIsPasswordModalOpen(false)} className="text-slate-400 bg-slate-100 p-1.5 rounded-full hover:bg-slate-200">
-                          <X size={18} />
-                        </button>
-                      </div>
-                      
-                      {passwordError && <div className="mb-4 bg-red-50 text-red-800 p-3 rounded-lg text-sm">{passwordError}</div>}
-                      {passwordSuccess && <div className="mb-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm">{passwordSuccess}</div>}
-
-                      <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contraseña Actual</label>
-                          <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nueva Contraseña</label>
-                          <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />
-                        </div>
-                        <div className="mt-6 flex justify-end gap-3 pt-2">
-                          <button type="button" onClick={() => setIsPasswordModalOpen(false)} className="px-5 py-2.5 rounded-xl border bg-slate-50 text-sm font-semibold">Cancelar</button>
-                          <button type="submit" className="px-5 py-2.5 rounded-xl blue-gradient text-white text-sm font-semibold">Actualizar</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Tabla Usuarios */}
             {loading ? (
@@ -370,6 +273,106 @@ export default function AdminDashboard() {
           </div>
         </main>
       </div>
+
+      {/* Modal Crear Usuario */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setIsModalOpen(false)}>
+              <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+            </div>
+            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full relative z-10">
+              <div className="px-6 pt-6 pb-6">
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="text-xl font-bold text-slate-800">Crear Usuario</h3>
+                  <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors">
+                    <X size={18} />
+                  </button>
+                </div>
+                <form onSubmit={handleCreateUser} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre de Usuario</label>
+                    <input
+                      type="text"
+                      required
+                      value={nuevoUsername}
+                      onChange={(e) => setNuevoUsername(e.target.value)}
+                      placeholder="Ej. maria.lopez"
+                      className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contraseña</label>
+                    <input
+                      type="password"
+                      required
+                      value={nuevaPassword}
+                      onChange={(e) => setNuevaPassword(e.target.value)}
+                      placeholder="Mínimo 6 caracteres"
+                      className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm"
+                    />
+                  </div>
+                  <div className="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-200 px-5 py-2.5 bg-slate-50 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2.5 text-sm font-semibold text-white blue-gradient shadow-md hover:opacity-90 transition-all"
+                    >
+                      Crear Cuenta
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Contraseña */}
+      {isPasswordModalOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setIsPasswordModalOpen(false)}>
+              <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+            </div>
+            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full relative z-10">
+              <div className="px-6 pt-6 pb-6">
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="text-xl font-bold text-slate-800">Cambiar Contraseña</h3>
+                  <button onClick={() => setIsPasswordModalOpen(false)} className="text-slate-400 bg-slate-100 p-1.5 rounded-full hover:bg-slate-200">
+                    <X size={18} />
+                  </button>
+                </div>
+                
+                {passwordError && <div className="mb-4 bg-red-50 text-red-800 p-3 rounded-lg text-sm">{passwordError}</div>}
+                {passwordSuccess && <div className="mb-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm">{passwordSuccess}</div>}
+
+                <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contraseña Actual</label>
+                    <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nueva Contraseña</label>
+                    <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full px-4 py-2.5 border rounded-xl" />
+                  </div>
+                  <div className="mt-6 flex justify-end gap-3 pt-2">
+                    <button type="button" onClick={() => setIsPasswordModalOpen(false)} className="px-5 py-2.5 rounded-xl border bg-slate-50 text-sm font-semibold">Cancelar</button>
+                    <button type="submit" className="px-5 py-2.5 rounded-xl blue-gradient text-white text-sm font-semibold">Actualizar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
