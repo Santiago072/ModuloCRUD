@@ -50,13 +50,7 @@ Copia el archivo de configuración al directorio de Nginx:
 sudo cp nginx/modulocrud.conf /etc/nginx/sites-available/modulocrud.conf
 sudo ln -s /etc/nginx/sites-available/modulocrud.conf /etc/nginx/sites-enabled/
 ```
-**Aviso Importante (SPA Routing):** Si experimentas errores `404 Not Found` al recargar la página en rutas secundarias (ej. `/admin`), asegúrate de que el bloque `location /` en la configuración de Nginx (`/etc/nginx/sites-available/modulocrud.conf`) incluya la siguiente instrucción para enrutar todo al `index.html`:
-```nginx
-location / {
-    # ... otras configuraciones
-    try_files $uri $uri/ /index.html;
-}
-```
+**Aviso Importante (SPA Routing Solucionado):** El error `404 Not Found` al recargar páginas como `/admin` ya fue solucionado internamente en el contenedor Docker (`frontend/nginx.conf`). Tu proxy Nginx del VPS solo debe encargarse de hacer `proxy_pass` hacia el puerto 8893 sin necesidad de añadir reglas extras.
 
 ```bash
 sudo nginx -t          # Verificar que no hay errores de sintaxis
