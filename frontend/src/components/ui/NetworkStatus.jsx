@@ -27,7 +27,7 @@ export function NetworkStatus() {
   }, []);
 
   return (
-    <div className="fixed bottom-4 right-4 z-[100] animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed top-4 right-4 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
       {isOnline ? (
         <div className="flex items-center gap-2 bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full shadow-md font-medium text-xs border border-emerald-200 opacity-80 hover:opacity-100 transition-opacity">
           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
