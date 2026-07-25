@@ -26,14 +26,12 @@ export function NetworkStatus() {
     };
   }, []);
 
-  if (isOnline && !showBackOnline) return null;
-
   return (
     <div className="fixed bottom-4 right-4 z-[100] animate-in fade-in slide-in-from-bottom-4 duration-300">
       {isOnline ? (
-        <div className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg shadow-emerald-600/20 font-medium text-sm">
-          <Wifi size={16} />
-          Conexión restablecida
+        <div className="flex items-center gap-2 bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full shadow-md font-medium text-xs border border-emerald-200 opacity-80 hover:opacity-100 transition-opacity">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          Conexión Estable
         </div>
       ) : (
         <div className="flex items-center gap-2 bg-red-600 text-white px-4 py-2.5 rounded-full shadow-lg shadow-red-600/20 font-medium text-sm">
