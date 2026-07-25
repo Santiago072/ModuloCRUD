@@ -44,11 +44,21 @@ chmod +x deploy.sh
 Esto construirá las imágenes Docker e iniciará los 3 contenedores:
 `modulocrud_db` · `modulocrud_backend` · `modulocrud_frontend`
 
-### 5. Configurar Nginx como Proxy Inverso
+### 5. Configurar Nginx como Proxy Inverso y SPA Routing
 Copia el archivo de configuración al directorio de Nginx:
 ```bash
 sudo cp nginx/modulocrud.conf /etc/nginx/sites-available/modulocrud.conf
 sudo ln -s /etc/nginx/sites-available/modulocrud.conf /etc/nginx/sites-enabled/
+```
+**Aviso Importante (SPA Routing):** Si experimentas errores `404 Not Found` al recargar la página en rutas secundarias (ej. `/admin`), asegúrate de que el bloque `location /` en la configuración de Nginx (`/etc/nginx/sites-available/modulocrud.conf`) incluya la siguiente instrucción para enrutar todo al `index.html`:
+```nginx
+location / {
+    # ... otras configuraciones
+    try_files $uri $uri/ /index.html;
+}
+```
+
+```bash
 sudo nginx -t          # Verificar que no hay errores de sintaxis
 sudo systemctl reload nginx
 ```

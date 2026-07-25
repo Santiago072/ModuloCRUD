@@ -5,6 +5,14 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lang/es/).
 
+## [v1.2.0] - 2026-07-24
+### Módulo Gestión de Encuestas (Admin) y Mejoras de Arquitectura
+- **Gestión Avanzada para Administradores**: Se implementó una nueva pestaña "Gestión de Encuestas" en el Panel Administrativo que permite a los administradores visualizar, buscar y editar todas las encuestas en tiempo real, de la misma forma y con la misma experiencia offline que los encuestadores.
+- **Sincronización Local para Admin**: Ahora el administrador aprovecha todo el potencial del motor offline Dexie.js descargando los datos de todos los encuestadores para realizar búsquedas instantáneas y ediciones "local-first".
+- **Auto-reparación de Estadísticas (Healing Script)**: Incorporada lógica en el backend (statsRoutes) para detectar y rellenar automáticamente registros huérfanos generados en versiones anteriores, garantizando que los contadores estadísticos de "Total Encuestas" sean 100% precisos de forma retroactiva.
+- **UX/UI Mejoras**: Refactorización del "Admin Header" separando la lógica modal del cambio de contraseña para que esté globalmente accesible. Las etiquetas "Sincronizado" y "Encuestador" en la vista de tarjetas fueron reubicadas optimizando la lectura. Formato de fechas estandarizado a YYYY-MM-DD.
+- **Fixes de Despliegue (Nginx 404)**: Corrección de rutas anidadas para evitar el error `404 Not Found` en Nginx cuando los usuarios recargaban la página en sub-rutas (SPA Routing Fix).
+
 ## [v1.1.0] - 2026-07-02
 ### Panel de Administración y Gestión de Encuestadores
 - **Panel Administrativo Web**: Se creó el área `/admin` (protegida con JWT y autenticación encriptada) para la gestión completa de los trabajadores en campo.
