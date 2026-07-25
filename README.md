@@ -7,7 +7,7 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 | Documento | Descripción |
 |-----------|-------------|
 | 👤 [Manual de Usuario](docs/MANUAL_USUARIO.md) | Guía de uso de la aplicación para usuarios finales |
-| 📜 [Registro de Cambios](docs/CHANGELOG.md) | Historial de versiones y modificaciones del sistema (v1.2.0) |
+| 📜 [Registro de Cambios](docs/CHANGELOG.md) | Historial de versiones y modificaciones del sistema (v1.3.0) |
 | 📋 [Plan de Implementación](docs/PLAN_IMPLEMENTACION.md) | Fases del proyecto, stack tecnológico y arquitectura de sincronización |
 | 📖 [Documentación Técnica](docs/documentacion-tecnica.md) | Arquitectura de carpetas, endpoints API, flujo offline-first |
 | 📋 [Especificación de Requisitos](docs/Especificacion_Requisitos.md) | Objetivos, RNF, modelo de datos y justificaciones de diseño |
@@ -16,7 +16,7 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 ---
 
 ### 📱 Portal App (PWA Frontend)
-* **Arquitectura Offline-First:** Los datos se guardan instantáneamente en el dispositivo (usando `IndexedDB` y `Dexie.js`) permitiendo continuar el trabajo sin interrupciones aunque se pierda la señal celular.
+* **Arquitectura Offline-First de Alta Seguridad:** Los datos se guardan instantáneamente en el dispositivo (usando `IndexedDB` y `Dexie.js`) permitiendo continuar el trabajo sin internet. Incluye un sistema de Autenticación Offline (LockScreen con cifrado SHA-256 local) y bloqueo automático por inactividad.
 * **Componentes UI:** Interfaz construida con **React 18** y **Tailwind CSS** para un diseño responsivo, limpio y rápido.
 * **Panel de Administración Avanzado (v1.2.0):** Dashboard integrado para la gestión de encuestadores (alta, baja, listado) y gestión total de encuestas (vista de tarjetas unificada, edición local-first), protegido mediante autenticación JWT.
 * **Manejo Dinámico de Encuestadores:** Sincronización automática del listado de encuestadores al cliente offline, autocompletado y memoria local persistente para máxima agilidad en campo.
@@ -57,10 +57,11 @@ El proyecto está completamente dockerizado para facilitar su despliegue en ento
 
 ---
 
-## 📅 Estado del Proyecto: Cloud Survey System v1.2.0 (Completado ✅)
+## 📅 Estado del Proyecto: Cloud Survey System v1.3.0 (Completado ✅)
 
 El sistema ha superado con éxito todas las fases de desarrollo y se encuentra en etapa de producción activa:
 * **Fases 1 a 4:** Arquitectura Offline-First, Backend Node.js, y motor de sincronización proactivo completados (Versión Base).
 * **Fase 5:** Despliegue en VPS (Nginx + Let's Encrypt + Docker) 100% estable con SPA Routing.
 * **Actualización v1.1.0:** Integración de Panel Administrativo, Control de Accesos por JWT y selector dinámico offline.
-* **Actualización v1.2.0 (Nueva):** Gestión de Encuestas Total, motor de autocuración (Healing Script) de estadísticas, refactorización de layouts, sincronización local y mejoras en SPA UI.
+* **Actualización v1.2.0:** Gestión de Encuestas Total, motor de autocuración (Healing Script) de estadísticas, refactorización de layouts y sincronización local para administradores.
+* **Actualización v1.3.0 (Nueva):** Módulo de Seguridad Offline. Bloqueo por inactividad (Auto-Lock), autenticación criptográfica offline (SHA-256), indicador dinámico de red y sesión JWT extendida a 30 días para zonas sin conectividad.

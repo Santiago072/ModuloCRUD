@@ -5,6 +5,13 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lang/es/).
 
+## [v1.3.0] - 2026-07-25
+### Seguridad Offline y Resiliencia en PWA
+- **Pantalla de Bloqueo Offline-First**: Nuevo componente "LockScreen" que protege la aplicación mediante criptografía local (SHA-256) sin requerir internet, garantizando que los datos locales (IndexedDB) no se comprometan.
+- **Temporizador de Inactividad Inteligente**: Sistema integrado de Auto-Lock. Si la aplicación no detecta actividad (mouse, teclado, táctil) durante 15 minutos, se bloquea automáticamente conservando el estado y los datos locales de manera segura.
+- **Indicador Dinámico de Red**: Componente visual no invasivo (`NetworkStatus`) que alerta al usuario en tiempo real cuando se pierde la conexión a internet ("Sin conexión") y cuando se recupera ("Conexión restablecida").
+- **Expiración de Sesión Extendida**: La validez del Token JWT se extendió de 8 horas a 30 días, permitiendo que los encuestadores trabajen en áreas rurales (offline) por periodos prolongados sin que el servidor rechace la sincronización al volver a conectarse.
+
 ## [v1.2.0] - 2026-07-24
 ### Módulo Gestión de Encuestas (Admin) y Mejoras de Arquitectura
 - **Gestión Avanzada para Administradores**: Se implementó una nueva pestaña "Gestión de Encuestas" en el Panel Administrativo que permite a los administradores visualizar, buscar y editar todas las encuestas en tiempo real, de la misma forma y con la misma experiencia offline que los encuestadores.
