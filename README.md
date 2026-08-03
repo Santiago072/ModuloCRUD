@@ -12,6 +12,7 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 | 📖 [Documentación Técnica](docs/documentacion-tecnica.md) | Arquitectura de carpetas, endpoints API, flujo offline-first |
 | 📋 [Especificación de Requisitos](docs/Especificacion_Requisitos.md) | Objetivos, RNF, modelo de datos y justificaciones de diseño |
 | 🚀 [Manual de Despliegue VPS](docs/DESPLIEGUE_VPS.md) | Guía paso a paso para instalar y actualizar en el VPS con Docker y Nginx |
+| 🏗️ [Arquitectura y Componentes](docs/ARQUITECTURA.md) | Diagramas Mermaid: componentes, flujo offline-first, seguridad y Docker |
 
 ---
 
