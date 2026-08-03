@@ -1,0 +1,68 @@
+name: CI — Módulo CRUD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # JOB 1: Backend (Node.js / Express)
+  # ─────────────────────────────────────────────
+  backend:
+    name: Backend — Install & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias (reproducible)
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        run: npm test
+
+  # ─────────────────────────────────────────────
+  # JOB 2: Frontend (React / Vite)
+  # ─────────────────────────────────────────────
+  frontend:
+    name: Frontend — Lint & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias (reproducible)
+        run: npm ci
+
+      - name: Análisis estático (oxlint)
+        run: npm run lint
+
+      - name: Compilar para producción
+        run: npm run build
+        env:
+          # URL de API necesaria para el build de Vite
+          VITE_API_URL: https://modulocrud.slscode.online/api
