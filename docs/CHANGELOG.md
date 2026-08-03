@@ -5,6 +5,55 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lang/es/).
 
+---
+
+## [v1.3.1] - 2026-08-03
+### Endurecimiento de Seguridad, Higiene del Repositorio y DevOps
+
+Esta versión no agrega funcionalidades nuevas al usuario final. Se concentra en cerrar
+los hallazgos identificados en el audit de madurez técnica (83/100) para llevar el
+proyecto a estándares de producción robustos.
+
+#### 🔐 Seguridad
+- **CORS restrictivo**: Se reemplazó la configuración `cors()` completamente permisiva
+  por una lista blanca de orígenes autorizados leída desde la variable de entorno
+  `ALLOWED_ORIGINS`. Cualquier dominio no listado recibe error HTTP CORS.
+- **Validación de arranque**: El servidor Express ahora valida al inicio que las variables
+  `JWT_SECRET` y `ALLOWED_ORIGINS` estén definidas. Si falta alguna, el proceso termina
+  con código 1 (*fail-safe*) en lugar de arrancar con valores inseguros.
+- **Eliminación del fallback JWT hardcodeado**: Se removió el string
+  `'supersecret_modulocrud_key'` que el middleware de autenticación usaba como clave JWT
+  de emergencia. Si alguien desplegaba sin configurar `.env`, un atacante podía fabricar
+  tokens válidos con esa clave pública conocida.
+
+#### 🧹 Higiene del Repositorio
+- **`backend/node_modules/` eliminado del tracking de Git**: 942 archivos de dependencias
+  que llevaban versionados desde el inicio del proyecto fueron removidos del índice de Git
+  con `git rm --cached`. Se regeneran localmente con `npm ci` usando el `package-lock.json`
+  versionado.
+- **`.vscode/` eliminado del tracking de Git**: El directorio de configuración personal
+  del editor fue agregado al `.gitignore` y removido del índice.
+- **`.env.example` actualizado**: Se documentaron las dos variables nuevas obligatorias
+  (`JWT_SECRET` y `ALLOWED_ORIGINS`) con instrucciones de generación para nuevos
+  desarrolladores.
+
+#### ⚙️ CI/CD — Integración Continua
+- **GitHub Actions**: Se creó el archivo `.github/workflows/ci.yml` con dos jobs paralelos
+  que se activan automáticamente en cada `push` o `pull_request` a `main`:
+  - *backend*: `npm ci` + `npm test`
+  - *frontend*: `npm ci` + `npm run lint` (oxlint) + `npm run build` (Vite)
+
+#### 📄 Documentación y Legal
+- **Licencia MIT agregada**: Archivo `LICENSE` en la raíz del repositorio. Define los
+  términos de uso y distribución del proyecto. Autor: Santiago072, Año: 2026.
+- **Diagrama de arquitectura**: Nuevo archivo `docs/ARQUITECTURA.md` con 4 diagramas
+  Mermaid interactivos: componentes y responsabilidades, flujo Offline-First, capas de
+  seguridad y topología de contenedores Docker.
+- **CONTRIBUTING.md**: Guía para nuevos colaboradores con instrucciones de configuración
+  local, convenciones de commits en español y flujo de trabajo con ramas.
+
+---
+
 ## [v1.3.0] - 2026-07-25
 ### Seguridad Offline y Resiliencia en PWA
 - **Pantalla de Bloqueo Offline-First**: Nuevo componente "LockScreen" que protege la aplicación mediante criptografía local (SHA-256) sin requerir internet, garantizando que los datos locales (IndexedDB) no se comprometan.
