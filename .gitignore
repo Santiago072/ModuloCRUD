@@ -4,5 +4,11 @@ dist/
 build/
 .DS_Store
 
+# IDE — configuración local del editor (no pertenece al repositorio)
+.vscode/
+
+# Dependencias del backend (se regeneran con npm ci)
+backend/node_modules/
+
 # Graphify
-graphify-out/  
+graphify-out/
