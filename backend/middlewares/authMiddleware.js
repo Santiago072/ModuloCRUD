@@ -10,7 +10,7 @@ const verifyToken = (req, res, next) => {
   try {
     // El token suele venir como "Bearer <token>"
     const bearer = token.split(' ')[1];
-    const decoded = jwt.verify(bearer, process.env.JWT_SECRET || 'supersecret_modulocrud_key');
+    const decoded = jwt.verify(bearer, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
