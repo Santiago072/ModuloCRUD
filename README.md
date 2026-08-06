@@ -14,6 +14,8 @@ Bienvenido al **Módulo CRUD**. Es un sistema moderno de recolección de datos y
 | 🚀 [Manual de Despliegue VPS](docs/DESPLIEGUE_VPS.md) | Guía paso a paso para instalar y actualizar en el VPS con Docker y Nginx |
 | 🏗️ [Arquitectura y Componentes](docs/ARQUITECTURA.md) | Diagramas Mermaid: componentes, flujo offline-first, seguridad y Docker |
 | 🤝 [Guía para Colaboradores](docs/CONTRIBUTING.md) | Configuración local, convenciones de commits y checklist de PR |
+| ⚖️ [Licencia MIT](LICENSE) | Términos legales de propiedad intelectual y uso abierto |
+
 
 ---
 
