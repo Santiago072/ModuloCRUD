@@ -25,11 +25,18 @@ const useAuthStore = create((set) => ({
         body: JSON.stringify({ username, password })
       });
 
-      const data = await response.json();
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        throw new Error(`Error del servidor (${response.status}): Respuesta no válida de la API`);
+      }
 
       if (!response.ok || data.status === 'error') {
         throw new Error(data.message || 'Error de autenticación');
       }
+
 
       const pwHash = await hashString(password);
       localStorage.setItem('app_pin', pwHash);

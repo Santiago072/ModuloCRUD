@@ -28,7 +28,9 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    callback(new Error(`Origen no permitido por política CORS: ${origin}`));
+    const err = new Error(`Origen no permitido por política CORS: ${origin}`);
+    err.status = 403;
+    callback(err);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -47,6 +49,17 @@ app.use('/api/encuestadores', encuestadoresRoutes);
 app.use('/api', apiRoutes);
 app.use('/api/stats', statsRoutes);
 
+// Manejador global de errores (garantiza respuestas JSON, nunca HTML)
+app.use((err, req, res, next) => {
+  console.error('[API ERROR]', err.message);
+  const statusCode = err.status || (res.statusCode !== 200 ? res.statusCode : 500);
+  res.status(statusCode).json({
+    status: 'error',
+    message: err.message || 'Error interno del servidor'
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor Backend corriendo en el puerto ${PORT}`);
 });
+
