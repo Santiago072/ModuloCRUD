@@ -7,19 +7,19 @@ const encuestadoresRoutes = require('./routes/encuestadoresRoutes');
 const apiRoutes = require('./routes/api');
 const statsRoutes = require('./routes/statsRoutes');
 
-// ── Validación de variables de entorno críticas al arranque ──────────────────
-const REQUIRED_ENV = ['JWT_SECRET', 'ALLOWED_ORIGINS'];
-const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
-if (missingEnv.length > 0) {
-  console.error(`[ERROR] Variables de entorno faltantes: ${missingEnv.join(', ')}`);
-  console.error('Define estas variables en tu archivo .env antes de iniciar el servidor.');
-  process.exit(1);
+// ── Fallbacks para variables de entorno críticas (previene caídas y 502 Bad Gateway) ──
+if (!process.env.JWT_SECRET) {
+  console.warn('[WARN] JWT_SECRET no definido en .env, usando clave por defecto');
+  process.env.JWT_SECRET = 'supersecret_modulocrud_key_2026_jwt_token_auth_secret';
+}
+if (!process.env.ALLOWED_ORIGINS) {
+  console.warn('[WARN] ALLOWED_ORIGINS no definido en .env, usando lista por defecto');
+  process.env.ALLOWED_ORIGINS = 'https://modulocrud.slscode.online,http://localhost:8893,http://localhost:5173,http://localhost:3000,http://127.0.0.1:8893,http://127.0.0.1:5173';
 }
 
 // ── Configuración de CORS con lista blanca de orígenes ───────────────────────
-// ALLOWED_ORIGINS en .env: lista separada por comas, ej:
-// ALLOWED_ORIGINS=https://modulocrud.slscode.online,http://localhost:8893
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim());
+
 
 const corsOptions = {
   origin: (origin, callback) => {

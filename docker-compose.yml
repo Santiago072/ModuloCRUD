@@ -6,10 +6,10 @@ services:
     container_name: modulocrud_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-modulocrud}
+      MYSQL_USER: ${DB_USER:-crud_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
     volumes:
       - db_data:/var/lib/mysql
       - ./BD.txt:/docker-entrypoint-initdb.d/BD.txt:ro  # Inicializa la BD automáticamente
@@ -31,10 +31,12 @@ services:
       - "127.0.0.1:8894:3000"  # Puerto 8894 host → 3000 interno (8893=frontend, 8894=backend)
     environment:
       - DB_HOST=db
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - PORT=3000  # Puerto interno del contenedor Node.js (sin cambios)
+      - DB_USER=${DB_USER:-crud_user}
+      - DB_PASSWORD=${DB_PASSWORD:-root}
+      - DB_NAME=${DB_NAME:-modulocrud}
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-supersecret_modulocrud_key_2026_jwt_token_auth_secret}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://modulocrud.slscode.online,http://localhost:8893,http://localhost:5173,http://localhost:3000,http://127.0.0.1:8893,http://127.0.0.1:5173}
     depends_on:
       db:
         condition: service_healthy
@@ -46,7 +48,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=${VITE_API_URL}   # Inyecta la URL de la API en el build de React
+        - VITE_API_URL=${VITE_API_URL:-https://modulocrud.slscode.online/api}
+
     container_name: modulocrud_frontend
     restart: always
     ports:

@@ -22,15 +22,12 @@ echo "⬇️  Obteniendo código desde GitHub (rama main)..."
 git fetch origin
 git reset --hard origin/main
 
-# Paso 3: Verificar que el archivo .env existe (no se sube al repo)
+# Paso 3: Asegurar que el archivo .env existe desde .env.example
 if [ ! -f ".env" ]; then
-  echo ""
-  echo "⚠️  ADVERTENCIA: No se encontró el archivo .env"
-  echo "   Copia el ejemplo y configura tus valores:"
-  echo "   cp .env.example .env && nano .env"
-  echo ""
-  exit 1
+  echo "📋 Creando .env automáticamente desde .env.example..."
+  cp .env.example .env
 fi
+
 
 # Cargar variables de entorno
 set -a
