@@ -70,14 +70,20 @@ sequenceDiagram
     participant SW as Service Worker
     participant API as Backend API
 
+    Note over E,IDB: 📵 Fase offline — sin internet
     E->>PWA: Registra encuesta
     PWA->>IDB: Guarda localmente (sync_status=pending)
     IDB-->>PWA: ✅ Guardado offline
+    PWA-->>E: Confirmación instantánea en pantalla
 
-    note over SW: Detecta conexión disponible
-    SW->>API: Background Sync — POST /api/sync (lote de pendientes)
+    Note over SW,API: 🌐 Fase de reconexión — internet disponible
+    SW->>SW: Evento 'online' detectado
+    SW->>IDB: Consulta registros con sync_status=pending
+    IDB-->>SW: Lote de registros pendientes
+    SW->>API: Background Sync — POST /api/sync
     API-->>SW: 200 OK
-    SW->>IDB: Marca sync_status=synced
+    SW->>IDB: Actualiza sync_status=synced
+    SW->>PWA: Notifica sincronización completada
 ```
 
 ---
@@ -98,20 +104,20 @@ graph LR
 
 ```mermaid
 graph TD
-    HOST["Host VPS\n127.0.0.1:8893 y 127.0.0.1:8894"]
-    NGINX_H["Nginx Host\n:443 / :80"]
+    INTERNET["🌐 Internet / Usuario"]
+    NGINX_H["Nginx Host\npuerto :443 HTTPS · :80 HTTP\n(corre en el VPS)"]
 
-    HOST --> NGINX_H
+    INTERNET -- "petición HTTPS" --> NGINX_H
 
-    subgraph NET["crud_network (bridge)"]
-        F["modulocrud_frontend\npuerto interno :80"]
-        B["modulocrud_backend\npuerto interno :3000"]
+    subgraph NET["crud_network (bridge) — red interna Docker"]
+        F["modulocrud_frontend\npuerto interno :80\nbind: 127.0.0.1:8893"]
+        B["modulocrud_backend\npuerto interno :3000\nbind: 127.0.0.1:8894"]
         D["modulocrud_db\npuerto interno :3306\nVolumen: modulocrud_db_data"]
     end
 
-    NGINX_H -- ":8893" --> F
-    NGINX_H -- ":8894" --> B
-    B -- "healthcheck ok" --> D
+    NGINX_H -- "proxy → :8893 (SPA)" --> F
+    NGINX_H -- "proxy /api → :8894" --> B
+    B -- "mysql2 + healthcheck" --> D
 ```
 
 > Los puertos están bindeados a `127.0.0.1` (no `0.0.0.0`), por lo que solo
