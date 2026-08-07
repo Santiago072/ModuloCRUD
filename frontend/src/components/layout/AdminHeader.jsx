@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { LayoutDashboard, KeyRound, X } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
+import { NetworkStatus } from '../ui/NetworkStatus';
 
 const API_URL = '/api';
 
@@ -63,16 +64,19 @@ export function AdminHeader() {
             <span className="font-medium">Panel Administrativo</span>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <NetworkStatus />
           <button
             onClick={() => setIsPasswordModalOpen(true)}
-            className="flex items-center gap-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+            className="flex items-center gap-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border border-slate-200/60 bg-white/80 shadow-xs"
+            title="Cambiar mi contraseña de acceso"
           >
-            <KeyRound size={18} />
+            <KeyRound size={16} className="text-slate-500" />
             <span className="hidden sm:inline">Mi Contraseña</span>
           </button>
         </div>
       </header>
+
 
       {/* Modal Contraseña */}
       {isPasswordModalOpen && (

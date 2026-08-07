@@ -50,18 +50,13 @@ export default function App() {
   }, [isAuthenticated, isLocked, lock]);
 
   if (isLocked) {
-    return (
-      <>
-        <NetworkStatus />
-        <LockScreen />
-      </>
-    );
+    return <LockScreen />;
   }
 
   return (
     <BrowserRouter>
-      <NetworkStatus />
       <Routes>
+
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route 

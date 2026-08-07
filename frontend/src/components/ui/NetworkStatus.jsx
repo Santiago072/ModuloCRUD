@@ -1,21 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Wifi, WifiOff } from 'lucide-react';
 
-export function NetworkStatus() {
+/**
+ * Indicador visual del estado de conexión (Online / Offline).
+ * Diseñado para integrarse armoniosamente en barras de navegación y encabezados.
+ */
+export function NetworkStatus({ className = '' }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [showBackOnline, setShowBackOnline] = useState(false);
 
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      setShowBackOnline(true);
-      setTimeout(() => setShowBackOnline(false), 3000); // Hide the "back online" message after 3s
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-      setShowBackOnline(false);
-    };
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -27,17 +22,30 @@ export function NetworkStatus() {
   }, []);
 
   return (
-    <div className="fixed top-4 right-4 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+    <div
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all select-none ${
+        isOnline
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80 shadow-xs'
+          : 'bg-red-50 text-red-700 border-red-200 shadow-xs animate-pulse'
+      } ${className}`}
+      title={isOnline ? 'Conexión a internet activa' : 'Sin conexión a internet'}
+    >
+      <div
+        className={`w-2 h-2 rounded-full ${
+          isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'
+        }`}
+      />
       {isOnline ? (
-        <div className="flex items-center gap-2 bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full shadow-md font-medium text-xs border border-emerald-200 opacity-80 hover:opacity-100 transition-opacity">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-          Conexión Estable
-        </div>
+        <span className="flex items-center gap-1">
+          <Wifi size={13} className="text-emerald-600" />
+          <span className="hidden sm:inline">Conexión Estable</span>
+          <span className="sm:hidden">Online</span>
+        </span>
       ) : (
-        <div className="flex items-center gap-2 bg-red-600 text-white px-4 py-2.5 rounded-full shadow-lg shadow-red-600/20 font-medium text-sm">
-          <WifiOff size={16} />
-          Sin conexión a internet
-        </div>
+        <span className="flex items-center gap-1">
+          <WifiOff size={13} className="text-red-600" />
+          <span>Sin conexión</span>
+        </span>
       )}
     </div>
   );
