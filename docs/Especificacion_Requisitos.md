@@ -40,25 +40,26 @@ El sistema adopta el patrón Offline-First combinado con MVVM (Model-View-ViewMo
 ```mermaid
 flowchart TD
     subgraph S1["1. CAPTURA EN CAMPO (OFFLINE)"]
-        A["📝 FORMULARIO\n(Datos de encuestado)"]
-        B["💾 INDEXEDDB LOCAL\n(sync_status='local')"]
-        C["⏳ COLA SYNCQUEUE\n(Operaciones pendientes)"]
+        A["📝 FORMULARIO<br/><b>(Datos de encuestado)</b>"]
+        B["💾 INDEXEDDB LOCAL<br/><b>(sync_status='local')</b>"]
+        C["⏳ COLA SYNCQUEUE<br/><b>(Operaciones pendientes)</b>"]
         A --> B --> C
     end
 
     subgraph S2["2. DETECCIÓN DE RED"]
-        D["📶 SERVICE WORKER\n(Evento 'online' detectado)"]
+        D["📶 SERVICE WORKER<br/><b>(Evento 'online' detectado)</b>"]
     end
 
     subgraph S3["3. PERSISTENCIA SERVIDOR"]
-        E["⚙️ API POST /api/sync\n(Autenticación JWT)"]
-        F[("🛢️ MARIADB / MYSQL\n(sync_status='synced')")]
+        E["⚙️ API POST /api/sync<br/><b>(Autenticación JWT)</b>"]
+        F[("🛢️ MARIADB / MYSQL<br/><b>(sync_status='synced')</b>")]
         E --> F
     end
 
-    C -->|"Background Sync al reconectar"| D
-    D -->|"Envío de lote seguro"| E
+    C -->|"Sync al<br/>reconectar"| D
+    D -->|"Envío de lote<br/>seguro"| E
 ```
+
 
 | Etapa | Componente | Descripción del Flujo Offline-First |
 |---|---|---|
