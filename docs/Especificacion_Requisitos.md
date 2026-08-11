@@ -38,32 +38,34 @@ El sistema adopta el patrón Offline-First combinado con MVVM (Model-View-ViewMo
 ### 2.2 Flujo de datos offline-first
 
 ```mermaid
-graph LR
-    subgraph CLIENTE["📱 Dispositivo del Encuestador (Offline-First)"]
-        direction TB
-        ACT["📝 1. Captura de Datos<br/><i>(Formulario Persona/Encuesta)</i>"]
-        IDB["💾 2. IndexedDB Local (Dexie)<br/><i>(Persistencia inmediata: sync_status='local')</i>"]
-        QUEUE["⏳ 3. SyncQueue<br/><i>(Cola de pendientes en segundo plano)</i>"]
-
-        ACT --> IDB --> QUEUE
+flowchart TD
+    subgraph S1["1. CAPTURA EN CAMPO (OFFLINE)"]
+        A["📝 FORMULARIO\n(Datos de encuestado)"]
+        B["💾 INDEXEDDB LOCAL\n(sync_status='local')"]
+        C["⏳ COLA SYNCQUEUE\n(Operaciones pendientes)"]
+        A --> B --> C
     end
 
-    subgraph SYNC["🔄 Proceso de Sincronización"]
-        direction TB
-        SW["📶 4. Service Worker<br/><i>(Detecta recuperación de conexión)</i>"]
+    subgraph S2["2. DETECCIÓN DE RED"]
+        D["📶 SERVICE WORKER\n(Evento 'online' detectado)"]
     end
 
-    subgraph SERVER["☁️ Servidor Central (Backend API)"]
-        direction TB
-        API["⚙️ 5. POST /api/sync<br/><i>(Validación JWT y lote)</i>"]
-        MYSQL[("🛢️ 6. MariaDB / MySQL<br/><i>(Guarda lote y actualiza sync_status='synced')</i>")]
-
-        API --> MYSQL
+    subgraph S3["3. PERSISTENCIA SERVIDOR"]
+        E["⚙️ API POST /api/sync\n(Autenticación JWT)"]
+        F[("🛢️ MARIADB / MYSQL\n(sync_status='synced')")]
+        E --> F
     end
 
-    QUEUE -->|"Al recuperar red"| SW
-    SW -->|"Background Sync"| API
+    C -->|"Background Sync al reconectar"| D
+    D -->|"Envío de lote seguro"| E
 ```
+
+| Etapa | Componente | Descripción del Flujo Offline-First |
+|---|---|---|
+| **1. Captura en Campo** | `IndexedDB (Dexie.js)` | El encuestador llena el formulario sin internet; los datos se guardan al instante en el navegador/app con `sync_status = 'local'`. |
+| **2. Detección de Red** | `Service Worker` | Monitorea el estado de conectividad en segundo plano; al recuperar señal de red, activa el proceso de sincronización. |
+| **3. Servidor Central** | `Express API + MySQL` | Recibe el lote mediante `POST /api/sync`, valida el token JWT, inserta las encuestas en MySQL y actualiza el estado a `synced`. |
+
 
 El flujo de operaciones garantiza que el sistema nunca bloquea al usuario por falta de conexión:
 1. Usuario realiza una acción (crear, editar, eliminar registro).
