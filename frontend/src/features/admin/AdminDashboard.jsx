@@ -23,6 +23,11 @@ export default function AdminDashboard() {
   const [editingUser, setEditingUser] = useState(null);
   const [editUsername, setEditUsername] = useState('');
   const [editPassword, setEditPassword] = useState('');
+  
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const fetchUsuarios = async () => {
     try {
       const res = await fetch(`${API_URL}/auth/users`, {
@@ -124,6 +129,11 @@ export default function AdminDashboard() {
       console.error('Error deleting usuario', error);
     }
   };
+
+  // Lógica de paginación
+  const totalPages = Math.ceil(usuarios.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const displayedUsuarios = usuarios.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -233,7 +243,7 @@ export default function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-slate-100">
-                          {usuarios.map((u) => (
+                          {displayedUsuarios.map((u) => (
                             <tr key={u.id} className="hover:bg-slate-50/50 transition-colors">
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">
                                 {u.username}
@@ -278,6 +288,30 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
+
+            {/* Controles de Paginación */}
+            {totalPages > 1 && !loading && (
+              <div className="flex items-center justify-between pt-5 mt-4 border-t border-slate-100">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                >
+                  Anterior
+                </button>
+                <span className="text-sm text-slate-500 font-medium">
+                  Página {currentPage} de {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+
           </div>
 
 
