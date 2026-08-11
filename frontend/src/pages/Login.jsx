@@ -236,7 +236,7 @@ export default function Login() {
             
             <button 
               onClick={() => setShowInfoModal(false)}
-              className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors backdrop-blur-md"
+              className="absolute top-4 right-4 z-20 p-2 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors backdrop-blur-md cursor-pointer"
             >
               <X size={20} />
             </button>
