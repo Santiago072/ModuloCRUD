@@ -36,12 +36,42 @@ El sistema adopta el patrón Offline-First combinado con MVVM (Model-View-ViewMo
 | Offline | Service Worker | Cache de assets, interceptación de red |
 
 ### 2.2 Flujo de datos offline-first
+
+```mermaid
+graph LR
+    subgraph CLIENTE["📱 Dispositivo del Encuestador (Offline-First)"]
+        direction TB
+        ACT["📝 1. Captura de Datos<br/><i>(Formulario Persona/Encuesta)</i>"]
+        IDB["💾 2. IndexedDB Local (Dexie)<br/><i>(Persistencia inmediata: sync_status='local')</i>"]
+        QUEUE["⏳ 3. SyncQueue<br/><i>(Cola de pendientes en segundo plano)</i>"]
+
+        ACT --> IDB --> QUEUE
+    end
+
+    subgraph SYNC["🔄 Proceso de Sincronización"]
+        direction TB
+        SW["📶 4. Service Worker<br/><i>(Detecta recuperación de conexión)</i>"]
+    end
+
+    subgraph SERVER["☁️ Servidor Central (Backend API)"]
+        direction TB
+        API["⚙️ 5. POST /api/sync<br/><i>(Validación JWT y lote)</i>"]
+        MYSQL[("🛢️ 6. MariaDB / MySQL<br/><i>(Guarda lote y actualiza sync_status='synced')</i>")]
+
+        API --> MYSQL
+    end
+
+    QUEUE -->|"Al recuperar red"| SW
+    SW -->|"Background Sync"| API
+```
+
 El flujo de operaciones garantiza que el sistema nunca bloquea al usuario por falta de conexión:
 1. Usuario realiza una acción (crear, editar, eliminar registro).
 2. La acción se escribe inmediatamente en IndexedDB (respuesta instantánea).
 3. Si hay internet: la operación se envía también al servidor en tiempo real.
 4. Si no hay internet: la operación se agrega a una cola de sincronización (SyncQueue).
 5. El Service Worker detecta cuando se restaura la conexión y procesa la cola automáticamente.
+
 
 **Garantía de integridad:**
 Cada registro incluye un campo `sync_status` con valores: `'local'` (pendiente de subir al servidor), `'synced'` (sincronizado con el servidor) o `'deleted'` (pendiente de eliminación física en el servidor). El campo `updated_at` permite resolver conflictos de concurrencia a favor del dato más reciente.
