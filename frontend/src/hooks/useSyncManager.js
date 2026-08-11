@@ -16,7 +16,17 @@ export function useSyncManager() {
       }
     };
 
+    // Sincronización periódica cada 15 segundos en segundo plano si hay red
+    const intervalId = setInterval(() => {
+      if (navigator.onLine) {
+        syncData();
+      }
+    }, 15000);
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isOnline]); 
 }
