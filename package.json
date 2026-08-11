@@ -1,0 +1,12 @@
+{
+  "name": "modulo-crud-workspace",
+  "version": "1.3.1",
+  "private": true,
+  "description": "Sistema de Encuestas PWA Offline-First (Módulo CRUD)",
+  "scripts": {
+    "test": "npm --prefix backend test",
+    "test:backend": "npm --prefix backend test",
+    "lint": "npm --prefix frontend run lint",
+    "build": "npm --prefix frontend run build"
+  }
+}
