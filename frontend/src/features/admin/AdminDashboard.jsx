@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, Users, FileText, Trophy, Loader2 } from 'lucide-react';
+import { Plus, X, Users, FileText, Trophy, Loader2, Download, ClipboardList } from 'lucide-react';
 import { AppSidebar } from '../../components/layout/AppSidebar';
 import { AdminHeader } from '../../components/layout/AdminHeader';
+import { exportToCSV } from '../../utils/exportUtils';
 
 const API_URL = '/api';
 
@@ -133,6 +134,30 @@ export default function AdminDashboard() {
 
         <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-8 space-y-8">
           
+          {/* Barra de Acceso Rápido */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Panel de Administración</h1>
+              <p className="text-sm text-slate-500 mt-1">Supervisa métricas de censos, gestiona encuestadores y descarga reportes consolidados.</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={exportToCSV}
+                className="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm active:scale-95"
+              >
+                <Download size={16} className="text-slate-500" />
+                <span>Exportar CSV</span>
+              </button>
+              <button
+                onClick={() => navigate('/admin/encuestas')}
+                className="flex items-center gap-2 blue-gradient hover:opacity-90 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-500/20 active:scale-95"
+              >
+                <ClipboardList size={16} />
+                <span>Gestionar / Nueva Encuesta</span>
+              </button>
+            </div>
+          </div>
+
           {/* Tarjetas de Estadísticas */}
           {stats && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
