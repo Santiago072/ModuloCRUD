@@ -238,10 +238,36 @@ cp .env.example .env
 
 ---
 
+## 5. Pruebas Automatizadas (Unit & Integration Testing)
+
+El backend incluye una suite de pruebas automatizadas utilizando el test runner nativo de **Node.js 20 (`node:test` y `node:assert`)** para garantizar rendimiento y eliminar dependencias pesadas:
+
+| Suite | Archivo | Pruebas | Cobertura / Qué valida |
+|---|---|:---:|---|
+| **Auth & Bcrypt/JWT** | `backend/tests/auth.test.js` | 4 | Hashing Bcrypt, comparación de contraseñas, firma y decodificación de tokens JWT, rechazo de tokens alterados y expirados |
+| **Seguridad CORS** | `backend/tests/cors.test.js` | 4 | Verificación estricta de lista blanca (`ALLOWED_ORIGINS`), autorización de dominios de producción/locales y rechazo (403) de orígenes no autorizados |
+| **Auth Middleware** | `backend/tests/middleware.test.js` | 3 | Respuestas 403 ante ausencia de header `Authorization`, 401 ante tokens malformados y paso exitoso `next()` con adjunto de `req.user` |
+
+### Comandos de Ejecución
+
+```bash
+# Backend (Pruebas unitarias nativas)
+cd backend
+npm test
+
+# Frontend (Análisis estático y compilación)
+cd frontend
+npm run lint
+npm run build
+```
+
+---
+
 ## 6. CI/CD — Integración Continua (GitHub Actions)
 
 El archivo [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) define un pipeline
 automático que se ejecuta en cada `push` o `pull_request` a la rama `main`.
+
 
 ### Jobs del Pipeline
 
