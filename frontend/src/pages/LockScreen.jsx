@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import useAuthStore from '../store/authStore';
-import { Lock, LogOut, Loader2 } from 'lucide-react';
+import { Lock, LogOut, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LockScreen() {
   const { user, unlock, logout, isLoading, error } = useAuthStore();
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleUnlock = async (e) => {
     e.preventDefault();
@@ -42,17 +43,24 @@ export default function LockScreen() {
               <label htmlFor="password" className="block text-sm font-semibold text-slate-700">
                 Contraseña
               </label>
-              <div className="mt-2">
+              <div className="mt-2 relative">
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium transition-all"
+                  className="appearance-none block w-full px-4 pr-11 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium transition-all"
                   placeholder="Tu contraseña..."
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 

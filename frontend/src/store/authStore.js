@@ -72,12 +72,36 @@ const useAuthStore = create((set) => ({
     try {
       const pwHash = await hashString(password);
       const storedHash = localStorage.getItem('app_pin');
-      if (pwHash === storedHash) {
+      
+      if (storedHash && pwHash === storedHash) {
         localStorage.setItem('app_locked', 'false');
         set({ isLocked: false, isLoading: false });
         return true;
       }
-      set({ error: 'Contraseña local incorrecta', isLoading: false });
+
+      // Si falla localmente o no hay pin (sesión antigua), intentamos validar con el servidor si hay internet
+      if (navigator.onLine) {
+        const username = JSON.parse(localStorage.getItem('app_user'))?.username;
+        if (username) {
+          const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'success') {
+              localStorage.setItem('app_pin', pwHash);
+              localStorage.setItem('app_locked', 'false');
+              set({ isLocked: false, isLoading: false });
+              return true;
+            }
+          }
+        }
+      }
+
+      set({ error: 'Contraseña incorrecta', isLoading: false });
       return false;
     } catch (e) {
       set({ error: 'Error al verificar la contraseña', isLoading: false });
