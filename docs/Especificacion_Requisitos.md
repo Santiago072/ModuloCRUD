@@ -41,22 +41,22 @@ El sistema adopta el patrón Offline-First combinado con MVVM (Model-View-ViewMo
 graph TB
     subgraph CLIENTE["📱 1. DISPOSITIVO DEL ENCUESTADOR (OFFLINE-FIRST)"]
         direction TB
-        ACT["📝 <b>CAPTURA EN CAMPO</b><br>Formulario de persona y encuesta"]
-        IDB["💾 <b>INDEXEDDB LOCAL</b><br>Persistencia con sync_status='local'"]
-        QUEUE["⏳ <b>COLA SYNCQUEUE</b><br>Cola de operaciones pendientes"]
+        ACT["📝 CAPTURA EN CAMPO"]
+        IDB["💾 INDEXEDDB LOCAL"]
+        QUEUE["⏳ COLA SYNCQUEUE"]
 
         ACT --> IDB --> QUEUE
     end
 
     subgraph SYNC["🔄 2. DETECCIÓN DE CONECTIVIDAD"]
         direction TB
-        SW["📶 <b>SERVICE WORKER</b><br>Detección automática de reconexión"]
+        SW["📶 SERVICE WORKER"]
     end
 
     subgraph SERVER["☁️ 3. SERVIDOR CENTRAL (BACKEND API)"]
         direction TB
-        API["⚙️ <b>POST /api/sync</b><br>Validación de token JWT y lote"]
-        MYSQL[("🛢️ <b>MARIADB / MYSQL</b><br>Inserción en lote y estado 'synced'")]
+        API["⚙️ POST /api/sync"]
+        MYSQL[("🛢️ MARIADB / MYSQL")]
 
         API --> MYSQL
     end
