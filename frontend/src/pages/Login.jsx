@@ -15,13 +15,17 @@ import {
   BarChart3,
   ShieldCheck,
   Clock,
-  Sparkles
+  Sparkles,
+  Info,
+  X
 } from 'lucide-react';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  
   const { login, isLoading, error } = useAuthStore();
   const navigate = useNavigate();
 
@@ -45,22 +49,31 @@ export default function Login() {
 
       <div className="w-full max-w-5xl relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         
-        {/* Panel Izquierdo: Presentación del Sistema y Explicación del Modo Offline de 30 Días */}
-        <div className="lg:col-span-6 flex flex-col justify-center space-y-5 px-2 sm:px-4">
+        {/* Panel Izquierdo: Presentación del Sistema */}
+        <div className="lg:col-span-6 flex flex-col justify-center space-y-6 px-2 sm:px-4">
           
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-xs">
               <ClipboardCheck size={15} className="text-blue-600" />
               <span>Sistema de Censo & Encuestas PWA</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-xs">
-              <Sparkles size={13} className="text-emerald-600" />
-              <span>Modo Campo 30 Días</span>
-            </span>
+            <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-full shadow-xs pr-1">
+              <span className="inline-flex items-center gap-1.5 pl-3 py-1 text-xs font-semibold">
+                <Sparkles size={13} className="text-emerald-600" />
+                <span>Modo Campo 30 Días</span>
+              </span>
+              <button 
+                onClick={() => setShowInfoModal(true)}
+                className="p-1.5 rounded-full text-emerald-600 hover:bg-emerald-100 hover:text-emerald-800 transition-colors"
+                title="Información sobre el modo offline"
+              >
+                <Info size={14} />
+              </button>
+            </div>
           </div>
 
           <div className="space-y-1.5">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 uppercase">
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">
               BIENVENIDO
             </h1>
             <h2 className="text-base sm:text-lg font-bold text-blue-600 uppercase tracking-wide">
@@ -68,52 +81,39 @@ export default function Login() {
             </h2>
           </div>
 
-          {/* Banner Informativo Destacado: Garantía de 30 Días Offline */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-sky-50/80 border border-blue-200/80 shadow-sm relative overflow-hidden">
-            <div className="flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-blue-600 text-white shrink-0 shadow-sm">
-                <Clock size={20} />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>Sesión Offline Activa hasta por 30 Días</span>
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                  Inicia sesión antes de salir y podrás realizar encuestas en <strong>zonas rurales o sin señal</strong> durante un periodo de hasta <strong>30 días</strong>. Todos los datos registrados se guardan de forma 100% segura en tu dispositivo y se sincronizarán automáticamente al recuperar internet.
-                </p>
-              </div>
-            </div>
-          </div>
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+            Plataforma diseñada para registrar información ciudadana, levantar censos demográficos y gestionar contactos de manera ágil. Captura datos en cualquier lugar, incluso en zonas rurales sin conexión a internet.
+          </p>
 
           {/* 3 Beneficios Funcionales Clave */}
-          <div className="space-y-2.5 pt-1">
-            <div className="flex items-center gap-3 bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:border-blue-300 transition-all">
-              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
-                <MapPin size={16} />
+          <div className="space-y-3 pt-1">
+            <div className="flex items-center gap-3.5 bg-white/90 p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:border-blue-300 transition-all">
+              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
+                <MapPin size={18} />
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Levantamiento en Campo</h4>
-                <p className="text-xs text-slate-500">Registro ágil de personas, hogares y contactos con rotación de prioridad.</p>
+                <p className="text-xs text-slate-500 mt-0.5">Registro rápido de personas, hogares y contactos prioritarios.</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:border-blue-300 transition-all">
-              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
-                <WifiOff size={16} />
+            <div className="flex items-center gap-3.5 bg-white/90 p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:border-blue-300 transition-all">
+              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
+                <WifiOff size={18} />
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Continuidad sin Conexión</h4>
-                <p className="text-xs text-slate-500">Trabaja sin interrupciones aunque se pierda la cobertura celular.</p>
+                <p className="text-xs text-slate-500 mt-0.5">Trabaja sin interrupciones aunque se pierda la cobertura celular.</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:border-blue-300 transition-all">
-              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
-                <BarChart3 size={16} />
+            <div className="flex items-center gap-3.5 bg-white/90 p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:border-blue-300 transition-all">
+              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
+                <BarChart3 size={18} />
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Sincronización y Exportación</h4>
-                <p className="text-xs text-slate-500">Subida automática a la base de datos central y descarga de reportes en Excel/CSV.</p>
+                <p className="text-xs text-slate-500 mt-0.5">Subida automática a la base central y descarga en Excel/CSV.</p>
               </div>
             </div>
           </div>
@@ -225,8 +225,54 @@ export default function Login() {
 
           </div>
         </div>
-
       </div>
+
+      {/* Modal de Información Offline */}
+      {showInfoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md relative overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Cabecera decorativa */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 h-24 absolute top-0 w-full"></div>
+            
+            <button 
+              onClick={() => setShowInfoModal(false)}
+              className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors backdrop-blur-md"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="px-6 pt-12 pb-8 relative z-10">
+              <div className="w-16 h-16 bg-white rounded-2xl shadow-lg border border-slate-100 flex items-center justify-center mb-5 mx-auto text-blue-600">
+                <Clock size={32} />
+              </div>
+              
+              <h3 className="text-xl font-bold text-slate-900 text-center mb-3">
+                Sesión Offline Activa hasta por 30 Días
+              </h3>
+              
+              <div className="space-y-4 text-sm text-slate-600">
+                <p>
+                  Inicia sesión antes de salir y podrás realizar encuestas en <strong>zonas rurales o sin señal</strong> durante un periodo de hasta <strong>30 días</strong>.
+                </p>
+                <div className="bg-blue-50/70 p-4 rounded-xl border border-blue-100">
+                  <p className="font-medium text-blue-800 flex items-start gap-2">
+                    <ShieldCheck size={18} className="shrink-0 mt-0.5 text-blue-600" />
+                    Todos los datos registrados se guardan de forma 100% segura en tu dispositivo y se sincronizarán automáticamente al recuperar internet.
+                  </p>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setShowInfoModal(false)}
+                className="mt-6 w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
