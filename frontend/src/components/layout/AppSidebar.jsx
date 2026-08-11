@@ -1,12 +1,13 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, LogOut, Settings, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, ClipboardList, X } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
 export function AppSidebar() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, isSidebarOpen, closeSidebar } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    closeSidebar();
     await logout();
     navigate('/login');
   };
@@ -20,14 +21,23 @@ export function AppSidebar() {
         { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Mi Dashboard' }
       ];
 
-  return (
-    <aside className="w-64 glass h-screen sticky top-0 flex flex-col hidden md:flex border-r border-slate-200/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-20">
+  const sidebarContent = (
+    <div className="flex flex-col h-full">
       <div className="p-6">
-        <div className="flex items-center gap-3 text-blue-600 mb-8">
-          <div className="p-2 bg-blue-100 rounded-xl">
-            <ClipboardList size={24} />
+        <div className="flex items-center justify-between text-blue-600 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <ClipboardList size={24} />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-800">ModCRUD</h1>
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-800">ModCRUD</h1>
+          {/* Botón cerrar en móvil */}
+          <button
+            onClick={closeSidebar}
+            className="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <nav className="space-y-1.5">
@@ -36,11 +46,12 @@ export function AppSidebar() {
               key={item.to}
               to={item.to}
               end={item.to === '/admin'}
+              onClick={closeSidebar}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                   isActive 
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' 
-                    : 'text-slate-500 hover:bg-slate-100/80 hover:text-slate-900'
+                    : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
                 }`
               }
             >
@@ -63,12 +74,36 @@ export function AppSidebar() {
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors"
         >
           <LogOut size={20} />
           Cerrar Sesión
         </button>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Sidebar Fija para Escritorio (md+) */}
+      <aside className="w-64 glass h-screen sticky top-0 flex flex-col hidden md:flex border-r border-slate-200/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-20">
+        {sidebarContent}
+      </aside>
+
+      {/* Drawer Móvil para Pantallas Pequeñas (< md) */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop con desenfoque */}
+          <div 
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" 
+            onClick={closeSidebar} 
+          />
+          {/* Panel Lateral Deslizante */}
+          <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-2xl z-10 flex flex-col animate-in slide-in-from-left duration-250">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

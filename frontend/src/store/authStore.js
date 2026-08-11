@@ -13,8 +13,12 @@ const useAuthStore = create((set) => ({
   user: JSON.parse(localStorage.getItem('app_user')) || null,
   isAuthenticated: !!localStorage.getItem('app_token'),
   isLocked: localStorage.getItem('app_locked') === 'true',
+  isSidebarOpen: false,
   error: null,
   isLoading: false,
+
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  closeSidebar: () => set({ isSidebarOpen: false }),
 
   login: async (username, password) => {
     set({ isLoading: true, error: null });

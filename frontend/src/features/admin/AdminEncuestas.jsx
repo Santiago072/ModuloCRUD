@@ -6,7 +6,7 @@ import { PersonaDetail } from '../personas/PersonaDetail';
 import { PersonaForm } from '../personas/PersonaForm';
 import { useSyncManager } from '../../hooks/useSyncManager';
 import { exportToCSV } from '../../utils/exportUtils';
-import { Download, Plus, ClipboardList } from 'lucide-react';
+import { Download, Plus, X, ClipboardList } from 'lucide-react';
 
 export default function AdminEncuestas() {
   useSyncManager(); // Sync offline data so PersonaList works for admin
@@ -48,9 +48,13 @@ export default function AdminEncuestas() {
 
               <button
                 onClick={() => setShowForm(!showForm)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 blue-gradient hover:opacity-90 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-500/20 active:scale-95"
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-md active:scale-95 ${
+                  showForm
+                    ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 shadow-rose-500/10'
+                    : 'blue-gradient hover:opacity-90 text-white shadow-blue-500/20'
+                }`}
               >
-                <Plus size={18} />
+                {showForm ? <X size={18} /> : <Plus size={18} />}
                 <span>{showForm ? 'Cancelar' : 'Nueva Encuesta'}</span>
               </button>
             </div>

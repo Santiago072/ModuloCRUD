@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { LayoutDashboard, KeyRound, X } from 'lucide-react';
+import { LayoutDashboard, KeyRound, X, Menu } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import { NetworkStatus } from '../ui/NetworkStatus';
 
 const API_URL = '/api';
 
 export function AdminHeader() {
-  const { token } = useAuthStore();
+  const { token, toggleSidebar } = useAuthStore();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -56,9 +56,16 @@ export function AdminHeader() {
 
   return (
     <>
-      <header className="bg-white/70 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-10 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-slate-800 md:hidden">ModCRUD Admin</h2>
+      <header className="bg-white/70 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-10 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors"
+            title="Abrir menú de navegación"
+          >
+            <Menu size={20} />
+          </button>
+          <h2 className="text-base sm:text-lg font-bold text-slate-800 md:hidden truncate">ModCRUD Admin</h2>
           <div className="hidden md:flex items-center gap-2 text-slate-500">
             <LayoutDashboard size={18} />
             <span className="font-medium">Panel Administrativo</span>
