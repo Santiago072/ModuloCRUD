@@ -63,7 +63,7 @@ export function PersonaDetail({ personaId, onClose }) {
               </div>
             ) : (
               <>
-                <h2 className="text-lg font-bold text-gray-800 truncate">{persona.nombres} {persona.apellidos}</h2>
+                <h2 className="text-lg font-bold text-gray-800 truncate">{`${persona.nombres} ${persona.apellidos}`}</h2>
                 <p className="text-sm text-gray-500">CC: {persona.cc}</p>
               </>
             )}

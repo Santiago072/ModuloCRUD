@@ -108,7 +108,7 @@ export function PersonaList({ onSelect, isAdmin = false }) {
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <p className="font-semibold text-gray-800">{p.nombres} {p.apellidos}</p>
+                      <p className="font-semibold text-gray-800">{`${p.nombres} ${p.apellidos}`}</p>
                       {syncBadge(p.sync_status)}
                     </div>
                     <p className="text-sm text-gray-500">CC: {p.cc}</p>
