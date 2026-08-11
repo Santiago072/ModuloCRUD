@@ -38,32 +38,43 @@ El sistema adopta el patrón Offline-First combinado con MVVM (Model-View-ViewMo
 ### 2.2 Flujo de datos offline-first
 
 ```mermaid
-graph LR
-    subgraph CLIENTE["📱 Dispositivo del Encuestador (Offline-First)"]
+graph TB
+    subgraph CLIENTE["📱 1. DISPOSITIVO DEL ENCUESTADOR (OFFLINE-FIRST)"]
         direction TB
-        ACT["📝 1. Captura de Datos<br/><i>(Formulario Persona/Encuesta)</i>"]
-        IDB["💾 2. IndexedDB Local (Dexie)<br/><i>(Persistencia inmediata: sync_status='local')</i>"]
-        QUEUE["⏳ 3. SyncQueue<br/><i>(Cola de pendientes en segundo plano)</i>"]
+        ACT["📝 <b>CAPTURA EN CAMPO</b><br>Formulario de persona y encuesta"]
+        IDB["💾 <b>INDEXEDDB LOCAL</b><br>Persistencia con sync_status='local'"]
+        QUEUE["⏳ <b>COLA SYNCQUEUE</b><br>Cola de operaciones pendientes"]
 
         ACT --> IDB --> QUEUE
     end
 
-    subgraph SYNC["🔄 Proceso de Sincronización"]
+    subgraph SYNC["🔄 2. DETECCIÓN DE CONECTIVIDAD"]
         direction TB
-        SW["📶 4. Service Worker<br/><i>(Detecta recuperación de conexión)</i>"]
+        SW["📶 <b>SERVICE WORKER</b><br>Detección automática de reconexión"]
     end
 
-    subgraph SERVER["☁️ Servidor Central (Backend API)"]
+    subgraph SERVER["☁️ 3. SERVIDOR CENTRAL (BACKEND API)"]
         direction TB
-        API["⚙️ 5. POST /api/sync<br/><i>(Validación JWT y lote)</i>"]
-        MYSQL[("🛢️ 6. MariaDB / MySQL<br/><i>(Guarda lote y actualiza sync_status='synced')</i>")]
+        API["⚙️ <b>POST /api/sync</b><br>Validación de token JWT y lote"]
+        MYSQL[("🛢️ <b>MARIADB / MYSQL</b><br>Inserción en lote y estado 'synced'")]
 
         API --> MYSQL
     end
 
-    QUEUE -->|"Al recuperar red"| SW
+    QUEUE -->|"Al detectar red"| SW
     SW -->|"Background Sync"| API
+
+    style ACT fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#ffffff
+    style IDB fill:#1e293b,stroke:#a855f7,stroke-width:2px,color:#ffffff
+    style QUEUE fill:#1e293b,stroke:#fbbf24,stroke-width:2px,color:#ffffff
+    style SW fill:#1e293b,stroke:#06b6d4,stroke-width:2px,color:#ffffff
+    style API fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#ffffff
+    style MYSQL fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#ffffff
+    style CLIENTE fill:#0f172a,stroke:#334155,stroke-width:1px,color:#94a3b8
+    style SYNC fill:#0f172a,stroke:#334155,stroke-width:1px,color:#94a3b8
+    style SERVER fill:#0f172a,stroke:#334155,stroke-width:1px,color:#94a3b8
 ```
+
 
 | **1. Captura en Campo** | `IndexedDB (Dexie.js)` | El encuestador llena el formulario sin internet; los datos se guardan al instante en el navegador/app con `sync_status = 'local'`. |
 | **2. Detección de Red** | `Service Worker` | Monitorea el estado de conectividad en segundo plano; al recuperar señal de red, activa el proceso de sincronización. |
