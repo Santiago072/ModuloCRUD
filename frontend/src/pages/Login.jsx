@@ -13,7 +13,9 @@ import {
   MapPin,
   WifiOff,
   BarChart3,
-  ShieldCheck
+  ShieldCheck,
+  Clock,
+  Sparkles
 } from 'lucide-react';
 
 export default function Login() {
@@ -43,56 +45,75 @@ export default function Login() {
 
       <div className="w-full max-w-5xl relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         
-        {/* Panel Izquierdo: Presentación del Sistema (Colores equilibrados y tipografía nítida) */}
-        <div className="lg:col-span-6 flex flex-col justify-center space-y-6 px-2 sm:px-4">
+        {/* Panel Izquierdo: Presentación del Sistema y Explicación del Modo Offline de 30 Días */}
+        <div className="lg:col-span-6 flex flex-col justify-center space-y-5 px-2 sm:px-4">
           
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 w-fit shadow-sm">
-            <ClipboardCheck size={15} className="text-blue-600" />
-            <span>Sistema Integral de Captura Poblacional</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-xs">
+              <ClipboardCheck size={15} className="text-blue-600" />
+              <span>Sistema de Censo & Encuestas PWA</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-xs">
+              <Sparkles size={13} className="text-emerald-600" />
+              <span>Modo Campo 30 Días</span>
+            </span>
           </div>
 
           <div className="space-y-1.5">
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 uppercase">
               BIENVENIDO
             </h1>
             <h2 className="text-base sm:text-lg font-bold text-blue-600 uppercase tracking-wide">
-              Censo & Encuestas en Campo
+              Captura Poblacional en Terreno y Zonas Rurales
             </h2>
           </div>
 
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-            Plataforma diseñada para registrar información ciudadana, levantar censos demográficos y gestionar contactos de manera ágil. Captura datos en cualquier lugar, incluso en zonas rurales sin conexión a internet.
-          </p>
+          {/* Banner Informativo Destacado: Garantía de 30 Días Offline */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-sky-50/80 border border-blue-200/80 shadow-sm relative overflow-hidden">
+            <div className="flex items-start gap-3.5">
+              <div className="p-2.5 rounded-xl bg-blue-600 text-white shrink-0 shadow-sm">
+                <Clock size={20} />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <span>Sesión Offline Activa hasta por 30 Días</span>
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                  Inicia sesión antes de salir y podrás realizar encuestas en <strong>zonas rurales o sin señal</strong> durante un periodo de hasta <strong>30 días</strong>. Todos los datos registrados se guardan de forma 100% segura en tu dispositivo y se sincronizarán automáticamente al recuperar internet.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* 3 Beneficios Funcionales Clave */}
-          <div className="space-y-3 pt-1">
-            <div className="flex items-center gap-3.5 bg-white/90 p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:border-blue-300 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
-                <MapPin size={18} />
+          <div className="space-y-2.5 pt-1">
+            <div className="flex items-center gap-3 bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:border-blue-300 transition-all">
+              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
+                <MapPin size={16} />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Levantamiento de Información en Terreno</h4>
-                <p className="text-xs text-slate-500 mt-0.5">Registro rápido de personas, hogares y contactos prioritarios.</p>
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Levantamiento en Campo</h4>
+                <p className="text-xs text-slate-500">Registro ágil de personas, hogares y contactos con rotación de prioridad.</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 bg-white/90 p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:border-blue-300 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
-                <WifiOff size={18} />
+            <div className="flex items-center gap-3 bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:border-blue-300 transition-all">
+              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
+                <WifiOff size={16} />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Disponibilidad Total sin Conexión</h4>
-                <p className="text-xs text-slate-500 mt-0.5">Trabaja sin señal y sincroniza automáticamente al reconectarte.</p>
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Continuidad sin Conexión</h4>
+                <p className="text-xs text-slate-500">Trabaja sin interrupciones aunque se pierda la cobertura celular.</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 bg-white/90 p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:border-blue-300 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
-                <BarChart3 size={18} />
+            <div className="flex items-center gap-3 bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:border-blue-300 transition-all">
+              <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shrink-0">
+                <BarChart3 size={16} />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Consolidación y Exportación</h4>
-                <p className="text-xs text-slate-500 mt-0.5">Consulta de estadísticas y descarga de reportes en tiempo real.</p>
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Sincronización y Exportación</h4>
+                <p className="text-xs text-slate-500">Subida automática a la base de datos central y descarga de reportes en Excel/CSV.</p>
               </div>
             </div>
           </div>
@@ -109,7 +130,7 @@ export default function Login() {
                 Iniciar Sesión
               </h2>
               <p className="text-xs text-slate-500 mt-2 font-medium">
-                Ingresa tus credenciales para acceder a la plataforma
+                Ingresa tus credenciales para habilitar tu sesión en este dispositivo
               </p>
             </div>
 
@@ -180,7 +201,7 @@ export default function Login() {
                   {isLoading ? (
                     <>
                       <Loader2 className="animate-spin" size={18} />
-                      <span>Validando credenciales...</span>
+                      <span>Iniciando sesión segura...</span>
                     </>
                   ) : (
                     <>
@@ -194,9 +215,12 @@ export default function Login() {
             </form>
 
             {/* Pie de seguridad sutil */}
-            <div className="mt-7 pt-4 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-400">
-              <ShieldCheck size={14} className="text-emerald-600" />
-              <span>Acceso Seguro para Encuestadores y Administradores</span>
+            <div className="mt-7 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-slate-400">
+              <span className="flex items-center gap-1">
+                <ShieldCheck size={14} className="text-emerald-600" />
+                Cifrado SSL / JWT
+              </span>
+              <span>Listo para Trabajo Rural</span>
             </div>
 
           </div>
