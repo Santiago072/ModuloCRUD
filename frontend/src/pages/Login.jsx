@@ -52,19 +52,19 @@ export default function Login() {
         {/* Panel Izquierdo: Presentación del Sistema */}
         <div className="lg:col-span-6 flex flex-col justify-center space-y-6 px-2 sm:px-4">
           
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-xs">
-              <ClipboardCheck size={15} className="text-blue-600" />
-              <span>Sistema de Censo & Encuestas PWA</span>
+          <div className="flex items-center gap-2 w-full">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-xs whitespace-nowrap">
+              <ClipboardCheck size={14} className="text-blue-600" />
+              <span>Censo & Encuestas PWA</span>
             </span>
-            <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-full shadow-xs pr-1">
-              <span className="inline-flex items-center gap-1.5 pl-3 py-1 text-xs font-semibold">
+            <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-full shadow-xs pr-1 whitespace-nowrap">
+              <span className="inline-flex items-center gap-1.5 pl-3 py-1 text-[11px] sm:text-xs font-semibold">
                 <Sparkles size={13} className="text-emerald-600" />
                 <span>Modo Campo 30 Días</span>
               </span>
               <button 
                 onClick={() => setShowInfoModal(true)}
-                className="p-1.5 rounded-full text-emerald-600 hover:bg-emerald-100 hover:text-emerald-800 transition-colors"
+                className="p-1 rounded-full text-emerald-600 hover:bg-emerald-100 hover:text-emerald-800 transition-colors"
                 title="Información sobre el modo offline"
               >
                 <Info size={14} />
