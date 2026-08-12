@@ -7,6 +7,15 @@ y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lan
 
 ---
 
+## [v1.3.2] - 2026-08-11
+### Mejoras de Interfaz, UX y Resiliencia Offline
+- **Refinamiento UI/UX Login**: Se rediseñó la pantalla de inicio de sesión para incluir un modal informativo ("i") sobre las garantías del modo offline (30 días) manteniendo una interfaz limpia. Se corrigieron saltos de línea (sliders) en pantallas de escritorio.
+- **Auto-Sync Inmediato (Background Sync)**: Las modificaciones a encuestas en modo local (sin internet) ahora se sincronizan en segundo plano de manera periódica. Las ediciones con internet cambian el estado a "Sincronizado" inmediatamente de forma reactiva en la interfaz, eliminando la sensación de latencia.
+- **Paginación Global**: Se implementó paginación a 10 elementos por página en la tabla de Gestión de Usuarios del panel de administrador, homologando la experiencia con la lista de encuestas y previniendo scroll excesivo.
+- **Pantalla de Bloqueo Híbrida**: Se agregó un ícono para mostrar/ocultar contraseña en el Lock Screen. Además, la lógica de desbloqueo ahora actúa como un sistema híbrido (Fallback): si el usuario pierde el hash local (sesión antigua), el sistema contacta automáticamente al servidor para validar y reestablecer la seguridad criptográfica del dispositivo sin requerir cierre de sesión forzado.
+- **Correcciones Críticas de UI**: Se reparó un bug donde el botón de "X" en modales quedaba inaccesible por solapamiento de capas (`z-index` transparente), y se solucionó el *crasheo* (pantalla blanca) al abrir la tarjeta de detalles de encuesta provocado por inconsistencias en los nombres de variables del estado.
+
+
 ## [v1.3.1] - 2026-08-03
 ### Endurecimiento de Seguridad, Higiene del Repositorio y DevOps
 

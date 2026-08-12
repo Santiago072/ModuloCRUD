@@ -1,4 +1,4 @@
-# Manual de Usuario - Módulo CRUD Encuestas (Versión 1.1.0)
+# Manual de Usuario - Módulo CRUD Encuestas (Versión 1.3.2)
 
 Bienvenido al Módulo CRUD para Encuestas. Esta aplicación (PWA) está diseñada para funcionar **incluso sin internet** (offline-first), permitiendo a los encuestadores recolectar datos en campo y sincronizarlos automáticamente cuando se recupere la conexión.
 
@@ -19,14 +19,17 @@ La aplicación puede instalarse en su teléfono móvil o computadora como una ap
 
 ---
 
-## ⚡ Funcionamiento Básico (Offline-First)
+## ⚡ Funcionamiento Básico y Sesiones Offline
 
-La principal característica de este sistema es su capacidad de trabajar sin internet.
+La principal característica de este sistema es su capacidad de trabajar sin internet hasta por **30 días**. 
 
-*   **Sin conexión (Offline):** Puede seguir agregando encuestas, editando información de contactos y eliminando personas. Todos los cambios se guardan en la memoria local de su dispositivo y se marcan con una etiqueta de **Pendiente (Color Amarillo)**.
-*   **Con conexión (Online):** Al momento de detectar conexión a internet, la aplicación enviará todos los datos pendientes al servidor central. Una vez guardados con éxito, la etiqueta cambiará a **Sincronizado (Color Verde)**.
+* **Inicio de Sesión y Garantía Offline**: Inicie sesión en la pantalla principal antes de salir a campo (con internet). El sistema guardará un "Hash" (clave segura) en su dispositivo. Durante los siguientes 30 días, si la aplicación se bloquea por inactividad o la cierra por accidente, podrá **desbloquear su sesión sin necesidad de internet** simplemente ingresando su misma contraseña.
+* **Pantalla de Bloqueo Automática**: Por su seguridad, tras 15 minutos de inactividad, la pantalla se bloquea automáticamente. Al desbloquear, puede usar el **ícono del ojo** para verificar que ingresó la contraseña correctamente.
+  * _Nota: Si cambió su contraseña en otro dispositivo o perdió la sesión local, la pantalla de bloqueo verificará de manera inteligente (híbrida) con el servidor si cuenta con conexión a internet para restaurar el acceso sin hacerle perder su información._
+* **Sin conexión (Offline):** Puede seguir agregando encuestas, editando información de contactos y eliminando personas. Todos los cambios se guardan en la memoria local de su dispositivo de forma 100% segura y se marcan con una etiqueta de **Pendiente (Color Amarillo)**.
+* **Con conexión (Online) y Auto-Sync:** La aplicación implementa sincronización en segundo plano. Apenas se detecte conexión, el sistema sincronizará los registros de manera invisible. En cuanto se guarden, la etiqueta pasará inmediatamente a **Sincronizado (Color Verde)**.
 
-**Importante:** Nunca cierre sesión, borre los datos de navegación o desinstale la aplicación mientras tenga registros en estado "Pendiente", ya que esa información no ha llegado al servidor y se perderá.
+**Importante:** Nunca borre los datos de navegación, caché, o presione "Cerrar Sesión (Borrar Datos)" si tiene registros en estado "Pendiente", ya que no se han subido al servidor y se perderán irremediablemente.
 
 ---
 
@@ -35,55 +38,53 @@ La principal característica de este sistema es su capacidad de trabajar sin int
 ### 1. Registrar una nueva Encuesta
 1. Haga clic en el botón morado **"Nueva Encuesta"**.
 2. Llene los datos básicos obligatorios (Documento, Nombres, Apellidos y Fecha).
-3. **Seleccione su nombre de Encuestador** en la lista desplegable. El sistema recordará su selección automáticamente para las próximas encuestas.
+3. **Seleccione su nombre de Encuestador** en la lista desplegable. El sistema recordará su selección automáticamente.
 4. Ingrese el número de contacto principal (Celular, Fijo, WhatsApp, etc.).
 5. Haga clic en **Guardar**.
 
 ### 2. Buscar Personas
-En la pantalla principal, utilice la barra de búsqueda para encontrar registros rápidamente. Puede buscar por:
-*   Número de Cédula (CC).
-*   Nombres.
-*   Apellidos.
+En la pantalla principal, utilice la barra de búsqueda para encontrar registros. Esta lista maneja **paginación automática de 10 en 10**. Puede buscar por:
+* Número de Cédula (CC).
+* Nombres o Apellidos.
 
 ### 3. Ver Detalles e Historial
-Para ver toda la información de un usuario, simplemente haga clic sobre su tarjeta en la lista principal. Se abrirá una ventana con:
-*   Sus datos básicos, profesión y el **Encuestador** responsable.
-*   Su lista de contactos (Principal, Contacto 2, Contacto 3).
-*   El estado de sincronización.
+Para ver toda la información, haga clic sobre la tarjeta de un usuario:
+* Sus datos básicos, profesión y el **Encuestador** responsable.
+* Su lista de contactos (Principal, Contacto 2, Contacto 3).
+* El estado de sincronización real.
 
 ### 4. Actualizar o Eliminar Registros
-*   **Para Editar:** Dentro del detalle de la persona, presione el botón **"Editar"** en la esquina inferior derecha. Modifique los campos necesarios y presione **"Guardar"**.
-*   **Para Eliminar:** En la misma ventana de detalle, presione **"Eliminar"** en la esquina inferior izquierda. Le pedirá confirmación. Una vez confirmado, desaparecerá de su pantalla y se borrará del servidor en la próxima sincronización.
-*   **Para Añadir más números de teléfono:** En el detalle de la persona, al lado del título "Números de contacto", haga clic en **"+ Agregar"**. Tenga en cuenta que el nuevo número pasará a ser el contacto principal, y los demás se desplazarán hacia abajo.
+* **Para Editar:** En el detalle, presione **"Editar"** en la esquina inferior derecha. Modifique los campos y guarde.
+* **Para Eliminar:** Presione **"Eliminar"** en la esquina inferior izquierda. Le pedirá confirmación. Una vez confirmado, desaparecerá y se borrará del servidor en la próxima sincronización.
+* **Para Añadir contactos:** En el detalle, haga clic en **"+ Agregar"** al lado de "Números de contacto". El nuevo número se rotará para ser el contacto principal (Prioridad 1).
 
 ---
 
-## 🔒 Panel de Administración (NUEVO)
+## 🔒 Panel de Administración
 
-Los administradores tienen acceso a un panel de control avanzado para gestionar a los encuestadores del sistema:
+Los administradores tienen acceso a un panel de control avanzado (protegido) para gestionar a los encuestadores y ver métricas globales.
 
-1. **Ingreso:** En la esquina superior derecha de la pantalla principal, presione el botón **"Admin"**.
-2. **Dashboard:** Aquí podrá ver la lista de todos los encuestadores registrados.
-3. **Añadir Encuestadores:** Presione el botón "+ Nuevo Encuestador", escriba el nombre completo y presione guardar. Este nombre aparecerá automáticamente en los celulares de los encuestadores en campo (siempre y cuando tengan conexión a internet para descargar la lista actualizada).
-4. **Desactivar o Eliminar:** Puede pausar a un encuestador (Desactivar) para que no salga en la lista sin borrar su historial, o eliminarlo permanentemente.
-5. **Cambio de Contraseñas:** En la esquina superior derecha del panel, los administradores pueden cambiar su propia contraseña en cualquier momento por motivos de seguridad.
+1. **Gestión de Encuestas:** La pestaña "Gestión de Encuestas" replica la experiencia de la PWA pero reuniendo todos los registros de todos los encuestadores para ser auditados en tiempo real con capacidades locales de alto rendimiento (Dexie.js).
+2. **Dashboard de Estadísticas:** Muestra contadores totales de encuestas, encuestados y un "Top de Encuestadores" (Ranking), todo auto-reparado desde la base de datos central.
+3. **Gestión de Usuarios (Paginada):** En esta tabla puede añadir y editar usuarios. La tabla cuenta con **paginación de 10 usuarios por hoja** para mantener la eficiencia visual.
+4. **Cambio de Contraseñas:** Modal dedicado para el cambio rápido y encriptado de las claves de acceso de los encuestadores o del propio administrador.
 
 ---
 
 ## 📊 Exportación de Reportes
 
-Para generar reportes y entregar los consolidados de las encuestas:
-1. Asegúrese de tener buena conexión a internet para que la aplicación descargue todos los datos actualizados del equipo.
-2. En la pantalla principal, clic en el botón blanco **"Exportar CSV"**.
-3. Se generará automáticamente un archivo de Excel (`.xls`) con todas las personas, sus múltiples contactos y su estado de sincronización.
+Para generar reportes y entregar consolidados:
+1. Asegúrese de tener buena conexión a internet para que el panel de control o la PWA consoliden todos los datos.
+2. Haga clic en el botón blanco **"Exportar CSV"**.
+3. Se generará automáticamente un archivo de Excel (`.csv`) con todas las personas, sus múltiples contactos, quién los encuestó y su estado de sincronización.
 
 ---
 
 ## 🔧 Soporte Técnico y Errores Comunes
 
 *   **¿Por qué mis registros dicen "Pendiente"?**
-    Significa que no tiene conexión a internet o la conexión es inestable. Asegúrese de tener datos móviles encendidos o estar conectado a un Wi-Fi y recargue la página.
-*   **No aparece mi nombre en la lista de encuestadores**
-    El administrador debe agregarlo primero en el Panel de Control. Si ya lo agregó, conéctese a internet un momento y refresque la página para que el celular descargue la lista nueva.
+    Significa que no tiene conexión a internet o la conexión es inestable. Asegúrese de tener datos móviles encendidos o estar conectado a un Wi-Fi; el sistema intentará auto-sincronizar de fondo.
+*   **Contraseña local incorrecta en pantalla bloqueada**
+    Asegúrese de usar el botón del ojo ("👁️") para verificar que escribió correctamente la clave. Si cambió la clave en otro equipo recientemente y está sin internet, el sistema no tendrá cómo enterarse de ese cambio de clave hasta que vuelva a conectarse.
 *   **¿Por qué no veo los cambios que hizo mi compañero?**
-    La aplicación sincroniza los cambios cada vez que la abre o recupera el internet. Si acaba de abrir la app y no los ve, deslice hacia abajo (en el celular) o presione `F5` (en el PC) para forzar la sincronización.
+    La aplicación sincroniza los cambios cada vez que la abre o recupera internet. Refresque la aplicación (`Ctrl + F5`) para forzar la sincronización (Pull) del servidor.
