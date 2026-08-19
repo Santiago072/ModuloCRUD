@@ -7,6 +7,15 @@ y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lan
 
 ---
 
+## [v1.3.3] - 2026-08-19
+### Correcciones y mejoras
+
+- **Exportar CSV centralizado en Gestión de Encuestas:** Se eliminó el botón "Exportar CSV" del Panel de Administración (donde generaba un archivo vacío al ejecutarse sin datos locales cargados). La exportación queda disponible exclusivamente desde el módulo Gestión de Encuestas, donde los datos ya están sincronizados y disponibles para el administrador.
+- **Sincronización automática en Panel Admin:** Se incorporó `useSyncManager()` en el Panel de Administración para que los datos del servidor se descarguen automáticamente en IndexedDB al ingresar, manteniendo la coherencia de datos para estadísticas y listados.
+- **Documentación de requisitos actualizada:** Se reescribió `Especificacion_Requisitos.md` con la estructura formal `RF01`–`RF18` y `RNF01`–`RNF06`, incluyendo visibilidad exacta por roles y numeración de secciones en orden secuencial.
+
+---
+
 ## [v1.3.2] - 2026-08-11
 ### Mejoras de Interfaz, UX y Resiliencia Offline
 - **Refinamiento UI/UX Login**: Se rediseñó la pantalla de inicio de sesión para incluir un modal informativo ("i") sobre las garantías del modo offline (30 días) manteniendo una interfaz limpia. Se corrigieron saltos de línea (sliders) en pantallas de escritorio.
