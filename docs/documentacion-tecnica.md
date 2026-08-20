@@ -32,7 +32,7 @@ ModuloCRUD/
 │       │   └── usePersonaStore.js
 │       └── utils/               # Utilidades
 │           ├── validationSchemas.js # Esquemas Zod compartibles
-│           └── exportUtils.js       # Utilidad para exportación a CSV nativa
+│           └── exportUtils.js       # Utilidad para exportación nativa a Excel (.xlsx vía ExcelJS) con Web Share API y auto-sync
 ├── backend/                     # API REST — Node.js + Express
 │   ├── config/db.js             # Pool de conexiones MySQL (mysql2)
 │   ├── controllers/             # Lógica de negocio

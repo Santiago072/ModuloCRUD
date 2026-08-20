@@ -7,6 +7,16 @@ y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lan
 
 ---
 
+## [v1.3.4] - 2026-08-19
+### Mejoras de Exportación y Compatibilidad Móvil
+
+- **Exportación Excel Nativa con Estilo (`.xlsx` vía ExcelJS):** Se implementó la generación de archivos binarios OpenXML `.xlsx` reales estilizados con la librería `exceljs`. Esto soluciona de forma definitiva los errores de apertura en visores móviles (Android/iOS, Microsoft 365, Google Sheets) causados por archivos simulados en HTML.
+- **Diseño Visual Profesional en Hoja de Cálculo:** El archivo generado incluye encabezados en azul corporativo (`#2563EB`) con texto blanco en negrita, bordes completos (`thin`) en todas las celdas, efecto cebra suave (`#F8FAFC` / `#FFFFFF`) para facilitar la lectura y cálculo automático del ancho de cada columna para evitar textos truncados.
+- **Sincronización Automática Previa a la Exportación:** Al presionar "Exportar CSV/Excel", el sistema ejecuta una sincronización inmediata transparente con el servidor central para asegurar que la base de datos local (IndexedDB) del dispositivo móvil contenga todas las encuestas consolidadas antes de construir el archivo.
+- **Integración con Web Share API:** En celulares y dispositivos móviles, la exportación activa el menú nativo del sistema operativo para compartir el archivo directamente por WhatsApp, Correo o guardarlo en la carpeta de Descargas/Archivos del teléfono.
+
+---
+
 ## [v1.3.3] - 2026-08-19
 ### Correcciones y mejoras
 

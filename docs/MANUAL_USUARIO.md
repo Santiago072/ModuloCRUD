@@ -72,11 +72,12 @@ Los administradores tienen acceso a un panel de control avanzado (protegido) par
 ---
 
 ## 📊 Exportación de Reportes
-
+ 
 Para generar reportes y entregar consolidados:
-1. Asegúrese de tener buena conexión a internet para que el panel de control o la PWA consoliden todos los datos.
-2. Haga clic en el botón blanco **"Exportar CSV"**.
-3. Se generará automáticamente un archivo de Excel (`.csv`) con todas las personas, sus múltiples contactos, quién los encuestó y su estado de sincronización.
+1. Desde el módulo **Gestión de Encuestas** (o desde la pantalla principal si tiene permisos), haga clic en el botón blanco **"Exportar CSV"**.
+2. El sistema sincronizará de forma automática e inmediata con el servidor para garantizar que se incluyan todos los datos actualizados.
+3. **En Celulares / PWA:** Se abrirá el menú nativo de su teléfono para que pueda guardar el archivo directamente en su carpeta de **Descargas/Archivos** o compartirlo al instante por **WhatsApp, Correo electrónico o Google Drive**.
+4. **En el PC:** Se descargará automáticamente un archivo de Excel nativo (`.xlsx`) profesional con encabezados en azul corporativo, bordes completos, filas de lectura alternadas y anchos de columna automáticos.
 
 ---
 

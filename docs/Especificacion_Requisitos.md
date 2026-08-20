@@ -31,7 +31,7 @@ El sistema implementa dos roles de usuario con accesos diferenciados:
 * **RF07:** El sistema debe permitir consultar y buscar encuestas en tiempo real mediante filtrado reactivo por cédula, nombres o apellidos.
 * **RF08:** El sistema debe permitir editar y actualizar los datos de personas y contactos previamente registrados.
 * **RF09:** El sistema debe permitir la eliminación lógica de registros y sincronizar la baja con el servidor cuando haya conexión.
-* **RF10:** El sistema debe permitir exportar las encuestas a formato Excel (.xls) / CSV exclusivamente desde el módulo de Gestión de Encuestas.
+* **RF10:** El sistema debe permitir exportar las encuestas a formato Excel nativo (.xlsx) estilizado y CSV exclusivamente desde el módulo de Gestión de Encuestas, garantizando auto-sincronización previa y compatibilidad total con dispositivos móviles y de escritorio.
 
 ### 🔄 Sincronización y Resiliencia
 * **RF11:** El sistema debe guardar todos los registros inmediatamente en la base de datos local del navegador (IndexedDB) garantizando respuesta instantánea sin internet.
