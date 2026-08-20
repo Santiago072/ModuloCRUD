@@ -1,9 +1,8 @@
 import db from '../db/schema';
 
 /**
- * Exporta todas las personas con sus contactos a un archivo CSV estándar UTF-8 con BOM.
- * Compatible con navegadores de escritorio, visores móviles (Android/iOS), Google Sheets y Excel.
- * En dispositivos móviles con soporte para Web Share API, permite compartir o guardar el archivo directamente.
+ * Exporta todas las personas con sus contactos en formato Excel (.xls) estilizado con colores y bordes.
+ * En móviles utiliza Web Share API (o descarga diferida) para asegurar compatibilidad total con la app móvil y PC.
  */
 export const exportToCSV = async () => {
   try {
@@ -29,18 +28,8 @@ export const exportToCSV = async () => {
       'Contacto 2',
       'Contacto 3',
       'Encuestador',
-      'Estado Sincronización',
+      'Estado Sync',
     ];
-
-    // Función para escapar celdas en formato estándar CSV RFC 4180
-    const escapeCsvCell = (val) => {
-      const str = String(val ?? '').trim();
-      // Si contiene comas, comillas dobles, saltos de línea o punto y coma, envolver entre comillas dobles
-      if (/[",\n\r;]/.test(str)) {
-        return `"${str.replace(/"/g, '""')}"`;
-      }
-      return `"${str}"`;
-    };
 
     const rows = personas.map(p => {
       const pContacts = contactos
@@ -68,39 +57,84 @@ export const exportToCSV = async () => {
         pContacts[2]?.valor || '',
         encuestador,
         estado,
-      ].map(escapeCsvCell).join(';');
+      ];
     });
 
-    const csvContent = [
-      headers.map(escapeCsvCell).join(';'),
-      ...rows
-    ].join('\r\n');
+    // Escapar caracteres HTML para evitar fallos de formato
+    const esc = (val) =>
+      String(val ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 
-    // BOM UTF-8 (\uFEFF) para que Excel y visores móviles reconozcan tildes y caracteres especiales automáticamente
-    const blob = new Blob(['\uFEFF' + csvContent], {
-      type: 'text/csv;charset=utf-8;'
+    const headerHtml = headers
+      .map(h => `<th style="background-color:#2563eb;color:#ffffff;font-weight:bold;padding:10px 14px;border:1px solid #1d4ed8;text-align:left;font-size:12px;">${esc(h)}</th>`)
+      .join('');
+
+    const rowsHtml = rows
+      .map((row, idx) => {
+        const bg = idx % 2 === 0 ? '#f8fafc' : '#ffffff';
+        const cells = row
+          .map(v => `<td style="padding:8px 12px;border:1px solid #cbd5e1;background-color:${bg};font-size:11px;color:#1e293b;">${esc(v)}</td>`)
+          .join('');
+        return `<tr>${cells}</tr>`;
+      })
+      .join('');
+
+    const fechaExport = new Date().toLocaleDateString('es-CO', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
     });
 
-    const fileName = `encuestas_${new Date().toISOString().slice(0, 10)}.csv`;
+    const html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:x="urn:schemas-microsoft-com:office:excel"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <!--[if gte mso 9]><xml>
+          <x:ExcelWorkbook><x:ExcelWorksheets>
+            <x:ExcelWorksheet><x:Name>Encuestas</x:Name>
+            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+            </x:ExcelWorksheet>
+          </x:ExcelWorksheets></x:ExcelWorkbook>
+        </xml><![endif]-->
+      </head>
+      <body>
+        <table border="1" cellspacing="0" cellpadding="0"
+               style="font-family:Segoe UI,Calibri,Arial,sans-serif;border-collapse:collapse;">
+          <thead><tr>${headerHtml}</tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+        <p style="font-family:Segoe UI,Calibri;font-size:10px;color:#64748b;margin-top:12px;">
+          Reporte generado el ${fechaExport} — Módulo CRUD de Encuestas
+        </p>
+      </body>
+      </html>`;
 
-    // Intentar Web Share API si está disponible en móviles
-    const file = new File([blob], fileName, { type: 'text/csv;charset=utf-8;' });
+    // BOM UTF-8 (\ufeff) con MIME type oficial de Excel
+    const blob = new Blob(['\ufeff' + html], {
+      type: 'application/vnd.ms-excel;charset=utf-8',
+    });
+
+    const fileName = `encuestas_${new Date().toISOString().slice(0, 10)}.xls`;
+
+    // 1. Soporte en móvil a través de Web Share API
+    const file = new File([blob], fileName, { type: 'application/vnd.ms-excel' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
           files: [file],
           title: 'Exportación de Encuestas',
-          text: `Reporte de encuestas exportado el ${new Date().toLocaleDateString('es-CO')}`
+          text: `Reporte de encuestas con diseño (${fechaExport})`
         });
         return;
       } catch (shareErr) {
-        // Si el usuario cancela la ventana de compartir, no hacer nada; si falla, pasar al fallback de descarga
         if (shareErr.name === 'AbortError') return;
         console.warn('Web Share falló, procediendo con descarga estándar:', shareErr);
       }
     }
 
-    // Fallback estándar de descarga por enlace Blob
+    // 2. Fallback de descarga directa para navegadores
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -109,16 +143,15 @@ export const exportToCSV = async () => {
     document.body.appendChild(a);
     a.click();
 
-    // Retardo para revocar la URL y evitar que en Android/iOS se cancele la descarga antes de finalizar
     setTimeout(() => {
       if (document.body.contains(a)) {
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }, 2000);
+    }, 2500);
 
   } catch (error) {
-    console.error('Error al exportar CSV:', error);
-    alert('Ocurrió un error al generar el archivo de exportación: ' + error.message);
+    console.error('Error al exportar:', error);
+    alert('Ocurrió un error al exportar: ' + error.message);
   }
 };
