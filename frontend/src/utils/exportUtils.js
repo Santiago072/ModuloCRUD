@@ -1,121 +1,124 @@
 import db from '../db/schema';
 
 /**
- * Exporta todas las personas con sus contactos a un archivo Excel (.xls).
- * Usa formato HTML-table que Excel lee de forma nativa, garantizando
- * columnas correctas en cualquier configuración regional (español/inglés).
+ * Exporta todas las personas con sus contactos a un archivo CSV estándar UTF-8 con BOM.
+ * Compatible con navegadores de escritorio, visores móviles (Android/iOS), Google Sheets y Excel.
+ * En dispositivos móviles con soporte para Web Share API, permite compartir o guardar el archivo directamente.
  */
 export const exportToCSV = async () => {
-  // Excluir los registros marcados para borrar (soft-delete)
-  const personas = await db.personas
-    .filter(p => p.sync_status !== 'deleted')
-    .toArray();
-  const contactos = await db.contactos.toArray();
-  const encuestas = await db.encuestas.toArray();
+  try {
+    // Excluir los registros marcados para borrar (soft-delete)
+    const personas = await db.personas
+      .filter(p => p.sync_status !== 'deleted')
+      .toArray();
+    const contactos = await db.contactos.toArray();
+    const encuestas = await db.encuestas.toArray();
 
-  const headers = [
-    'CC',
-    'Nombres',
-    'Apellidos',
-    'Profesión',
-    'Fecha Registro',
-    'Contacto Principal',
-    'Contacto 2',
-    'Contacto 3',
-    'Encuestador',
-    'Estado Sync',
-  ];
+    if (!personas || personas.length === 0) {
+      alert('No hay registros de encuestas disponibles para exportar.');
+      return;
+    }
 
-  const rows = personas.map(p => {
-    const pContacts = contactos
-      .filter(c => c.persona_id === p.id && c.activo)
-      .sort((a, b) => a.prioridad - b.prioridad);
-
-    const pEncuesta = encuestas.find(e => e.persona_id === p.id);
-    const encuestador = pEncuesta ? pEncuesta.encuestador : 'Sin asignar';
-
-    const fecha = p.fecha_registro
-      ? String(p.fecha_registro).slice(0, 10)
-      : '';
-
-    const estadoMap = { synced: 'Sincronizado', local: 'Pendiente', deleted: 'Eliminado' };
-    const estado = estadoMap[p.sync_status] ?? p.sync_status;
-
-    return [
-      p.cc,
-      p.nombres,
-      p.apellidos,
-      p.profesion || '',
-      fecha,
-      pContacts[0]?.valor || '',
-      pContacts[1]?.valor || '',
-      pContacts[2]?.valor || '',
-      encuestador,
-      estado,
+    const headers = [
+      'Documento',
+      'Nombres',
+      'Apellidos',
+      'Profesión',
+      'Fecha Registro',
+      'Contacto Principal',
+      'Contacto 2',
+      'Contacto 3',
+      'Encuestador',
+      'Estado Sincronización',
     ];
-  });
 
-  // Escapar caracteres HTML para evitar inyecciones
-  const esc = (val) =>
-    String(val ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    // Función para escapar celdas en formato estándar CSV RFC 4180
+    const escapeCsvCell = (val) => {
+      const str = String(val ?? '').trim();
+      // Si contiene comas, comillas dobles, saltos de línea o punto y coma, envolver entre comillas dobles
+      if (/[",\n\r;]/.test(str)) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return `"${str}"`;
+    };
 
-  const headerHtml = headers
-    .map(h => `<th style="background:#4f46e5;color:#fff;font-weight:bold;padding:8px 12px;border:1px solid #3730a3;">${esc(h)}</th>`)
-    .join('');
+    const rows = personas.map(p => {
+      const pContacts = contactos
+        .filter(c => c.persona_id === p.id && c.activo)
+        .sort((a, b) => a.prioridad - b.prioridad);
 
-  const rowsHtml = rows
-    .map((row, idx) => {
-      const bg = idx % 2 === 0 ? '#f8f7ff' : '#ffffff';
-      const cells = row
-        .map(v => `<td style="padding:6px 12px;border:1px solid #e5e7eb;background:${bg};">${esc(v)}</td>`)
-        .join('');
-      return `<tr>${cells}</tr>`;
-    })
-    .join('');
+      const pEncuesta = encuestas.find(e => e.persona_id === p.id);
+      const encuestador = pEncuesta ? pEncuesta.encuestador : 'Sin asignar';
 
-  const fecha = new Date().toLocaleDateString('es-CO', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-  });
+      const fecha = p.fecha_registro
+        ? String(p.fecha_registro).slice(0, 10)
+        : '';
 
-  const html = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office"
-          xmlns:x="urn:schemas-microsoft-com:office:excel"
-          xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-      <meta charset="UTF-8">
-      <!--[if gte mso 9]><xml>
-        <x:ExcelWorkbook><x:ExcelWorksheets>
-          <x:ExcelWorksheet><x:Name>Encuestas</x:Name>
-          <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
-          </x:ExcelWorksheet>
-        </x:ExcelWorksheets></x:ExcelWorkbook>
-      </xml><![endif]-->
-    </head>
-    <body>
-      <table border="1" cellspacing="0" cellpadding="0"
-             style="font-family:Calibri,Arial,sans-serif;font-size:12px;border-collapse:collapse;">
-        <thead><tr>${headerHtml}</tr></thead>
-        <tbody>${rowsHtml}</tbody>
-      </table>
-      <p style="font-family:Calibri;font-size:10px;color:#9ca3af;margin-top:8px;">
-        Exportado el ${fecha} — Módulo CRUD Encuestas
-      </p>
-    </body>
-    </html>`;
+      const estadoMap = { synced: 'Sincronizado', local: 'Pendiente', deleted: 'Eliminado' };
+      const estado = estadoMap[p.sync_status] ?? p.sync_status;
 
-  // BOM UTF-8 para caracteres especiales
-  const blob = new Blob(['\ufeff' + html], {
-    type: 'application/vnd.ms-excel;charset=utf-8',
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `encuestas_${new Date().toISOString().slice(0, 10)}.xls`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+      return [
+        p.cc,
+        p.nombres,
+        p.apellidos,
+        p.profesion || '',
+        fecha,
+        pContacts[0]?.valor || '',
+        pContacts[1]?.valor || '',
+        pContacts[2]?.valor || '',
+        encuestador,
+        estado,
+      ].map(escapeCsvCell).join(';');
+    });
+
+    const csvContent = [
+      headers.map(escapeCsvCell).join(';'),
+      ...rows
+    ].join('\r\n');
+
+    // BOM UTF-8 (\uFEFF) para que Excel y visores móviles reconozcan tildes y caracteres especiales automáticamente
+    const blob = new Blob(['\uFEFF' + csvContent], {
+      type: 'text/csv;charset=utf-8;'
+    });
+
+    const fileName = `encuestas_${new Date().toISOString().slice(0, 10)}.csv`;
+
+    // Intentar Web Share API si está disponible en móviles
+    const file = new File([blob], fileName, { type: 'text/csv;charset=utf-8;' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Exportación de Encuestas',
+          text: `Reporte de encuestas exportado el ${new Date().toLocaleDateString('es-CO')}`
+        });
+        return;
+      } catch (shareErr) {
+        // Si el usuario cancela la ventana de compartir, no hacer nada; si falla, pasar al fallback de descarga
+        if (shareErr.name === 'AbortError') return;
+        console.warn('Web Share falló, procediendo con descarga estándar:', shareErr);
+      }
+    }
+
+    // Fallback estándar de descarga por enlace Blob
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.setAttribute('download', fileName);
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+
+    // Retardo para revocar la URL y evitar que en Android/iOS se cancele la descarga antes de finalizar
+    setTimeout(() => {
+      if (document.body.contains(a)) {
+        document.body.removeChild(a);
+      }
+      URL.revokeObjectURL(url);
+    }, 2000);
+
+  } catch (error) {
+    console.error('Error al exportar CSV:', error);
+    alert('Ocurrió un error al generar el archivo de exportación: ' + error.message);
+  }
 };
