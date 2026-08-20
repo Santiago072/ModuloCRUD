@@ -1,8 +1,10 @@
 import db from '../db/schema';
+import * as XLSX from 'xlsx';
 
 /**
- * Exporta todas las personas con sus contactos en formato Excel (.xls) estilizado con colores y bordes.
- * En móviles utiliza Web Share API (o descarga diferida) para asegurar compatibilidad total con la app móvil y PC.
+ * Exporta todas las personas con sus contactos a un archivo Excel (.xlsx) nativo real.
+ * Utiliza formato binario estándar compatible con Microsoft Excel (PC/Móvil), Google Sheets y visores de Android/iOS.
+ * Ajusta anchos de columna automáticamente y soporta Web Share API en dispositivos móviles.
  */
 export const exportToCSV = async () => {
   try {
@@ -31,7 +33,7 @@ export const exportToCSV = async () => {
       'Estado Sync',
     ];
 
-    const rows = personas.map(p => {
+    const dataRows = personas.map(p => {
       const pContacts = contactos
         .filter(c => c.persona_id === p.id && c.activo)
         .sort((a, b) => a.prioridad - b.prioridad);
@@ -60,72 +62,46 @@ export const exportToCSV = async () => {
       ];
     });
 
-    // Escapar caracteres HTML para evitar fallos de formato
-    const esc = (val) =>
-      String(val ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+    // Crear hoja de cálculo con encabezados y filas
+    const wsData = [headers, ...dataRows];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-    const headerHtml = headers
-      .map(h => `<th style="background-color:#2563eb;color:#ffffff;font-weight:bold;padding:10px 14px;border:1px solid #1d4ed8;text-align:left;font-size:12px;">${esc(h)}</th>`)
-      .join('');
+    // Calcular ancho óptimo para cada columna automáticamente
+    const colWidths = headers.map((header, colIndex) => {
+      let maxLen = header.length;
+      dataRows.forEach(row => {
+        const val = row[colIndex] ? String(row[colIndex]) : '';
+        if (val.length > maxLen) {
+          maxLen = val.length;
+        }
+      });
+      return { wch: Math.min(Math.max(maxLen + 3, 12), 40) };
+    });
+    ws['!cols'] = colWidths;
 
-    const rowsHtml = rows
-      .map((row, idx) => {
-        const bg = idx % 2 === 0 ? '#f8fafc' : '#ffffff';
-        const cells = row
-          .map(v => `<td style="padding:8px 12px;border:1px solid #cbd5e1;background-color:${bg};font-size:11px;color:#1e293b;">${esc(v)}</td>`)
-          .join('');
-        return `<tr>${cells}</tr>`;
-      })
-      .join('');
+    // Crear libro de trabajo
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Encuestas');
 
-    const fechaExport = new Date().toLocaleDateString('es-CO', {
-      year: 'numeric', month: '2-digit', day: '2-digit',
+    // Generar buffer binario en formato .xlsx estándar
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
 
-    const html = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office"
-            xmlns:x="urn:schemas-microsoft-com:office:excel"
-            xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <!--[if gte mso 9]><xml>
-          <x:ExcelWorkbook><x:ExcelWorksheets>
-            <x:ExcelWorksheet><x:Name>Encuestas</x:Name>
-            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
-            </x:ExcelWorksheet>
-          </x:ExcelWorksheets></x:ExcelWorkbook>
-        </xml><![endif]-->
-      </head>
-      <body>
-        <table border="1" cellspacing="0" cellpadding="0"
-               style="font-family:Segoe UI,Calibri,Arial,sans-serif;border-collapse:collapse;">
-          <thead><tr>${headerHtml}</tr></thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>
-        <p style="font-family:Segoe UI,Calibri;font-size:10px;color:#64748b;margin-top:12px;">
-          Reporte generado el ${fechaExport} — Módulo CRUD de Encuestas
-        </p>
-      </body>
-      </html>`;
+    const fileName = `encuestas_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
-    // BOM UTF-8 (\ufeff) con MIME type oficial de Excel
-    const blob = new Blob(['\ufeff' + html], {
-      type: 'application/vnd.ms-excel;charset=utf-8',
+    // 1. En móviles usar Web Share API si está disponible
+    const file = new File([blob], fileName, {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
 
-    const fileName = `encuestas_${new Date().toISOString().slice(0, 10)}.xls`;
-
-    // 1. Soporte en móvil a través de Web Share API
-    const file = new File([blob], fileName, { type: 'application/vnd.ms-excel' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
           files: [file],
           title: 'Exportación de Encuestas',
-          text: `Reporte de encuestas con diseño (${fechaExport})`
+          text: `Reporte de encuestas exportado el ${new Date().toLocaleDateString('es-CO')}`
         });
         return;
       } catch (shareErr) {
@@ -134,7 +110,7 @@ export const exportToCSV = async () => {
       }
     }
 
-    // 2. Fallback de descarga directa para navegadores
+    // 2. Fallback descarga directa
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
