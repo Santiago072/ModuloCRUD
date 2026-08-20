@@ -1,14 +1,24 @@
 import db from '../db/schema';
 import * as XLSX from 'xlsx';
+import { syncData } from './syncUtils';
 
 /**
  * Exporta todas las personas con sus contactos a un archivo Excel (.xlsx) nativo real.
  * Utiliza formato binario estándar compatible con Microsoft Excel (PC/Móvil), Google Sheets y visores de Android/iOS.
- * Ajusta anchos de columna automáticamente y soporta Web Share API en dispositivos móviles.
+ * Antes de exportar, intenta sincronizar con el servidor para asegurar que todos los datos estén presentes en el dispositivo.
  */
 export const exportToCSV = async () => {
   try {
-    // Excluir los registros marcados para borrar (soft-delete)
+    // 1. Si hay conexión a internet, forzar sincronización inmediata antes de exportar
+    if (navigator.onLine) {
+      try {
+        await syncData({ immediate: true });
+      } catch (syncErr) {
+        console.warn('Sincronización previa al exportar falló, usando datos locales:', syncErr);
+      }
+    }
+
+    // 2. Obtener los registros locales de IndexedDB
     const personas = await db.personas
       .filter(p => p.sync_status !== 'deleted')
       .toArray();
@@ -16,7 +26,7 @@ export const exportToCSV = async () => {
     const encuestas = await db.encuestas.toArray();
 
     if (!personas || personas.length === 0) {
-      alert('No hay registros de encuestas disponibles para exportar.');
+      alert('No hay registros de encuestas disponibles en este dispositivo para exportar.');
       return;
     }
 
@@ -62,7 +72,7 @@ export const exportToCSV = async () => {
       ];
     });
 
-    // Crear hoja de cálculo con encabezados y filas
+    // 3. Crear hoja de cálculo con encabezados y filas
     const wsData = [headers, ...dataRows];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
 
@@ -91,7 +101,7 @@ export const exportToCSV = async () => {
 
     const fileName = `encuestas_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
-    // 1. En móviles usar Web Share API si está disponible
+    // 4. En móviles intentar Web Share API
     const file = new File([blob], fileName, {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
@@ -110,7 +120,7 @@ export const exportToCSV = async () => {
       }
     }
 
-    // 2. Fallback descarga directa
+    // 5. Fallback descarga directa
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
