@@ -1,15 +1,20 @@
 import db from '../db/schema';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { syncData } from './syncUtils';
 
 /**
- * Exporta todas las personas con sus contactos a un archivo Excel (.xlsx) nativo real.
- * Utiliza formato binario estándar compatible con Microsoft Excel (PC/Móvil), Google Sheets y visores de Android/iOS.
- * Antes de exportar, intenta sincronizar con el servidor para asegurar que todos los datos estén presentes en el dispositivo.
+ * Exporta todas las personas con sus contactos a un archivo Excel (.xlsx) nativo real estilizado.
+ * Incluye:
+ * - Encabezados con fondo azul (#2563EB) y texto blanco en negrita.
+ * - Bordes completos (thin) en todas las celdas de datos.
+ * - Filas con efecto cebra (#F8FAFC / #FFFFFF).
+ * - Ajuste automático de anchos de columna.
+ * - Sincronización previa automática para garantizar disponibilidad de datos en móviles.
+ * - Web Share API en móviles / descarga directa en escritorio.
  */
 export const exportToCSV = async () => {
   try {
-    // 1. Si hay conexión a internet, forzar sincronización inmediata antes de exportar
+    // 1. Sincronizar inmediatamente si hay conexión para tener todos los datos en el dispositivo
     if (navigator.onLine) {
       try {
         await syncData({ immediate: true });
@@ -18,7 +23,7 @@ export const exportToCSV = async () => {
       }
     }
 
-    // 2. Obtener los registros locales de IndexedDB
+    // 2. Obtener datos de IndexedDB
     const personas = await db.personas
       .filter(p => p.sync_status !== 'deleted')
       .toArray();
@@ -72,36 +77,97 @@ export const exportToCSV = async () => {
       ];
     });
 
-    // 3. Crear hoja de cálculo con encabezados y filas
-    const wsData = [headers, ...dataRows];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    // 3. Crear Libro y Hoja con ExcelJS
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Módulo CRUD Encuestas';
+    workbook.created = new Date();
 
-    // Calcular ancho óptimo para cada columna automáticamente
-    const colWidths = headers.map((header, colIndex) => {
-      let maxLen = header.length;
+    const worksheet = workbook.addWorksheet('Encuestas', {
+      views: [{ showGridLines: true }]
+    });
+
+    // Fila 1: Encabezados
+    const headerRow = worksheet.addRow(headers);
+    headerRow.height = 26;
+
+    // Estilo de encabezados: Fondo Azul (#2563EB), Texto Blanco, Negrita, Centrado vertical
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF2563EB' }
+      };
+      cell.font = {
+        name: 'Segoe UI',
+        size: 11,
+        bold: true,
+        color: { argb: 'FFFFFFFF' }
+      };
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: 'left'
+      };
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FF1D4ED8' } },
+        left: { style: 'thin', color: { argb: 'FF1D4ED8' } },
+        bottom: { style: 'medium', color: { argb: 'FF1D4ED8' } },
+        right: { style: 'thin', color: { argb: 'FF1D4ED8' } }
+      };
+    });
+
+    // Filas de datos con bordes y colores alternados
+    dataRows.forEach((rowValues, index) => {
+      const row = worksheet.addRow(rowValues);
+      row.height = 20;
+
+      const isEven = index % 2 === 0;
+      const bgArgb = isEven ? 'FFF8FAFC' : 'FFFFFFFF'; // Gris muy suave y Blanco
+
+      row.eachCell((cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: bgArgb }
+        };
+        cell.font = {
+          name: 'Segoe UI',
+          size: 10,
+          color: { argb: 'FF1E293B' }
+        };
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: 'left'
+        };
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+          left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+          bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+          right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+        };
+      });
+    });
+
+    // 4. Ajustar ancho automático de columnas
+    worksheet.columns.forEach((col, i) => {
+      let maxLen = headers[i] ? headers[i].length : 10;
       dataRows.forEach(row => {
-        const val = row[colIndex] ? String(row[colIndex]) : '';
+        const val = row[i] ? String(row[i]) : '';
         if (val.length > maxLen) {
           maxLen = val.length;
         }
       });
-      return { wch: Math.min(Math.max(maxLen + 3, 12), 40) };
+      col.width = Math.min(Math.max(maxLen + 4, 14), 45);
     });
-    ws['!cols'] = colWidths;
 
-    // Crear libro de trabajo
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Encuestas');
-
-    // Generar buffer binario en formato .xlsx estándar
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], {
+    // 5. Generar Buffer Binario .xlsx
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
 
     const fileName = `encuestas_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
-    // 4. En móviles intentar Web Share API
+    // 6. En móviles usar Web Share API
     const file = new File([blob], fileName, {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
@@ -120,7 +186,7 @@ export const exportToCSV = async () => {
       }
     }
 
-    // 5. Fallback descarga directa
+    // 7. Fallback descarga directa
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
