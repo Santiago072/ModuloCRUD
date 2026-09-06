@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
 import {
   ClipboardCheck,
   Wifi,
@@ -19,6 +20,7 @@ import {
   Users,
   RefreshCw,
   Eye,
+  EyeOff,
   Activity,
   ChevronRight,
   Check,
@@ -26,7 +28,11 @@ import {
   Radio,
   Sliders,
   MapPin,
-  FileText
+  FileText,
+  User,
+  Loader2,
+  AlertCircle,
+  X
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -34,6 +40,15 @@ export default function LandingPage() {
   const [syncedRecords, setSyncedRecords] = useState(148);
   const [pendingRecords, setPendingRecords] = useState(3);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Estados para el Modal de Login
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { login, isLoading, error } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleSimulateSync = () => {
     if (pendingRecords === 0) return;
@@ -47,6 +62,15 @@ export default function LandingPage() {
 
   const handleAddSampleRecord = () => {
     setPendingRecords(prev => prev + 1);
+  };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    const success = await login(username, password);
+    if (success) {
+      setIsLoginModalOpen(false);
+      navigate('/');
+    }
   };
 
   return (
@@ -74,67 +98,67 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Navbar Flotante con Anclas Oficiales */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-xs">
+      {/* Navbar Flotante con Padding Cómodo y Anclas Oficiales */}
+      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 transition-all shadow-xs py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
-              <ClipboardCheck className="w-5 h-5" />
+          <Link to="/" className="flex items-center gap-3.5 group">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+              <ClipboardCheck className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-lg font-extrabold tracking-tight text-slate-900 flex items-center gap-1">
+              <span className="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5">
                 Módulo<span className="text-indigo-600">CRUD</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100 ml-1 uppercase">
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100 uppercase">
                   PWA
                 </span>
               </span>
-              <p className="text-[10px] text-slate-500 font-medium -mt-0.5 tracking-wide">
+              <p className="text-[11px] text-slate-500 font-medium -mt-0.5 tracking-wide">
                 Sistema Offline-First de Captura y Censo
               </p>
             </div>
           </Link>
 
-          {/* Links de Navegación idénticos al entorno local */}
-          <div className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-600">
-            <a href="#motor" className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+          {/* Links de Navegación idénticos al entorno local con espaciado y padding óptimos */}
+          <div className="hidden md:flex items-center gap-8 text-[0.92rem] font-semibold text-slate-600">
+            <a href="#motor" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
               <Database className="w-4 h-4 text-indigo-500" />
               <span>Motor Offline</span>
             </a>
-            <a href="#modo-campo" className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <a href="#modo-campo" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
               <Smartphone className="w-4 h-4 text-sky-500" />
               <span>Modo Campo</span>
             </a>
-            <a href="#excel" className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <a href="#excel" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
               <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
               <span>ExcelJS</span>
             </a>
-            <a href="#seguridad" className="hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <a href="#seguridad" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-indigo-600" />
               <span>Seguridad</span>
             </a>
           </div>
 
-          {/* Acciones */}
+          {/* Acciones: Abre Modal de Login Directo */}
           <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white text-sm font-semibold px-4 sm:px-5 py-2.5 rounded-xl shadow-md shadow-indigo-600/25 transition-all active:scale-98"
+            <button
+              onClick={() => setIsLoginModalOpen(true)}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-indigo-600/25 transition-all active:scale-98 cursor-pointer"
             >
               <Lock className="w-4 h-4" />
               <span>Portal PWA</span>
-            </Link>
+            </button>
           </div>
 
         </div>
       </nav>
 
-      {/* Hero Section: Con Smartphone Mockup PWA Interactivo */}
+      {/* Hero Section: Con Smartphone Mockup PWA y Aura Azul Intensa */}
       <section className="relative pt-12 pb-20 lg:pt-16 lg:pb-24 overflow-hidden">
         
-        {/* Luces de Fondo */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[850px] h-[500px] bg-gradient-to-tr from-indigo-200/40 via-sky-100/30 to-purple-100/30 blur-3xl -z-10 rounded-full pointer-events-none"></div>
+        {/* Aura de fondo global */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-tr from-indigo-300/35 via-sky-200/30 to-purple-200/30 blur-3xl -z-10 rounded-full pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
@@ -160,14 +184,14 @@ export default function LandingPage() {
 
               {/* Botones de Acción */}
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-                <Link
-                  to="/login"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white font-semibold text-base px-6 py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all"
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white font-semibold text-base px-6 py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all cursor-pointer"
                 >
                   <Lock className="w-4 h-4" />
                   <span>Iniciar Aplicación PWA</span>
                   <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
+                </button>
 
                 <a
                   href="#simulador"
@@ -196,15 +220,20 @@ export default function LandingPage() {
 
             </div>
 
-            {/* Columna Derecha: Mockup Smartphone Móvil PWA */}
+            {/* Columna Derecha: Mockup Smartphone Móvil PWA con Aura Azul Intensa */}
             <div className="lg:col-span-6 flex justify-center" id="simulador">
-              <div className="relative w-full max-w-[370px]">
+              <div className="relative w-full max-w-[380px]">
                 
-                {/* Glow decorativo de fondo */}
-                <div className="absolute -inset-3 bg-gradient-to-tr from-indigo-500/30 via-sky-500/20 to-purple-500/30 rounded-[50px] blur-2xl -z-10"></div>
+                {/* Aura Azul / Violeta Intensa Idéntica a Local */}
+                <div 
+                  className="absolute -inset-6 rounded-[56px] blur-3xl -z-10 pointer-events-none opacity-85"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(67, 56, 202, 0.45) 0%, rgba(2, 132, 199, 0.35) 50%, rgba(99, 102, 241, 0.4) 100%)'
+                  }}
+                ></div>
 
                 {/* Chasis Smartphone */}
-                <div className="bg-[#0f172a] p-3.5 rounded-[46px] shadow-2xl border-4 border-slate-800 ring-1 ring-white/20">
+                <div className="bg-[#090d16] p-3 rounded-[44px] shadow-2xl border-4 border-slate-800 ring-1 ring-white/10 relative">
                   
                   {/* Speaker frontal */}
                   <div className="w-20 h-4 bg-slate-900 rounded-full mx-auto mb-2 flex items-center justify-center">
@@ -212,7 +241,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Pantalla OLED */}
-                  <div className="bg-white rounded-[34px] overflow-hidden border border-slate-100 shadow-inner">
+                  <div className="bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-inner">
                     
                     {/* Barra de Estado */}
                     <div className="bg-slate-900 px-4 py-2.5 text-white flex items-center justify-between text-xs font-mono border-b border-slate-800">
@@ -582,12 +611,12 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  <Link
-                    to="/login"
-                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2.5 rounded-xl shadow-md transition-colors mt-2"
+                  <button
+                    onClick={() => setIsLoginModalOpen(true)}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2.5 rounded-xl shadow-md transition-colors mt-2 cursor-pointer"
                   >
                     <span>Abrir Portal para Exportar</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
 
@@ -662,7 +691,9 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center gap-6 text-sm">
-              <Link to="/login" className="hover:text-white transition-colors">Portal PWA</Link>
+              <button onClick={() => setIsLoginModalOpen(true)} className="hover:text-white transition-colors cursor-pointer">
+                Portal PWA
+              </button>
               <a href="https://github.com/Santiago072/ModuloCRUD" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                 GitHub Repo
               </a>
@@ -674,6 +705,123 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* MODAL DE LOGIN INTERACTIVO (Igual que en local) */}
+      {isLoginModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+            
+            {/* Cabecera del Modal con Gradiente */}
+            <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-sky-600 p-6 text-white relative">
+              <button
+                onClick={() => setIsLoginModalOpen(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                title="Cerrar modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2.5 mb-1.5">
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                  <Lock className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-xs font-bold tracking-wide uppercase bg-white/20 px-2.5 py-0.5 rounded-full">
+                  Acceso Seguro PWA
+                </span>
+              </div>
+              <h3 className="text-2xl font-black">Iniciar Sesión</h3>
+              <p className="text-indigo-100 text-xs mt-1">
+                Ingrese sus credenciales de brigadista o administrador
+              </p>
+            </div>
+
+            {/* Formulario de Login */}
+            <div className="p-6 sm:p-8">
+              {error && (
+                <div className="mb-5 bg-rose-50 border border-rose-200 p-3.5 rounded-xl flex items-start gap-2.5 text-rose-700 text-xs">
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                  <span className="font-semibold">{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
+                    Usuario o Encuestador
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="block w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-600 transition-all font-medium"
+                      placeholder="Ej. admin o encuestador"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="block w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-600 transition-all font-medium"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 shadow-md shadow-indigo-600/25 transition-all disabled:opacity-60 cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Verificando credenciales...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Ingresar a la Plataforma</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-slate-400">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  Cifrado SHA-256 / JWT
+                </span>
+                <span>Listo para Trabajo Rural</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
