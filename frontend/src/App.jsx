@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import LockScreen from './pages/LockScreen';
 import AdminDashboard from './features/admin/AdminDashboard';
@@ -11,7 +12,7 @@ import { NetworkStatus } from './components/ui/NetworkStatus';
 
 function RootRedirect() {
   const { isAuthenticated, user } = useAuthStore();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) return <LandingPage />;
   return user?.rol === 'admin' ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />;
 }
 
@@ -58,6 +59,7 @@ export default function App() {
       <Routes>
 
         <Route path="/" element={<RootRedirect />} />
+        <Route path="/landing" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route 
           path="/dashboard" 
