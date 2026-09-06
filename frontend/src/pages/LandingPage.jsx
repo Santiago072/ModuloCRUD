@@ -32,7 +32,8 @@ import {
   User,
   Loader2,
   AlertCircle,
-  X
+  X,
+  PlusCircle
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -74,79 +75,75 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-indigo-500 selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen text-slate-800 font-sans selection:bg-indigo-500 selection:text-white relative overflow-x-hidden">
       
-      {/* Top Banner Operativo */}
-      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-indigo-200 text-xs py-2 px-4 border-b border-indigo-500/20">
+      {/* Top Banner Operativo Idéntico a Local */}
+      <div className="bg-gradient-to-r from-[#090d16] via-[#171d34] to-[#090d16] text-[#c7d2fe] text-xs py-2 px-6 border-b border-indigo-500/25">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 font-medium">
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 tracking-wide uppercase">
+          <div className="flex items-center gap-2.5 font-medium">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/25 text-indigo-200 border border-indigo-500/40 tracking-wider uppercase">
               PWA v1.3.1
             </span>
             <span>Arquitectura Offline-First de Alta Resiliencia con Dexie.js & IndexedDB</span>
           </div>
           <div className="flex items-center gap-4 text-slate-300 text-[11px]">
             <span className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              Cifrado Local SHA-256
-            </span>
-            <span className="hidden sm:flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              Sincronización Reactiva en Segundo Plano
+              <i className="bi bi-shield-check text-emerald-400"></i>
+              <span>Cifrado Local SHA-256 & Sincronización Reactiva en Segundo Plano</span>
             </span>
           </div>
         </div>
       </div>
 
-      {/* Navbar Flotante con Padding Cómodo y Anclas Oficiales */}
-      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 transition-all shadow-xs py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+      {/* Navbar con estilo, padding y altura idéntica a local */}
+      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs py-3.5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 flex items-center justify-between">
           
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3.5 group">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
-              <ClipboardCheck className="w-6 h-6" />
+          <Link to="/" className="flex items-center gap-3 group text-decoration-none">
+            <div className="w-[42px] h-[42px] rounded-xl bg-gradient-to-br from-[#4338ca] to-[#0284c7] flex items-center justify-center text-white text-xl shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+              <i className="bi bi-clipboard-check-fill"></i>
             </div>
             <div>
-              <span className="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5">
-                Módulo<span className="text-indigo-600">CRUD</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100 uppercase">
+              <span className="text-[1.22rem] font-extrabold tracking-tight text-[#090d16] flex items-center gap-1.5">
+                Módulo<span className="text-[#4338ca]">CRUD</span>
+                <span className="text-[0.65rem] font-bold px-2 py-0.5 bg-[#eef2ff] text-[#4338ca] rounded-full border border-[#c7d2fe]">
                   PWA
                 </span>
               </span>
-              <p className="text-[11px] text-slate-500 font-medium -mt-0.5 tracking-wide">
+              <p className="text-[0.72rem] text-slate-500 font-medium -mt-0.5 tracking-wide">
                 Sistema Offline-First de Captura y Censo
               </p>
             </div>
           </Link>
 
-          {/* Links de Navegación idénticos al entorno local con espaciado y padding óptimos */}
-          <div className="hidden md:flex items-center gap-8 text-[0.92rem] font-semibold text-slate-600">
-            <a href="#motor" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
-              <Database className="w-4 h-4 text-indigo-500" />
+          {/* Links de Navegación con tipografía, íconos y espaciado exacto de local */}
+          <div className="hidden md:flex items-center gap-7 text-[0.88rem] font-semibold text-slate-600">
+            <a href="#motor" className="hover:text-[#4338ca] transition-colors flex items-center gap-1.5 py-1">
+              <i className="bi bi-database-check text-[#4338ca]"></i>
               <span>Motor Offline</span>
             </a>
-            <a href="#modo-campo" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-sky-500" />
+            <a href="#modo-campo" className="hover:text-[#4338ca] transition-colors flex items-center gap-1.5 py-1">
+              <i className="bi bi-phone-fill text-sky-600"></i>
               <span>Modo Campo</span>
             </a>
-            <a href="#excel" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
-              <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
+            <a href="#excel" className="hover:text-[#4338ca] transition-colors flex items-center gap-1.5 py-1">
+              <i className="bi bi-file-earmark-spreadsheet-fill text-emerald-600"></i>
               <span>ExcelJS</span>
             </a>
-            <a href="#seguridad" className="hover:text-indigo-600 transition-colors py-2 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-indigo-600" />
+            <a href="#seguridad" className="hover:text-[#4338ca] transition-colors flex items-center gap-1.5 py-1">
+              <i className="bi bi-shield-lock-fill text-[#4338ca]"></i>
               <span>Seguridad</span>
             </a>
           </div>
 
-          {/* Acciones: Abre Modal de Login Directo */}
+          {/* Botón Portal PWA que abre el modal de login */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsLoginModalOpen(true)}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-indigo-600/25 transition-all active:scale-98 cursor-pointer"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#4338ca] to-[#312e81] hover:from-[#3730a3] hover:to-[#282566] text-white text-[0.88rem] font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-indigo-600/30 transition-all active:scale-98 cursor-pointer border border-white/20"
             >
-              <Lock className="w-4 h-4" />
+              <i className="bi bi-box-arrow-in-right"></i>
               <span>Portal PWA</span>
             </button>
           </div>
@@ -154,201 +151,150 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section: Con Smartphone Mockup PWA y Aura Azul Intensa */}
-      <section className="relative pt-12 pb-20 lg:pt-16 lg:pb-24 overflow-hidden">
-        
-        {/* Aura de fondo global */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-tr from-indigo-300/35 via-sky-200/30 to-purple-200/30 blur-3xl -z-10 rounded-full pointer-events-none"></div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section: Grid idéntico a local */}
+      <section className="relative pt-16 pb-20 lg:pt-18 lg:pb-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
             
-            {/* Columna Izquierda: Información de Alto Impacto */}
+            {/* Columna Izquierda: Hero Content */}
             <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
               
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-50 border border-indigo-200/80 text-indigo-700 shadow-xs">
-                <Radio className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[0.78rem] font-bold bg-[#eef2ff] border border-[#c7d2fe] text-[#4338ca]">
+                <i className="bi bi-broadcast"></i>
                 <span>Modo Campo Extendido • 30 Días 100% Offline</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight text-slate-900 leading-[1.12]">
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.3rem] font-extrabold tracking-tight text-[#090d16] leading-[1.14]">
                 Recolección de datos <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-600">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4338ca] to-[#0284c7]">
                   sin pérdida de señal ni interrupciones
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0 font-normal">
+              <p className="text-[1.05rem] text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0 font-normal">
                 Diseñado específicamente para brigadas y encuestadores en territorio. Permite capturar censos en zonas rurales o sótanos sin conexión. Los registros se escriben inmediatamente en IndexedDB mediante Dexie.js y se sincronizan al recuperar enlace de datos.
               </p>
 
               {/* Botones de Acción */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white font-semibold text-base px-6 py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-br from-[#4338ca] to-[#312e81] hover:from-[#3730a3] hover:to-[#282566] text-white font-semibold text-[0.95rem] px-7 py-3.5 rounded-xl shadow-lg shadow-indigo-600/35 transition-all cursor-pointer border border-white/20"
                 >
-                  <Lock className="w-4 h-4" />
+                  <i className="bi bi-person-fill-lock text-base"></i>
                   <span>Iniciar Aplicación PWA</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
                 </button>
 
                 <a
-                  href="#simulador"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-base px-6 py-3.5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all"
+                  href="#modo-campo"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-[0.95rem] px-6 py-3.5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all"
                 >
-                  <Activity className="w-4 h-4 text-indigo-600" />
-                  <span>Ver Simulador Offline</span>
+                  <i className="bi bi-compass-fill text-indigo-600"></i>
+                  <span>Ver Modo Campo</span>
                 </a>
               </div>
 
               {/* Métricas / Badges Clave */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200/80">
+              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200">
                 <div>
-                  <h4 className="text-2xl sm:text-3xl font-extrabold text-slate-900">0 ms</h4>
-                  <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">Latencia Local</p>
+                  <h4 className="text-[1.75rem] font-extrabold text-[#090d16] leading-none">0 ms</h4>
+                  <p className="text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Latencia Local</p>
                 </div>
                 <div>
-                  <h4 className="text-2xl sm:text-3xl font-extrabold text-indigo-600">100%</h4>
-                  <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">Offline Ready</p>
+                  <h4 className="text-[1.75rem] font-extrabold text-[#4338ca] leading-none">100%</h4>
+                  <p className="text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Offline Ready</p>
                 </div>
                 <div>
-                  <h4 className="text-2xl sm:text-3xl font-extrabold text-emerald-600">ExcelJS</h4>
-                  <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">Export Nativo</p>
+                  <h4 className="text-[1.75rem] font-extrabold text-[#059669] leading-none">ExcelJS</h4>
+                  <p className="text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Export Nativo</p>
                 </div>
               </div>
 
             </div>
 
-            {/* Columna Derecha: Mockup Smartphone Móvil PWA con Aura Azul Intensa */}
+            {/* Columna Derecha: Mockup Smartphone PWA idéntico al local */}
             <div className="lg:col-span-6 flex justify-center" id="simulador">
-              <div className="relative w-full max-w-[380px]">
-                
-                {/* Aura Azul / Violeta Intensa Idéntica a Local */}
-                <div 
-                  className="absolute -inset-6 rounded-[56px] blur-3xl -z-10 pointer-events-none opacity-85"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(67, 56, 202, 0.45) 0%, rgba(2, 132, 199, 0.35) 50%, rgba(99, 102, 241, 0.4) 100%)'
-                  }}
-                ></div>
-
-                {/* Chasis Smartphone */}
-                <div className="bg-[#090d16] p-3 rounded-[44px] shadow-2xl border-4 border-slate-800 ring-1 ring-white/10 relative">
+              <div className="mobile-device-stage w-full max-w-[400px]">
+                <div className="smartphone-mockup">
+                  <div className="smartphone-speaker"></div>
                   
-                  {/* Speaker frontal */}
-                  <div className="w-20 h-4 bg-slate-900 rounded-full mx-auto mb-2 flex items-center justify-center">
-                    <div className="w-10 h-1 bg-slate-700 rounded-full"></div>
-                  </div>
-
-                  {/* Pantalla OLED */}
-                  <div className="bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-inner">
+                  <div className="smartphone-screen">
                     
-                    {/* Barra de Estado */}
-                    <div className="bg-slate-900 px-4 py-2.5 text-white flex items-center justify-between text-xs font-mono border-b border-slate-800">
-                      <span className="text-[11px] text-slate-300">09:41 • Brigada #04</span>
-                      
+                    {/* Barra de Estado Móvil */}
+                    <div className="phone-status-bar">
+                      <span>09:41 • Brigada #04</span>
                       <button
                         onClick={() => setIsSimulatingOffline(!isSimulatingOffline)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
-                          isSimulatingOffline
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40'
-                            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                        }`}
-                        title="Haz clic para alternar estado de red"
+                        className={`phone-net-badge ${isSimulatingOffline ? 'offline' : ''}`}
+                        title="Haz clic para alternar el estado de red"
                       >
-                        {isSimulatingOffline ? (
-                          <>
-                            <WifiOff className="w-3 h-3 text-amber-400" />
-                            <span>Offline</span>
-                          </>
-                        ) : (
-                          <>
-                            <Wifi className="w-3 h-3 text-emerald-400" />
-                            <span>En Línea</span>
-                          </>
-                        )}
+                        <i className={`bi ${isSimulatingOffline ? 'bi-wifi-off' : 'bi-wifi'}`}></i>
+                        <span>{isSimulatingOffline ? 'Offline' : 'En Línea'}</span>
                       </button>
                     </div>
 
-                    {/* Cabecera App Móvil */}
-                    <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    {/* Cabecera de la App PWA */}
+                    <div className="phone-app-header">
                       <div>
-                        <h5 className="font-bold text-xs text-slate-900">Módulo Encuesta</h5>
-                        <p className="text-[10px] text-slate-500">Captura Persona & Contacto</p>
+                        <h5>Módulo Encuesta</h5>
+                        <small className="text-slate-500 text-[0.68rem] block">Captura Persona & Contacto</small>
                       </div>
-                      <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded border border-indigo-200">
+                      <span className="text-[0.68rem] font-bold bg-[#e0e7ff] text-[#4338ca] px-2 py-0.5 rounded">
                         Dexie.js
                       </span>
                     </div>
 
-                    {/* Métricas Móviles */}
-                    <div className="p-4 space-y-3 bg-gradient-to-b from-white to-slate-50">
+                    {/* Cuerpo del Móvil */}
+                    <div className="phone-app-body">
                       
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
-                          <span className="text-[10px] text-slate-500 font-semibold block">Servidor VPS</span>
-                          <div className="text-xl font-extrabold text-slate-900 mt-0.5">{syncedRecords}</div>
-                          <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5 mt-0.5">
-                            <Check className="w-2.5 h-2.5" /> Sincronizados
-                          </span>
+                      <div className="phone-metric-row">
+                        <div className="phone-metric-box">
+                          <span>Servidor VPS</span>
+                          <h3>{syncedRecords}</h3>
+                          <small className="text-[#059669]">Sincronizados</small>
                         </div>
-
-                        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
-                          <span className="text-[10px] text-slate-500 font-semibold block">Memoria Local</span>
-                          <div className="text-xl font-extrabold text-indigo-600 mt-0.5">{pendingRecords}</div>
-                          <span className="text-[10px] text-amber-600 font-bold flex items-center gap-0.5 mt-0.5">
-                            ● Pendientes
-                          </span>
+                        <div className="phone-metric-box">
+                          <span>Memoria Local</span>
+                          <h3 className="text-[#4338ca]">{pendingRecords}</h3>
+                          <small className="text-[#d97706]">Pendientes</small>
                         </div>
                       </div>
 
-                      {/* Consola de Operación */}
-                      <div className="bg-slate-900 rounded-xl p-3 text-white font-mono text-[11px] space-y-1.5 border border-slate-800">
-                        <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-slate-400">Red:</span>
-                          <span className={isSimulatingOffline ? 'text-amber-400 font-bold' : 'text-emerald-400 font-bold'}>
-                            {isSimulatingOffline ? 'OFFLINE (Almacenando local)' : 'CONECTADO (Background Sync)'}
-                          </span>
+                      <div className="phone-sim-card">
+                        <div className="phone-sim-row">
+                          <div>
+                            <span className="label">Red: </span>
+                            <span className={isSimulatingOffline ? 'text-amber-400 font-bold' : 'text-[#34d399] font-bold'}>
+                              {isSimulatingOffline ? 'OFFLINE (Almacenando local)' : 'CONECTADO (Background Sync)'}
+                            </span>
+                          </div>
+                          <div><span className="label">Cifrado: </span><span>Local SHA-256</span></div>
+                          <div><span className="label">Prioridad: </span><span className="text-[#818cf8]">Rotación Activa</span></div>
                         </div>
-                        <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-slate-400">Cifrado:</span>
-                          <span className="text-sky-300">Local SHA-256</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-slate-400">Prioridad:</span>
-                          <span className="text-indigo-300">Rotación Activa</span>
+
+                        <div className="phone-sim-buttons">
+                          <button className="btn-phone-record" onClick={handleAddSampleRecord}>
+                            <i className="bi bi-plus-circle"></i> + Encuesta
+                          </button>
+                          <button
+                            className="btn-phone-sync"
+                            onClick={handleSimulateSync}
+                            disabled={pendingRecords === 0 || isSyncing}
+                          >
+                            <i className={`bi bi-arrow-repeat ${isSyncing ? 'animate-spin' : ''}`}></i>
+                            <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar'}</span>
+                          </button>
                         </div>
                       </div>
 
-                      {/* Botones de Prueba en la App Móvil */}
-                      <div className="flex gap-2 pt-1">
-                        <button
-                          onClick={handleAddSampleRecord}
-                          className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold py-2 rounded-lg border border-slate-300 transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                        >
-                          <span>+ Encuesta</span>
-                        </button>
-                        
-                        <button
-                          onClick={handleSimulateSync}
-                          disabled={pendingRecords === 0 || isSyncing}
-                          className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 disabled:text-slate-400 text-white text-xs font-bold py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-                        >
-                          <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                          <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar'}</span>
-                        </button>
+                      <div className="text-[0.68rem] text-center text-slate-400">
+                        <i className="bi bi-shield-check text-[#4338ca]"></i> Auto-guardado local garantizado
                       </div>
-
-                      <p className="text-[10px] text-center text-slate-400 pt-1 flex items-center justify-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-indigo-500" />
-                        <span>Auto-guardado local garantizado</span>
-                      </p>
 
                     </div>
 
                   </div>
                 </div>
-
               </div>
             </div>
 
@@ -358,7 +304,7 @@ export default function LandingPage() {
 
       {/* SECCIÓN 1: MOTOR OFFLINE (id="motor") */}
       <section className="py-20 bg-white border-y border-slate-200" id="motor">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">
@@ -376,8 +322,8 @@ export default function LandingPage() {
             
             {/* Tarjeta 1 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200/80 hover:border-indigo-300 hover:shadow-md transition-all">
-              <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-6">
-                <Database className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-6 text-xl">
+                <i className="bi bi-database-fill-gear"></i>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">IndexedDB con Dexie.js</h3>
               <p className="text-slate-600 text-sm leading-relaxed mb-4">
@@ -385,20 +331,20 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-2 text-xs font-medium text-slate-600">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-indigo-600" />
+                  <i className="bi bi-check-circle-fill text-[#4338ca]"></i>
                   <span>Cero pérdida por reinicio de batería</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-indigo-600" />
-                  <span>Consultas reactivas indexadas</span>
+                  <i className="bi bi-check-circle-fill text-[#4338ca]"></i>
+                  <span>Consultas reactivas indexadas por ID</span>
                 </li>
               </ul>
             </div>
 
             {/* Tarjeta 2 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200/80 hover:border-indigo-300 hover:shadow-md transition-all">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-6">
-                <RefreshCw className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-6 text-xl">
+                <i className="bi bi-arrow-repeat"></i>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Background Sync API</h3>
               <p className="text-slate-600 text-sm leading-relaxed mb-4">
@@ -406,11 +352,11 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-2 text-xs font-medium text-slate-600">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <i className="bi bi-check-circle-fill text-[#059669]"></i>
                   <span>Resolución inteligente de marcas</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <i className="bi bi-check-circle-fill text-[#059669]"></i>
                   <span>Reintentos exponenciales seguros</span>
                 </li>
               </ul>
@@ -418,8 +364,8 @@ export default function LandingPage() {
 
             {/* Tarjeta 3 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200/80 hover:border-indigo-300 hover:shadow-md transition-all">
-              <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mb-6">
-                <Smartphone className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mb-6 text-xl">
+                <i className="bi bi-phone-vibrate"></i>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Instalación Nativa PWA</h3>
               <p className="text-slate-600 text-sm leading-relaxed mb-4">
@@ -427,11 +373,11 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-2 text-xs font-medium text-slate-600">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-sky-600" />
+                  <i className="bi bi-check-circle-fill text-sky-600"></i>
                   <span>Service Worker precachea activos</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-sky-600" />
+                  <i className="bi bi-check-circle-fill text-sky-600"></i>
                   <span>Pantalla completa tipo app nativa</span>
                 </li>
               </ul>
@@ -444,7 +390,7 @@ export default function LandingPage() {
 
       {/* SECCIÓN 2: MODO CAMPO (id="modo-campo") */}
       <section className="py-20 bg-slate-50 border-b border-slate-200" id="modo-campo">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-bold text-sky-600 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
@@ -505,7 +451,7 @@ export default function LandingPage() {
             <div className="lg:col-span-5">
               <div className="bg-slate-900 rounded-2xl p-7 text-white border border-slate-800 shadow-xl space-y-4">
                 <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm pb-2 border-b border-slate-800">
-                  <Radio className="w-4 h-4 animate-pulse" />
+                  <i className="bi bi-broadcast-pin"></i>
                   <span>Bitácora Operativa de Brigada</span>
                 </div>
 
@@ -530,7 +476,7 @@ export default function LandingPage() {
 
                 <div className="pt-2">
                   <div className="p-3 bg-white/5 rounded-xl border border-white/10 text-[11px] text-slate-300 flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <i className="bi bi-shield-check text-emerald-400 shrink-0 text-sm"></i>
                     <span>Datos cifrados y protegidos por LockScreen</span>
                   </div>
                 </div>
@@ -544,7 +490,7 @@ export default function LandingPage() {
 
       {/* SECCIÓN 3: EXCELJS (id="excel") */}
       <section className="py-20 bg-slate-100" id="excel">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 rounded-3xl p-8 sm:p-12 lg:p-14 text-white border border-indigo-500/20 relative overflow-hidden shadow-2xl">
             
             <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -553,7 +499,7 @@ export default function LandingPage() {
               
               <div className="lg:col-span-7 space-y-5">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  <FileSpreadsheet className="w-3.5 h-3.5" />
+                  <i className="bi bi-file-earmark-excel-fill"></i>
                   <span>Motor Nativo ExcelJS</span>
                 </div>
 
@@ -567,15 +513,15 @@ export default function LandingPage() {
 
                 <div className="flex flex-wrap gap-3 pt-2">
                   <div className="flex items-center gap-2 text-xs font-semibold bg-white/10 px-3.5 py-2 rounded-lg border border-white/10">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <i className="bi bi-check2 text-emerald-400"></i>
                     <span>Cabeceras Estilizadas y Filtros</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-semibold bg-white/10 px-3.5 py-2 rounded-lg border border-white/10">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <i className="bi bi-check2 text-emerald-400"></i>
                     <span>Múltiples Teléfonos por Fila</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-semibold bg-white/10 px-3.5 py-2 rounded-lg border border-white/10">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <i className="bi bi-check2 text-emerald-400"></i>
                     <span>Exportación CSV & XLSX</span>
                   </div>
                 </div>
@@ -585,15 +531,15 @@ export default function LandingPage() {
                 <div className="bg-slate-900/90 backdrop-blur-md p-6 rounded-2xl border border-slate-800 max-w-sm w-full shadow-xl">
                   <div className="flex items-center justify-between pb-4 border-b border-slate-800">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                        <FileSpreadsheet className="w-5 h-5" />
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+                        <i className="bi bi-file-earmark-spreadsheet-fill"></i>
                       </div>
                       <div>
                         <div className="text-xs font-bold">censo_recoleccion_campo.xlsx</div>
                         <div className="text-[10px] text-slate-400">Generado en 0.38s en cliente</div>
                       </div>
                     </div>
-                    <Download className="w-4 h-4 text-slate-400" />
+                    <i className="bi bi-download text-slate-400"></i>
                   </div>
 
                   <div className="py-4 space-y-2 text-[11px] font-mono text-slate-300">
@@ -628,7 +574,7 @@ export default function LandingPage() {
 
       {/* SECCIÓN 4: SEGURIDAD (id="seguridad") */}
       <section className="py-20 bg-white" id="seguridad">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">
@@ -645,8 +591,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200 shadow-xs hover:border-indigo-300 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-6">
-                <Lock className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-6 text-xl">
+                <i className="bi bi-lock-fill"></i>
               </div>
               <h4 className="font-bold text-lg text-slate-900 mb-2">LockScreen Automático</h4>
               <p className="text-sm text-slate-600 leading-relaxed">
@@ -655,8 +601,8 @@ export default function LandingPage() {
             </div>
 
             <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200 shadow-xs hover:border-sky-300 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mb-6">
-                <ShieldCheck className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mb-6 text-xl">
+                <i className="bi bi-shield-check"></i>
               </div>
               <h4 className="font-bold text-lg text-slate-900 mb-2">Hashes Criptográficos</h4>
               <p className="text-sm text-slate-600 leading-relaxed">
@@ -665,8 +611,8 @@ export default function LandingPage() {
             </div>
 
             <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200 shadow-xs hover:border-emerald-300 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-6">
-                <Users className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-6 text-xl">
+                <i className="bi bi-people-fill"></i>
               </div>
               <h4 className="font-bold text-lg text-slate-900 mb-2">Auditoría por Encuestador</h4>
               <p className="text-sm text-slate-600 leading-relaxed">
@@ -681,11 +627,11 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="bg-slate-950 text-slate-400 py-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-600/30">
-                <ClipboardCheck className="w-4 h-4" />
+                <i className="bi bi-clipboard-check"></i>
               </div>
               <span className="text-slate-200 font-bold text-base">Módulo CRUD — PWA Offline-First</span>
             </div>
@@ -706,7 +652,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* MODAL DE LOGIN INTERACTIVO (Igual que en local) */}
+      {/* MODAL DE LOGIN INTERACTIVO */}
       {isLoginModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
           <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
