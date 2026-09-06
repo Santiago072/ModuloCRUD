@@ -188,11 +188,11 @@ export default function LandingPage() {
                 </button>
 
                 <a
-                  href="#modo-campo"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-[0.95rem] px-6 py-3.5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all"
+                  href="#simulador"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-[0.95rem] px-6 py-3.5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all text-decoration-none"
                 >
-                  <i className="bi bi-compass-fill text-indigo-600"></i>
-                  <span>Ver Modo Campo</span>
+                  <i className="bi bi-phone text-indigo-600 text-lg"></i>
+                  <span>Ver Simulador Offline</span>
                 </a>
               </div>
 

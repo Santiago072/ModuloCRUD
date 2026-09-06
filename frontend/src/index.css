@@ -275,3 +275,19 @@ body {
 }
 
 .btn-phone-sync:hover { background: #3730a3; }
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/50 shadow-sm;
+  }
+  .glass-panel {
+    @apply bg-white/90 backdrop-blur-lg border border-white/40 shadow-xl rounded-2xl;
+  }
+  .blue-gradient {
+    @apply bg-gradient-to-br from-blue-500 to-blue-700 text-white;
+  }
+  .blue-gradient-subtle {
+    @apply bg-gradient-to-br from-blue-50 to-white border border-blue-100;
+  }
+}
+
