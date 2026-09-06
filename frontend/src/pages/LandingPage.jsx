@@ -70,7 +70,9 @@ export default function LandingPage() {
     const success = await login(username, password);
     if (success) {
       setIsLoginModalOpen(false);
-      navigate('/');
+      const currentUser = useAuthStore.getState().user;
+      const target = currentUser?.rol === 'admin' ? '/admin' : '/dashboard';
+      navigate(target, { replace: true });
     }
   };
 
@@ -195,26 +197,26 @@ export default function LandingPage() {
               </div>
 
               {/* Métricas / Badges Clave */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-6 border-t border-slate-200">
                 <div>
-                  <h4 className="text-[1.75rem] font-extrabold text-[#090d16] leading-none">0 ms</h4>
-                  <p className="text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Latencia Local</p>
+                  <h4 className="text-xl sm:text-[1.75rem] font-extrabold text-[#090d16] leading-none">0 ms</h4>
+                  <p className="text-[0.65rem] sm:text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Latencia Local</p>
                 </div>
                 <div>
-                  <h4 className="text-[1.75rem] font-extrabold text-[#4338ca] leading-none">100%</h4>
-                  <p className="text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Offline Ready</p>
+                  <h4 className="text-xl sm:text-[1.75rem] font-extrabold text-[#4338ca] leading-none">100%</h4>
+                  <p className="text-[0.65rem] sm:text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Offline Ready</p>
                 </div>
                 <div>
-                  <h4 className="text-[1.75rem] font-extrabold text-[#059669] leading-none">ExcelJS</h4>
-                  <p className="text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Export Nativo</p>
+                  <h4 className="text-xl sm:text-[1.75rem] font-extrabold text-[#059669] leading-none">ExcelJS</h4>
+                  <p className="text-[0.65rem] sm:text-[0.74rem] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Export Nativo</p>
                 </div>
               </div>
 
             </div>
 
             {/* Columna Derecha: Mockup Smartphone PWA idéntico al local */}
-            <div className="lg:col-span-6 flex justify-center" id="simulador">
-              <div className="mobile-device-stage w-full max-w-[400px]">
+            <div className="lg:col-span-6 flex justify-center w-full px-2 sm:px-0" id="simulador">
+              <div className="mobile-device-stage w-full max-w-[340px] sm:max-w-[395px]">
                 <div className="smartphone-mockup">
                   <div className="smartphone-speaker"></div>
                   

@@ -9,7 +9,7 @@ export function AppSidebar() {
   const handleLogout = async () => {
     closeSidebar();
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const navItems = user?.rol === 'admin' 

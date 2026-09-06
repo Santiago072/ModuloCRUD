@@ -33,7 +33,9 @@ export default function Login() {
     e.preventDefault();
     const success = await login(username, password);
     if (success) {
-      navigate('/');
+      const currentUser = useAuthStore.getState().user;
+      const target = currentUser?.rol === 'admin' ? '/admin' : '/dashboard';
+      navigate(target, { replace: true });
     }
   };
 
