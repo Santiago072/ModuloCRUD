@@ -74,7 +74,12 @@ export function PersonaForm({ onSuccess, onCancel }) {
   const onSubmit = async (data) => {
     try {
       if (existingPersona) {
-        // Actualizar persona existente
+        // 1. Si ingresó un nuevo número, rotar contactos primero en Dexie
+        if (data.nuevo_contacto?.trim()) {
+          await ContactoRepository.addContacto(existingPersona.id, 'celular', data.nuevo_contacto.trim());
+        }
+
+        // 2. Actualizar datos de la persona y sincronizar en conjunto
         await updatePersona(existingPersona.id, {
           nombres: data.nombres,
           apellidos: data.apellidos,
@@ -82,10 +87,6 @@ export function PersonaForm({ onSuccess, onCancel }) {
           fecha_registro: data.fecha_registro,
           encuestador: useAuthStore.getState().user?.username || 'Sin registro',
         });
-        // Si ingresó un nuevo número, aplicar rotación
-        if (data.nuevo_contacto?.trim()) {
-          await addContacto(existingPersona.id, 'celular', data.nuevo_contacto.trim());
-        }
       } else {
         // Crear nueva persona
         await createPersona({
