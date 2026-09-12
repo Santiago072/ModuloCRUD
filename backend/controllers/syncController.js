@@ -7,11 +7,11 @@ exports.pullData = async (req, res) => {
     
     if (req.user.rol === 'admin') {
       [personas] = await pool.query('SELECT * FROM personas');
-      [contactos] = await pool.query('SELECT * FROM contactos WHERE activo = 1 OR activo = true');
+      [contactos] = await pool.query('SELECT * FROM contactos WHERE activo = 1 OR activo = true ORDER BY prioridad ASC');
       [encuestas] = await pool.query('SELECT * FROM encuestas');
     } else {
       [personas] = await pool.query('SELECT * FROM personas WHERE usuario_id = ?', [req.user.id]);
-      [contactos] = await pool.query('SELECT c.* FROM contactos c JOIN personas p ON c.persona_id = p.id WHERE p.usuario_id = ? AND (c.activo = 1 OR c.activo = true)', [req.user.id]);
+      [contactos] = await pool.query('SELECT c.* FROM contactos c JOIN personas p ON c.persona_id = p.id WHERE p.usuario_id = ? AND (c.activo = 1 OR c.activo = true) ORDER BY c.prioridad ASC', [req.user.id]);
       [encuestas] = await pool.query('SELECT * FROM encuestas WHERE usuario_id = ?', [req.user.id]);
     }
     

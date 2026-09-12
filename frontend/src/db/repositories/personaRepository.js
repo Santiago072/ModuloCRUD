@@ -101,7 +101,9 @@ export const PersonaRepository = {
   getPendingSync: async () => {
     const personas = await db.personas.where('sync_status').anyOf('local', 'deleted').toArray();
     for (let p of personas) {
-      p.contactos = await db.contactos.where('persona_id').equals(p.id).toArray();
+      // Ordenar contactos por prioridad ASC para que el servidor los reciba en el orden correcto
+      const todos = await db.contactos.where('persona_id').equals(p.id).toArray();
+      p.contactos = todos.sort((a, b) => (a.prioridad ?? 999) - (b.prioridad ?? 999));
       p.encuestas = await db.encuestas.where('persona_id').equals(p.id).toArray();
     }
     return personas;
@@ -164,13 +166,16 @@ export const PersonaRepository = {
           await db.contactos.where('persona_id').anyOf(localIdsToUpdate).delete();
         }
 
-        for (const sc of serverContactos) {
+        // Ordenar por prioridad ASC para insertar en orden determinista
+        const contactosOrdenados = [...serverContactos].sort((a, b) => (a.prioridad ?? 999) - (b.prioridad ?? 999));
+
+        for (const sc of contactosOrdenados) {
           const localPersonaId = serverToLocalId[sc.persona_id];
           if (localPersonaId) {
             const { id, ...contactData } = sc;
             // Forzar a booleano porque MySQL lo devuelve como 1 o 0
             contactData.activo = contactData.activo === 1 || contactData.activo === true;
-            await db.contactos.put({ ...contactData, persona_id: localPersonaId });
+            await db.contactos.add({ ...contactData, persona_id: localPersonaId });
           }
         }
       }

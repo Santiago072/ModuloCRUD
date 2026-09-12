@@ -1,41 +1,77 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { usePersonaStore } from '../../store/usePersonaStore';
-import { X, Phone, Trash2, PlusCircle, Save, AlertTriangle } from 'lucide-react';
+import { X, Phone, Trash2, PlusCircle, Save, AlertTriangle, Loader2 } from 'lucide-react';
+import db from '../../db/schema';
 
 const prioridadLabel = (n) => ['Principal', 'Contacto 2', 'Contacto 3'][n - 1] ?? `C${n}`;
 
 export function PersonaDetail({ personaId, onClose }) {
   const { updatePersona, deletePersona, addContacto, loading } = usePersonaStore();
-  const [persona, setPersona] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [editData, setEditData] = useState({});
   const [newContacto, setNewContacto] = useState('');
   const [addingContact, setAddingContact] = useState(false);
+  const [savingContact, setSavingContact] = useState(false);
 
-  const load = async () => {
-    const data = await usePersonaStore.getState().getWithContacts(personaId);
-    setPersona(data);
-    if (data) {
-      setEditData({
-        nombres: data.nombres || '',
-        apellidos: data.apellidos || '',
-        profesion: data.profesion || '',
-        fecha_registro: data.fecha_registro || '',
-      });
-    }
+  // ── Suscripción reactiva a Dexie: se actualiza automáticamente sin load() manual ──
+  const persona = useLiveQuery(
+    () => db.personas.get(personaId),
+    [personaId]
+  );
+
+  const contactos = useLiveQuery(
+    () =>
+      db.contactos
+        .where('persona_id')
+        .equals(personaId)
+        .and(c => Boolean(c.activo))
+        .sortBy('prioridad'),
+    [personaId]
+  );
+
+  const encuesta = useLiveQuery(
+    () => db.encuestas.where('persona_id').equals(personaId).first(),
+    [personaId]
+  );
+
+  // undefined = cargando, null = no existe (fue borrada)
+  if (persona === undefined) {
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50">
+        <Loader2 size={32} className="text-white animate-spin" />
+      </div>
+    );
+  }
+
+  if (persona === null || !persona) {
+    // La persona fue eliminada; cerramos el modal limpiamente
+    onClose();
+    return null;
+  }
+
+  const currentEditData = editData ?? {
+    nombres: persona.nombres || '',
+    apellidos: persona.apellidos || '',
+    profesion: persona.profesion || '',
+    fecha_registro: persona.fecha_registro || '',
   };
 
-  useEffect(() => {
-    if (personaId) {
-      load();
-    }
-  }, [personaId]);
+  const handleEdit = () => {
+    setEditData({
+      nombres: persona.nombres || '',
+      apellidos: persona.apellidos || '',
+      profesion: persona.profesion || '',
+      fecha_registro: persona.fecha_registro || '',
+    });
+    setEditMode(true);
+  };
 
   const handleSave = async () => {
-    await updatePersona(personaId, editData);
+    await updatePersona(personaId, currentEditData);
     setEditMode(false);
-    await load();
+    setEditData(null);
   };
 
   const handleDelete = async () => {
@@ -45,13 +81,15 @@ export function PersonaDetail({ personaId, onClose }) {
 
   const handleAddContacto = async () => {
     if (!newContacto.trim()) return;
-    await addContacto(personaId, 'celular', newContacto.trim());
-    setNewContacto('');
-    setAddingContact(false);
-    await load();
+    setSavingContact(true);
+    try {
+      await addContacto(personaId, 'celular', newContacto.trim());
+      setNewContacto('');
+      setAddingContact(false);
+    } finally {
+      setSavingContact(false);
+    }
   };
-
-  if (!persona) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4">
@@ -64,13 +102,13 @@ export function PersonaDetail({ personaId, onClose }) {
               <div className="space-y-2">
                 <input
                   className="w-full border border-indigo-300 rounded-lg px-3 py-1.5 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={editData.nombres}
+                  value={currentEditData.nombres}
                   onChange={(e) => setEditData((d) => ({ ...d, nombres: e.target.value }))}
                   placeholder="Nombres"
                 />
                 <input
                   className="w-full border border-indigo-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={editData.apellidos}
+                  value={currentEditData.apellidos}
                   onChange={(e) => setEditData((d) => ({ ...d, apellidos: e.target.value }))}
                   placeholder="Apellidos"
                 />
@@ -98,7 +136,7 @@ export function PersonaDetail({ personaId, onClose }) {
               {editMode ? (
                 <input
                   className="w-full border border-indigo-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={editData.profesion}
+                  value={currentEditData.profesion}
                   onChange={(e) => setEditData((d) => ({ ...d, profesion: e.target.value }))}
                   placeholder="Profesión"
                 />
@@ -112,7 +150,7 @@ export function PersonaDetail({ personaId, onClose }) {
                 <input
                   type="date"
                   className="w-full border border-indigo-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={editData.fecha_registro?.slice(0, 10)}
+                  value={currentEditData.fecha_registro?.slice(0, 10)}
                   onChange={(e) => setEditData((d) => ({ ...d, fecha_registro: e.target.value }))}
                 />
               ) : (
@@ -120,6 +158,14 @@ export function PersonaDetail({ personaId, onClose }) {
               )}
             </div>
           </div>
+
+          {/* Encuestador */}
+          {encuesta?.encuestador && (
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1 font-semibold">Encuestador</p>
+              <p className="text-sm font-medium text-gray-700">{encuesta.encuestador}</p>
+            </div>
+          )}
 
           {/* Contactos */}
           <div>
@@ -143,17 +189,23 @@ export function PersonaDetail({ personaId, onClose }) {
                     type="tel"
                     value={newContacto}
                     onChange={(e) => setNewContacto(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddContacto()}
                     placeholder="Número de celular"
                     className="flex-1 border border-indigo-300 bg-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    autoFocus
+                    disabled={savingContact}
                   />
                   <button
                     onClick={handleAddContacto}
-                    className="px-3.5 py-1.5 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 font-semibold shadow-xs"
+                    disabled={savingContact || !newContacto.trim()}
+                    className="px-3.5 py-1.5 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 font-semibold shadow-xs disabled:opacity-60 flex items-center gap-1"
                   >
+                    {savingContact ? <Loader2 size={12} className="animate-spin" /> : null}
                     Guardar
                   </button>
                   <button
                     onClick={() => { setAddingContact(false); setNewContacto(''); }}
+                    disabled={savingContact}
                     className="px-3 py-1.5 text-gray-500 text-xs rounded-lg hover:bg-gray-200"
                   >
                     Cancelar
@@ -163,10 +215,10 @@ export function PersonaDetail({ personaId, onClose }) {
             )}
 
             <div className="space-y-2">
-              {!persona.contactos || persona.contactos.length === 0 ? (
+              {!contactos || contactos.length === 0 ? (
                 <p className="text-sm text-gray-400 italic">Sin contactos registrados</p>
               ) : (
-                persona.contactos.map((c) => (
+                contactos.map((c) => (
                   <div
                     key={c.id}
                     className={`flex items-center justify-between p-3 rounded-xl border text-sm ${
@@ -224,7 +276,7 @@ export function PersonaDetail({ personaId, onClose }) {
             {editMode ? (
               <>
                 <button
-                  onClick={() => setEditMode(false)}
+                  onClick={() => { setEditMode(false); setEditData(null); }}
                   className="flex-1 sm:flex-none px-4 py-2 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium"
                 >
                   Cancelar
@@ -239,7 +291,7 @@ export function PersonaDetail({ personaId, onClose }) {
               </>
             ) : (
               <button
-                onClick={() => setEditMode(true)}
+                onClick={handleEdit}
                 className="w-full sm:w-auto px-5 py-2 text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg transition-colors text-center"
               >
                 Editar
