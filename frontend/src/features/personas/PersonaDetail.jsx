@@ -6,6 +6,9 @@ import db from '../../db/schema';
 
 const prioridadLabel = (n) => ['Principal', 'Contacto 2', 'Contacto 3'][n - 1] ?? `C${n}`;
 
+// Centinela para diferenciar "cargando" (LOADING) de "no existe" (undefined)
+const LOADING = Symbol('loading');
+
 export function PersonaDetail({ personaId, onClose }) {
   const { updatePersona, deletePersona, addContacto, loading } = usePersonaStore();
   const [editMode, setEditMode] = useState(false);
@@ -16,9 +19,12 @@ export function PersonaDetail({ personaId, onClose }) {
   const [savingContact, setSavingContact] = useState(false);
 
   // ── Suscripción reactiva a Dexie: se actualiza automáticamente sin load() manual ──
+  // LOADING = estado inicial antes de que Dexie resuelva (evita falso cierre del modal)
+  // undefined = Dexie ya resolvió pero la persona no existe (fue eliminada)
   const persona = useLiveQuery(
     () => db.personas.get(personaId),
-    [personaId]
+    [personaId],
+    LOADING  // valor inicial mientras la query aún no ha resuelto
   );
 
   const contactos = useLiveQuery(
@@ -28,16 +34,18 @@ export function PersonaDetail({ personaId, onClose }) {
         .equals(personaId)
         .and(c => Boolean(c.activo))
         .sortBy('prioridad'),
-    [personaId]
+    [personaId],
+    LOADING
   );
 
   const encuesta = useLiveQuery(
     () => db.encuestas.where('persona_id').equals(personaId).first(),
-    [personaId]
+    [personaId],
+    LOADING
   );
 
-  // undefined = cargando, null = no existe (fue borrada)
-  if (persona === undefined) {
+  // Estado cargando: useLiveQuery aún no resolvió O Dexie está en medio de una transacción
+  if (persona === LOADING || contactos === LOADING) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50">
         <Loader2 size={32} className="text-white animate-spin" />
@@ -45,8 +53,8 @@ export function PersonaDetail({ personaId, onClose }) {
     );
   }
 
-  if (persona === null || !persona) {
-    // La persona fue eliminada; cerramos el modal limpiamente
+  // Persona no encontrada en Dexie (fue eliminada externamente)
+  if (!persona) {
     onClose();
     return null;
   }
