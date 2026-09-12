@@ -13,37 +13,54 @@ exports.addContacto = async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // 1. Verificar si el contacto ya existe para esta persona
+    // 1. Verificar si el contacto ya existe para esta persona (activo o inactivo)
     const [existentes] = await connection.query(
-      'SELECT id FROM contactos WHERE persona_id = ? AND valor = ?',
+      'SELECT id, prioridad, activo FROM contactos WHERE persona_id = ? AND valor = ?',
       [persona_id, valor]
     );
 
-    if (existentes.length > 0) {
+    const existente = existentes.length > 0 ? existentes[0] : null;
+
+    // Si ya existe, está activo y ya es prioridad 1, no hacer nada
+    if (existente && (existente.activo === 1 || existente.activo === true) && existente.prioridad === 1) {
       await connection.rollback();
-      return res.status(200).json({ status: 'success', message: 'El contacto ya existe. No hay cambios (Integridad garantizada).' });
+      return res.status(200).json({ status: 'success', message: 'El contacto ya es el principal.' });
     }
 
-    // 2. Desplazar prioridades existentes (1 -> 2, 2 -> 3)
+    const pExistente = (existente && (existente.activo === 1 || existente.activo === true))
+      ? existente.prioridad
+      : 999;
+
+    // 2. Rotar prioridades de los que estaban antes que él
     await connection.query(
-      'UPDATE contactos SET prioridad = prioridad + 1 WHERE persona_id = ? AND activo = true',
+      'UPDATE contactos SET prioridad = prioridad + 1 WHERE persona_id = ? AND (activo = 1 OR activo = true) AND prioridad < ?',
+      [persona_id, pExistente]
+    );
+
+    // 3. Desactivar los que pasaron de prioridad 3
+    await connection.query(
+      'UPDATE contactos SET activo = 0 WHERE persona_id = ? AND prioridad > 3',
       [persona_id]
     );
 
-    // 3. Desactivar (archivar) los que pasaron a prioridad > 3
-    await connection.query(
-      'UPDATE contactos SET activo = false WHERE persona_id = ? AND prioridad > 3',
-      [persona_id]
-    );
-
-    // 4. Insertar el nuevo contacto como el principal (prioridad = 1)
-    const [insertResult] = await connection.query(
-      'INSERT INTO contactos (persona_id, tipo, valor, prioridad, activo) VALUES (?, ?, ?, 1, true)',
-      [persona_id, tipo, valor]
-    );
+    // 4. Si existía, reactivarlo y ponerlo en 1; si no, insertarlo en 1
+    let contactoId;
+    if (existente) {
+      await connection.query(
+        'UPDATE contactos SET prioridad = 1, activo = 1, updated_at = NOW() WHERE id = ?',
+        [existente.id]
+      );
+      contactoId = existente.id;
+    } else {
+      const [insertResult] = await connection.query(
+        'INSERT INTO contactos (persona_id, tipo, valor, prioridad, activo) VALUES (?, ?, ?, 1, 1)',
+        [persona_id, tipo, valor]
+      );
+      contactoId = insertResult.insertId;
+    }
 
     await connection.commit();
-    res.status(201).json({ status: 'success', message: 'Contacto agregado y rotado exitosamente', id: insertResult.insertId });
+    res.status(201).json({ status: 'success', message: 'Contacto agregado y rotado exitosamente', id: contactoId });
   } catch (error) {
     await connection.rollback();
     res.status(500).json({ status: 'error', message: error.message });

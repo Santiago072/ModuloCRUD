@@ -4,7 +4,7 @@ export const ContactoRepository = {
   getByPersona: (personaId) =>
     db.contactos
       .where('persona_id').equals(personaId)
-      .and(c => c.activo === true)
+      .and(c => Boolean(c.activo))
       .sortBy('prioridad'),
 
   /** Algoritmo 5.2 — Rotación de prioridades */

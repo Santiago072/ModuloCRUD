@@ -89,7 +89,7 @@ export const PersonaRepository = {
     if (!persona) return null;
     const contactos = await db.contactos
       .where('persona_id').equals(id)
-      .and(c => c.activo === true)
+      .and(c => Boolean(c.activo))
       .sortBy('prioridad');
     
     const encuesta = await db.encuestas.where('persona_id').equals(id).first();
