@@ -148,16 +148,10 @@ export const PersonaRepository = {
         }
       }
 
-      // 1.5 Borrar localmente las que estaban sincronizadas pero ya no existen en el servidor
-      const serverCcSet = new Set(serverPersonas.map(p => p.cc));
-      const locales = await db.personas.toArray();
-      for (const loc of locales) {
-        if (loc.sync_status === 'synced' && !serverCcSet.has(loc.cc)) {
-          await db.contactos.where('persona_id').equals(loc.id).delete();
-          await db.encuestas.where('persona_id').equals(loc.id).delete();
-          await db.personas.delete(loc.id);
-        }
-      }
+      // NOTA: No borramos registros locales que no estén en el servidor.
+      // En un sistema offline-first, solo se elimina cuando el usuario lo hace
+      // explícitamente (sync_status: 'deleted'). Eliminar por ausencia en el pull
+      // causa pérdida de datos ante hard-reload o problemas de timing de red.
 
       // 2. Limpiar y recrear contactos usando los IDs locales
       if (serverContactos && serverContactos.length > 0) {
