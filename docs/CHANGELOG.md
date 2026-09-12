@@ -7,6 +7,24 @@ y este proyecto se adhiere al [Versionamiento Semántico](https://semver.org/lan
 
 ---
 
+## [v1.3.6] - 2026-09-11
+### Correcciones Críticas de Integridad Offline-First
+
+- **Eliminación de borrado destructivo en pull (syncFromServer):** Se eliminó la lógica que borraba registros locales si no aparecían en la respuesta del servidor durante un pull. Esta lógica causaba pérdida de datos al hacer `Ctrl+Shift+R` inmediatamente después de crear una encuesta (race condition entre el push inicial y el pull del reload). En una arquitectura offline-first, los registros solo se eliminan cuando el usuario lo hace explícitamente (`sync_status: 'deleted'`), nunca por ausencia en una consulta del servidor.
+- **Modal de detalle estabilizado con símbolo centinela `LOADING`:** Se corrigió el bug donde el modal de detalle (`PersonaDetail`) se cerraba solo al agregar un segundo contacto consecutivo. La causa raíz era que `useLiveQuery` retorna `undefined` transitoriamente durante transacciones activas de Dexie, y la condición `!persona` lo interpretaba como "persona eliminada". La solución usa `Symbol('loading')` como valor inicial del hook para distinguir: `LOADING` = cargando (mostrar spinner), `undefined/falsy` = no existe (cerrar modal).
+
+---
+
+## [v1.3.5] - 2026-09-11
+### Refactorización Reactiva del Modal de Detalle
+
+- **`PersonaDetail` migrado a `useLiveQuery`:** Se eliminó el patrón `useState` + `load()` manual que causaba una condición de carrera con el sync automático cada 15 segundos. Ahora el componente usa `useLiveQuery` directamente sobre Dexie para `persona`, `contactos` y `encuesta`, garantizando reactividad automática sin necesidad de recargas manuales.
+- **Spinner de guardado de contacto:** Se añadió indicador visual de carga al botón "Guardar" del formulario de nuevo contacto durante la operación de escritura en Dexie y push al servidor.
+- **Soporte de `Enter` en input de contacto:** El campo de nuevo número de contacto ahora acepta `Enter` para guardar directamente.
+- **Visualización del encuestador en detalle:** El nombre del encuestador asociado a la encuesta ahora aparece en el modal de detalle de persona.
+
+---
+
 ## [v1.3.4] - 2026-08-19
 ### Mejoras de Exportación y Compatibilidad Móvil
 

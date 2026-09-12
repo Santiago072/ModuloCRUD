@@ -61,11 +61,13 @@ El proyecto está completamente dockerizado para facilitar su despliegue en ento
 
 ---
 
-## 📅 Estado del Proyecto: Cloud Survey System v1.3.0 (Completado ✅)
+## 📅 Estado del Proyecto: Cloud Survey System v1.3.6 (Activo ✅)
 
-El sistema ha superado con éxito todas las fases de desarrollo y se encuentra en etapa de producción activa:
+El sistema ha superado con éxito todas las fases de desarrollo y se encuentra en etapa de producción activa con mejoras continuas:
 * **Fases 1 a 4:** Arquitectura Offline-First, Backend Node.js, y motor de sincronización proactivo completados (Versión Base).
 * **Fase 5:** Despliegue en VPS (Nginx + Let's Encrypt + Docker) 100% estable con SPA Routing.
 * **Actualización v1.1.0:** Integración de Panel Administrativo, Control de Accesos por JWT y selector dinámico offline.
 * **Actualización v1.2.0:** Gestión de Encuestas Total, motor de autocuración (Healing Script) de estadísticas, refactorización de layouts y sincronización local para administradores.
-* **Actualización v1.3.0 (Nueva):** Módulo de Seguridad Offline. Bloqueo por inactividad (Auto-Lock), autenticación criptográfica offline (SHA-256), indicador dinámico de red y sesión JWT extendida a 30 días para zonas sin conectividad.
+* **Actualización v1.3.0:** Módulo de Seguridad Offline. Bloqueo por inactividad (Auto-Lock), autenticación criptográfica offline (SHA-256), indicador dinámico de red y sesión JWT extendida a 30 días.
+* **Actualización v1.3.4:** Exportación Excel nativa con estilo (`.xlsx` vía ExcelJS), Web Share API en móviles y sincronización previa a exportación.
+* **Actualización v1.3.5 – v1.3.6 (Últimas):** Estabilidad crítica offline-first. Se migró `PersonaDetail` a `useLiveQuery` para reactividad automática eliminando condiciones de carrera. Se corrigió el cierre falso del modal con símbolo centinela `LOADING`. Se eliminó la lógica de borrado destructivo en el pull del servidor que causaba pérdida de encuestas recién creadas al hacer hard reload (`Ctrl+Shift+R`).
